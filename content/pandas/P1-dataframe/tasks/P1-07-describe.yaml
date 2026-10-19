@@ -1,0 +1,22 @@
+id: P1-07-describe
+type: dataframe
+title: Сводка по сумме
+difficulty: 1
+lesson_section: explore
+statement: |
+  Запиши в `result` сводную статистику колонки `amount` таблицы `orders` (количество, среднее, отклонение, минимум, квартили, максимум), округлённую до 2 знаков.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+reference: |
+  result = orders["amount"].describe().round(2)
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = orders.describe().round(2)"
+    expect_detector: columns_count
+hints:
+  - "Сводку даёт describe — раздел «Первый осмотр таблицы»."
+  - "Выбери колонку, вызови describe и округли результат."
+  - "orders[\"amount\"].describe().round(2)."
+  - "result = orders[\"amount\"].___().round(___)"
+  - "describe у Series возвращает Series с подписями count, mean, std, min, 25%, 50%, 75%, max. У всей таблицы describe вернул бы DataFrame по всем числовым колонкам. 50% — это медиана."

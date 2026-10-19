@@ -1,0 +1,7 @@
+code: M1
+title: Подготовка данных
+intro: train_test_split, кодирование категорий, масштабирование, пропуски и Pipeline — и как не допустить утечку.
+minutes: 35
+expected_tasks: 10
+packages: [numpy, pandas, scipy, scikit-learn]
+data: [churn]

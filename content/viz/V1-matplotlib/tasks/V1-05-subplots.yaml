@@ -1,0 +1,32 @@
+id: V1-05-subplots
+type: plot
+title: Два графика рядом
+difficulty: 2
+lesson_section: subplots
+statement: |
+  Построй фигуру из двух графиков в одну строку. Слева — линия числа заказов по месяцам (`resample("MS")`, все заказы), справа — линия среднего `amount` по месяцам. У каждого графика должен быть свой заголовок.
+setup: |
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  orders = pd.read_csv("orders.csv", parse_dates=["order_date"])
+plot:
+  labels: true
+reference: |
+  m = orders.resample("MS", on="order_date").agg(n=("order_id", "count"), check=("amount", "mean"))
+  fig, axes = plt.subplots(1, 2, figsize=(10, 3))
+  axes[0].plot(m.index, m["n"])
+  axes[0].set_title("Заказов в месяц")
+  axes[1].plot(m.index, m["check"])
+  axes[1].set_title("Средний чек")
+star3: [first_try]
+buggy_variants:
+  - code: "m = orders.resample('MS', on='order_date').agg(n=('order_id', 'count'), check=('amount', 'mean'))\nfig, ax = plt.subplots()\nax.plot(m.index, m['n'])\nax.plot(m.index, m['check'])\nax.set_title('Заказы и чек')"
+    expect_detector: plot_axes
+  - code: "m = orders.resample('MS', on='order_date').agg(n=('order_id', 'count'), check=('amount', 'mean'))\nfig, axes = plt.subplots(1, 2, figsize=(10, 3))\naxes[0].plot(m.index, m['check'])\naxes[0].set_title('Заказов в месяц')\naxes[1].plot(m.index, m['n'])\naxes[1].set_title('Средний чек')"
+    expect_detector: plot_data
+hints:
+  - "Сетка графиков — раздел «Несколько графиков»."
+  - "Посчитай оба показателя одним resample с agg, создай две оси через plt.subplots(1, 2) и нарисуй на каждой свою линию."
+  - "plt.subplots(1, 2), axes[0].plot(...), axes[1].plot(...), axes[i].set_title(...)."
+  - "m = orders.resample(\"MS\", on=\"order_date\").agg(n=(\"order_id\", \"count\"), check=(\"amount\", ___))\nfig, axes = plt.subplots(___, ___, figsize=(10, 3))\naxes[0].plot(m.index, m[\"n\"])\naxes[0].set_title(\"...\")\naxes[1].plot(m.index, m[\"check\"])\naxes[1].set_title(\"...\")"
+  - "Две величины разного масштаба на одних осях не читаются: сотни заказов и тысячи рублей. Поэтому — два графика рядом. Проверка сравнивает графики по порядку: левый, затем правый."

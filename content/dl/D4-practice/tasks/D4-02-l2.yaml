@@ -1,0 +1,35 @@
+id: D4-02-l2
+type: function
+function: l2
+title: Штраф L2
+difficulty: 1
+lesson_section: regularization
+tol: 1.0e-09
+statement: 'Напиши функцию `l2(weights, lam)`: `weights` — список матриц весов. Верни кортеж `(penalty, grads)`, где `penalty = λ/2 · Σ W²` по всем матрицам (число `float`), а `grads` — список градиентов штрафа `λ · W` в том же порядке.
+
+  '
+setup: "import numpy as np\n\ndef rnd(*shape, seed=0):\n    return np.random.default_rng(seed).normal(size=shape).round(3)\n"
+starter: "def l2(weights, lam):\n    pass\n"
+reference: "def l2(weights, lam):\n    penalty = float(lam / 2 * sum((W ** 2).sum() for W in weights))\n    return penalty, [lam * W for W in weights]\n"
+tests:
+  visible:
+  - l2([np.array([[1.0, -2.0], [0.5, 3.0]])], 0.1)
+  hidden:
+  - l2([rnd(3, 2, seed=1), rnd(2, 4, seed=2)], 0.01)
+  - l2([np.zeros((2, 2))], 1.0)
+  - l2([rnd(5, seed=3)], 0.0)
+random:
+  count: 10
+  gen: '(lambda s: f''l2([rnd({random.randint(1, 4)}, {random.randint(1, 4)}, seed={s}), rnd(3, seed={s + 1})], {random.choice([0.001, 0.1, 0.5])})'')(random.randint(0, 999))'
+star3:
+- first_try
+- max_lines:3
+buggy_variants:
+- code: "def l2(weights, lam):\n    penalty = float(lam * sum((W ** 2).sum() for W in weights))\n    return penalty, [lam * W for W in weights]"
+- code: "def l2(weights, lam):\n    penalty = float(lam / 2 * sum((W ** 2).sum() for W in weights))\n    return penalty, [2 * lam * W for W in weights]"
+hints:
+- Регуляризация — раздел «Регуляризация L2».
+- Сумма квадратов по каждой матрице, сложенная по всем матрицам и умноженная на λ/2; градиенты — списковое включение.
+- lam / 2 * sum((W ** 2).sum() for W in weights); [lam * W for W in weights].
+- "def l2(weights, lam):\n    penalty = float(lam / ___ * sum((W ** 2).sum() for W in weights))\n    return penalty, [___ * W for W in weights]"
+- Множитель 1/2 выбран, чтобы производная λ/2 · W² была ровно λ·W. Если поменять штраф, но не градиент, обучение будет оптимизировать не ту потерю, которую ты печатаешь.

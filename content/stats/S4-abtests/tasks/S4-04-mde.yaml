@@ -1,0 +1,31 @@
+id: S4-04-mde
+type: stat
+title: Какой эффект мы заметим
+difficulty: 3
+lesson_section: sample-size
+statement: |
+  В `exp_checkout` в группе A было `nA` участников, базовая конверсия — конверсия группы A. Найди минимальную конверсию группы B, которую тест такого размера (равные группы по `nA`) заметит с мощностью 0.8 при alpha = 0.05. Подсказка: размер эффекта Коэна `h = 2·asin(√p1) − 2·asin(√p0)`. Запиши `mde_abs = p1 − p0` (допуск ±0.0001).
+setup: |
+  import numpy as np
+  import pandas as pd
+  from statsmodels.stats.power import NormalIndPower
+  t = pd.read_csv("ab_metrics.csv").merge(pd.read_csv("ab_assignments.csv"), on=["user_id", "experiment"])
+outputs:
+  - var: mde_abs
+    tol: 0.0001
+reference: |
+  g = t[(t["experiment"] == "exp_checkout") & (t["group"] == "A")]["converted"]
+  nA, p0 = len(g), g.mean()
+  h = NormalIndPower().solve_power(nobs1=nA, alpha=0.05, power=0.8, ratio=1)
+  p1 = np.sin((h + 2 * np.arcsin(np.sqrt(p0))) / 2) ** 2
+  mde_abs = p1 - p0
+star3: [first_try, "max_lines:5"]
+buggy_variants:
+  - code: "g = t[(t['experiment'] == 'exp_checkout') & (t['group'] == 'A')]['converted']\nnA, p0 = len(g), g.mean()\nh = NormalIndPower().solve_power(nobs1=nA, alpha=0.05, power=0.8, ratio=1)\nmde_abs = h"
+    expect_detector: stat_value
+hints:
+  - "solve_power решает относительно незаданного параметра — раздел «Размер выборки»."
+  - "Передай nobs1, alpha и power, не задавая effect_size, — получишь минимальный h. Затем выведи p1 из формулы h через синус: p1 = sin((h + 2·asin(√p0)) / 2)²."
+  - "NormalIndPower().solve_power(nobs1=nA, alpha=0.05, power=0.8, ratio=1), np.sin(...) ** 2."
+  - "g = t[(t[\"experiment\"] == \"exp_checkout\") & (t[\"group\"] == \"A\")][\"converted\"]\nnA, p0 = len(g), g.___()\nh = NormalIndPower().solve_power(nobs1=___, alpha=0.05, power=0.8, ratio=1)\np1 = np.sin((h + 2 * np.arcsin(np.sqrt(p0))) / 2) ** ___\nmde_abs = p1 - p0"
+  - "h — это не доля, а нормированная величина, поэтому её нужно перевести обратно. MDE около 2 п. п. означает: эффект меньше этого тест, скорее всего, не увидит, даже если он есть."

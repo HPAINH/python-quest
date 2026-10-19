@@ -1,0 +1,31 @@
+id: C5-10-grades
+type: stdio
+title: Средние оценки
+difficulty: 2
+lesson_section: nested
+statement: |
+  В первой строке дано число записей `n`, дальше `n` строк `имя оценка`. Выведи для каждого ученика строку `имя средний_балл` со средним с двумя знаками после запятой. Ученики — в алфавитном порядке.
+reference: |
+  grades = {}
+  for _ in range(int(input())):
+      name, g = input().split()
+      grades.setdefault(name, []).append(int(g))
+  for name in sorted(grades):
+      print(f"{name} {sum(grades[name]) / len(grades[name]):.2f}")
+tests:
+  visible: ["4\nаня 5\nборис 3\nаня 4\nборис 4", "1\nвика 2"]
+  hidden: ["3\nz 5\na 1\nm 3", "2\nx 5\nx 4", "3\nБорис 5\nаня 3\nАня 4"]
+random:
+  count: 25
+  helpers: |
+    def gen():
+        k = random.randint(1, 12)
+        return str(k) + "\n" + "\n".join(f"{random.choice(['аня', 'борис', 'вика', 'глеб'])} {random.randint(1, 5)}" for _ in range(k))
+  gen: "gen()"
+star3: [first_try]
+hints:
+  - "Словарь списков — раздел «Вложенные структуры»."
+  - "Собери для каждого имени список его оценок. Потом пройди по именам в алфавитном порядке и выведи среднее."
+  - "grades.setdefault(name, []).append(int(g)), sorted(grades), sum / len, формат .2f."
+  - "grades = {}\nfor _ in range(int(input())):\n    name, g = input().split()\n    grades.setdefault(name, ___).append(int(g))\nfor name in ___(grades):\n    print(f\"{name} {sum(grades[name]) / len(grades[name]):___}\")"
+  - "sorted по словарю сортирует ключи. Заглавные буквы в Python идут раньше строчных, поэтому «Аня» и «Борис» окажутся перед «аня» — это ожидаемо, проверка использует ту же сортировку."

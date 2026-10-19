@@ -1,0 +1,22 @@
+id: P1-06-nunique
+type: value
+title: Активные клиенты
+difficulty: 1
+lesson_section: explore
+statement: |
+  Сколько разных клиентов сделали хотя бы один заказ? Запиши число в `result`.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+reference: |
+  result = orders["customer_id"].nunique()
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = orders['customer_id'].count()"
+  - code: "result = len(orders)"
+hints:
+  - "Число разных значений — nunique, раздел «Первый осмотр таблицы»."
+  - "Каждый заказ хранит id клиента. Клиенты повторяются, нужны только разные."
+  - "orders[\"customer_id\"].nunique()."
+  - "result = orders[\"customer_id\"].___()"
+  - "count() считает непустые значения — то есть все заказы, а не клиентов. len(orders) — тоже число заказов. nunique оставляет только уникальные id."

@@ -1,0 +1,6 @@
+code: N1
+title: Массивы
+intro: Массивы NumPy — поэлементная арифметика, тип элементов, форма, создание массивов и reshape.
+minutes: 25
+expected_tasks: 10
+packages: [numpy]

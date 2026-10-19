@@ -1,0 +1,52 @@
+id: V1-08-boss-dashboard
+type: plot
+title: "Босс: мини-дашборд"
+difficulty: 3
+boss: true
+lesson_section: subplots
+statement: |
+  Собери фигуру из двух графиков в одну строку.
+
+  1. Слева — столбцы выручки по отделам (`department` из `categories`) по позициям **доставленных** заказов, по убыванию. Выручка позиции — `quantity * unit_price * (1 - discount)`.
+  2. Справа — линия числа доставленных заказов по месяцам (`resample("MS")`).
+
+  У обоих графиков нужны заголовок и подписи обеих осей.
+setup: |
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  orders = pd.read_csv("orders.csv", parse_dates=["order_date"])
+  items = pd.read_csv("order_items.csv")
+  products = pd.read_csv("products.csv")
+  categories = pd.read_csv("categories.csv")
+plot:
+  labels: true
+  ordered: true
+reference: |
+  delivered = orders[orders["status"] == "delivered"]
+  items["revenue"] = items["quantity"] * items["unit_price"] * (1 - items["discount"])
+  t = items.merge(delivered[["order_id"]], on="order_id").merge(products[["product_id", "category_id"]], on="product_id")
+  t = t.merge(categories[["category_id", "department"]], on="category_id")
+  dep = t.groupby("department")["revenue"].sum().sort_values(ascending=False)
+  m = delivered.resample("MS", on="order_date").size()
+  fig, axes = plt.subplots(1, 2, figsize=(11, 4))
+  axes[0].bar(dep.index, dep.values)
+  axes[0].set_title("Выручка по отделам")
+  axes[0].set_xlabel("Отдел")
+  axes[0].set_ylabel("₽")
+  axes[1].plot(m.index, m.values)
+  axes[1].set_title("Доставленные заказы")
+  axes[1].set_xlabel("Месяц")
+  axes[1].set_ylabel("Заказов")
+  fig.tight_layout()
+star3: [first_try]
+buggy_variants:
+  - code: "items['revenue'] = items['quantity'] * items['unit_price'] * (1 - items['discount'])\nt = items.merge(products[['product_id', 'category_id']], on='product_id').merge(categories[['category_id', 'department']], on='category_id')\ndep = t.groupby('department')['revenue'].sum().sort_values(ascending=False)\ndelivered = orders[orders['status'] == 'delivered']\nm = delivered.resample('MS', on='order_date').size()\nfig, axes = plt.subplots(1, 2)\naxes[0].bar(dep.index, dep.values)\naxes[0].set_title('Отделы')\naxes[0].set_xlabel('Отдел')\naxes[0].set_ylabel('₽')\naxes[1].plot(m.index, m.values)\naxes[1].set_title('Заказы')\naxes[1].set_xlabel('Месяц')\naxes[1].set_ylabel('Заказов')"
+    expect_detector: plot_data
+  - code: "delivered = orders[orders['status'] == 'delivered']\nitems['revenue'] = items['quantity'] * items['unit_price'] * (1 - items['discount'])\nt = items.merge(delivered[['order_id']], on='order_id').merge(products[['product_id', 'category_id']], on='product_id').merge(categories[['category_id', 'department']], on='category_id')\ndep = t.groupby('department')['revenue'].sum().sort_values(ascending=False)\nm = delivered.resample('MS', on='order_date').size()\nfig, axes = plt.subplots(1, 2)\naxes[0].bar(dep.index, dep.values)\naxes[0].set_title('Отделы')\naxes[1].plot(m.index, m.values)\naxes[1].set_title('Заказы')"
+    expect_detector: plot_labels
+hints:
+  - "Всё из уровня: две оси через subplots, столбцы по убыванию, линия по месяцам, подписи на каждом графике."
+  - "Для левого графика оставь позиции доставленных заказов (merge с их order_id), доберись до отдела через товары и категории, сложи выручку по отделу и отсортируй. Для правого — resample по месяцам и size."
+  - "items.merge(delivered[[\"order_id\"]], on=\"order_id\"), merge с products и categories, groupby(\"department\")[\"revenue\"].sum().sort_values(ascending=False), delivered.resample(\"MS\", on=\"order_date\").size()."
+  - "delivered = orders[orders[\"status\"] == \"delivered\"]\nitems[\"revenue\"] = items[\"quantity\"] * items[\"unit_price\"] * (1 - items[\"discount\"])\nt = items.merge(delivered[[___]], on=\"order_id\").merge(products[[\"product_id\", \"category_id\"]], on=\"product_id\")\nt = t.merge(categories[[\"category_id\", \"department\"]], on=\"category_id\")\ndep = t.groupby(\"department\")[\"revenue\"].sum().sort_values(ascending=___)\nm = delivered.resample(\"MS\", on=\"order_date\").___()\nfig, axes = plt.subplots(1, 2, figsize=(11, 4))\naxes[0].bar(dep.index, dep.values)\n...\naxes[1].plot(m.index, m.values)\n..."
+  - "Без фильтра по доставленным в выручку отделов попали бы отменённые и возвращённые заказы. Подписи нужны на каждом графике отдельно: set_title и set_xlabel одних осей не переносятся на соседние."

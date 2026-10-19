@@ -1,0 +1,28 @@
+id: C0-01-sum
+type: stdio
+title: Сумма двух чисел
+difficulty: 1
+lesson_section: input
+statement: |
+  На вход подаются два целых числа, каждое на своей строке. Выведи их сумму.
+starter: |
+  a = input()
+  b = input()
+reference: |
+  a = int(input())
+  b = int(input())
+  print(a + b)
+tests:
+  visible: ["2\n3", "-10\n4"]
+  hidden: ["0\n0", "1000000\n1", "-5\n-7"]
+random: {count: 20, gen: "f'{random.randint(-1000, 1000)}\\n{random.randint(-1000, 1000)}'"}
+star3: [first_try]
+buggy_variants:
+  - code: "a = input()\nb = input()\nprint(a + b)"
+    expect_detector: input_no_int
+hints:
+  - "Это задача на ввод чисел — раздел урока «Ввод: input»."
+  - "Прочитай каждую строку, переведи её в целое число, сложи и выведи результат."
+  - "Нужны input(), int() и print()."
+  - "a = int(___)\nb = ___\nprint(___)"
+  - "int(input()) читает строку и сразу превращает её в число. Без int() строки «2» и «3» склеились бы в «23». print(a + b) выводит сумму."

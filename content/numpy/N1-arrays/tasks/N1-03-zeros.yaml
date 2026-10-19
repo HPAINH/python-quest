@@ -1,0 +1,27 @@
+id: N1-03-zeros
+type: array
+title: Пустой план продаж
+difficulty: 1
+lesson_section: create
+dtype: strict
+statement: |
+  Заготовь таблицу плана продаж: `stores` магазинов (строки) на `days` дней (столбцы), заполненную **целыми** нулями. Запиши её в `result`. Тип элементов должен быть целым.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  stores = int(rng.integers(2, 9))
+  days = int(rng.integers(5, 15))
+reference: |
+  result = np.zeros((stores, days), dtype=int)
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = np.zeros((stores, days))"
+    expect_detector: array_dtype
+  - code: "result = np.zeros((days, stores), dtype=int)"
+    expect_detector: axis_confusion
+hints:
+  - "Нули создаёт np.zeros, а тип задаёт параметр dtype — раздел «Создание массивов»."
+  - "Форма передаётся кортежем (строки, столбцы). По умолчанию zeros создаёт дробные нули, а нужны целые."
+  - "np.zeros((stores, days), dtype=int)."
+  - "result = np.zeros((___, ___), dtype=___)"
+  - "Без dtype=int массив будет float64 — значения те же, но тип другой, а в этой задаче тип проверяется строго. Порядок осей важен: первая — строки (магазины), вторая — столбцы (дни)."

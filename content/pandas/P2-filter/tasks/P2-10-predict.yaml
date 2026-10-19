@@ -1,0 +1,25 @@
+id: P2-10-predict
+type: predict
+title: Сортировка и выборка
+difficulty: 2
+lesson_section: sort
+statement: |
+  Впиши, что выведет программа.
+code: |
+  import pandas as pd
+  df = pd.DataFrame({
+      "id": [101, 102, 103, 104, 105],
+      "city": ["Казань", "Москва", "Казань", "Самара", "Москва"],
+      "amount": [990, 450, 990, 1290, 300],
+  })
+  top = df.sort_values(["amount", "id"], ascending=[False, False])
+  print(top["id"].tolist())
+  print(top.iloc[0]["city"], top.index[0])
+  print(df.loc[df["city"].isin(["Москва", "Самара"]), "amount"].sum())
+  print(df.query("amount < 1000 and city != 'Москва'")["id"].tolist())
+hints:
+  - "Повтори sort_values, iloc и isin — разделы «Сортировка», «loc и iloc» и «Фильтры»."
+  - "При равных суммах 990 порядок решает id по убыванию. После сортировки индекс сохраняет старые подписи."
+  - "Первая строка top — заказ с суммой 1290. Его подпись в исходной таблице — 3."
+  - "Четыре строки: список id, город и подпись, одно число, список id."
+  - "Ответ: «[104, 103, 101, 102, 105]», «Самара 3», «2040», «[101, 103]». Москва и Самара: 450 + 1290 + 300 = 2040."

@@ -1,0 +1,26 @@
+id: P3-02-fillna
+type: dataframe
+title: Город «не указан»
+difficulty: 1
+lesson_section: missing
+sql_quest_ref: COALESCE
+statement: |
+  Запиши в `result` таблицу с колонками `customer_id` и `city`, где вместо пропусков в городе стоит строка `не указан`. Все клиенты, исходный порядок.
+setup: |
+  import pandas as pd
+  customers = pd.read_csv("customers.csv")
+reference: |
+  customers["city"] = customers["city"].fillna("не указан")
+  result = customers[["customer_id", "city"]]
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "customers['city'].fillna('не указан')\nresult = customers[['customer_id', 'city']]"
+    expect_detector: column_values
+  - code: "result = customers.dropna(subset=['city'])[['customer_id', 'city']]"
+    expect_detector: shape_rows
+hints:
+  - "Заполнение пропусков — fillna, раздел «Пропуски»."
+  - "fillna возвращает новую колонку — запиши её обратно в таблицу или собери результат из неё."
+  - "customers[\"city\"] = customers[\"city\"].fillna(\"не указан\")."
+  - "customers[\"city\"] = customers[\"city\"].___(\"не указан\")\nresult = customers[[\"customer_id\", ___]]"
+  - "Методы pandas почти никогда не меняют таблицу сами — без присваивания заполненная колонка теряется. dropna убрал бы клиентов без города вместо того, чтобы их подписать."

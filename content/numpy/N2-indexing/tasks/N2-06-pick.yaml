@@ -1,0 +1,23 @@
+id: N2-06-pick
+type: array
+title: Цены по корзине
+difficulty: 1
+lesson_section: slicing2d
+statement: |
+  `catalog` — цены всех товаров, индекс массива — номер товара. `basket` — список номеров товаров в корзине (могут повторяться). Запиши в `result` цены товаров корзины в её порядке.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  catalog = np.round(rng.uniform(50, 3000, size=40), 2)
+  basket = [int(x) for x in rng.integers(0, 40, size=int(rng.integers(3, 9)))]
+reference: |
+  result = catalog[basket]
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = catalog[basket[0]:basket[-1]]"
+hints:
+  - "Выбор по списку индексов — раздел «Двумерные массивы», абзац про список индексов."
+  - "Массив можно проиндексировать списком номеров — получится массив выбранных элементов в том же порядке."
+  - "catalog[basket]."
+  - "result = catalog[___]"
+  - "Индексация списком возвращает по элементу на каждый номер, повторы тоже сохраняются. Цикл с append сделал бы то же, но медленнее и длиннее."

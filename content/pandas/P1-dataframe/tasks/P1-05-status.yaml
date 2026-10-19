@@ -1,0 +1,24 @@
+id: P1-05-status
+type: dataframe
+title: Статусы заказов
+difficulty: 1
+lesson_section: explore
+statement: |
+  Посчитай, сколько заказов в каждом статусе. Запиши в `result` Series: индекс — статус, значение — число заказов.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+reference: |
+  result = orders["status"].value_counts()
+sql_quest_ref: GROUP BY с COUNT
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = orders['status'].unique()"
+    expect_detector: result_type
+  - code: "result = orders['channel'].value_counts()"
+hints:
+  - "Частоты значений считает value_counts — раздел «Первый осмотр таблицы»."
+  - "Выбери колонку статуса и посчитай частоты её значений."
+  - "orders[\"status\"].value_counts()."
+  - "result = orders[\"___\"].___()"
+  - "value_counts возвращает Series: подписи — значения колонки, числа — частоты, отсортированные по убыванию. unique вернул бы только список статусов без количеств. В SQL то же самое — SELECT status, COUNT(*) ... GROUP BY status."

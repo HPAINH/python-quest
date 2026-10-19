@@ -1,0 +1,35 @@
+id: V3-02-sources
+type: plot
+title: Какой источник лучше
+difficulty: 2
+lesson_section: compare
+statement: |
+  Вопрос маркетолога: «Из какого источника пользователи чаще становятся покупателями?» Для каждого `source` из `users.csv` посчитай долю пользователей с хотя бы одной покупкой и построй подходящий график: самый конверсионный источник — первым слева. Нужны заголовок и подпись оси Y.
+setup: |
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  import seaborn as sns
+  users = pd.read_csv("users.csv")
+  events = pd.read_csv("events.csv")
+plot:
+  labels: true
+  ordered: true
+reference: |
+  buyers = events.loc[events["event"] == "purchase", "user_id"].unique()
+  conv = users.assign(buyer=users["user_id"].isin(buyers)).groupby("source")["buyer"].mean().sort_values(ascending=False)
+  fig, ax = plt.subplots()
+  ax.bar(conv.index, conv.values)
+  ax.set_title("Доля покупателей по источнику")
+  ax.set_ylabel("доля")
+star3: [first_try]
+buggy_variants:
+  - code: "buyers = events.loc[events['event'] == 'purchase', 'user_id'].unique()\nconv = users.assign(buyer=users['user_id'].isin(buyers)).groupby('source')['buyer'].mean()\nfig, ax = plt.subplots()\nax.bar(conv.index, conv.values)\nax.set_title('Конверсия')\nax.set_ylabel('доля')"
+    expect_detector: plot_order
+  - code: "buyers = events.loc[events['event'] == 'purchase', 'user_id'].unique()\nconv = users.assign(buyer=users['user_id'].isin(buyers)).groupby('source')['buyer'].mean().sort_values(ascending=False)\nfig, ax = plt.subplots()\nax.pie(conv.values, labels=conv.index)\nax.set_title('Конверсия')"
+    expect_detector: plot_kind
+hints:
+  - "Сравнение групп — раздел «Сравнение»."
+  - "Отметь покупателей булевой колонкой, возьми среднее по источнику, отсортируй по убыванию и нарисуй столбцы."
+  - "users[\"user_id\"].isin(buyers), groupby(\"source\")[\"buyer\"].mean().sort_values(ascending=False), ax.bar(...)."
+  - "buyers = events.loc[events[\"event\"] == \"purchase\", \"user_id\"].unique()\nconv = users.assign(buyer=users[\"user_id\"].isin(buyers)).groupby(\"source\")[\"buyer\"].mean().sort_values(ascending=___)\nfig, ax = plt.subplots()\nax.___(conv.index, conv.values)\nax.set_title(\"...\")\nax.set_ylabel(\"...\")"
+  - "Доли конверсии не складываются в целое, поэтому круговая диаграмма здесь не просто неудобна, а неверна по смыслу. Сортировка отвечает на вопрос «кто лучше» без чтения подписей."

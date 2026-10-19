@@ -1,0 +1,24 @@
+id: P7-05-cohort-size
+type: dataframe
+title: Размер когорт
+difficulty: 1
+lesson_section: cohorts
+statement: |
+  Запиши в `result` число пользователей в каждой месячной когорте регистрации: колонки `cohort` (строка вида `2026-03`) и `users`, по возрастанию когорты.
+setup: |
+  import pandas as pd
+  users = pd.read_csv("users.csv", parse_dates=["signup_date"])
+reference: |
+  users["cohort"] = users["signup_date"].dt.to_period("M").astype(str)
+  result = users.groupby("cohort")["user_id"].nunique().reset_index(name="users")
+ordered: true
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "users['cohort'] = users['signup_date'].dt.month.astype(str)\nresult = users.groupby('cohort')['user_id'].nunique().reset_index(name='users')"
+    expect_detector: column_values
+hints:
+  - "Когорта по месяцу — раздел «Когорты»."
+  - "Переведи дату регистрации в месяц через to_period(\"M\"), сделай строкой и посчитай пользователей в каждой когорте."
+  - "users[\"signup_date\"].dt.to_period(\"M\").astype(str), groupby(\"cohort\")[\"user_id\"].nunique()."
+  - "users[\"cohort\"] = users[\"signup_date\"].dt.to_period(___).astype(str)\nresult = users.groupby(\"cohort\")[\"user_id\"].___().reset_index(name=\"users\")"
+  - "Номер месяца без года смешал бы когорты разных лет. Строка 2026-03 сортируется правильно, потому что год идёт первым."

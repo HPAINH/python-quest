@@ -1,0 +1,31 @@
+id: C6-07-fix-default
+type: fix_bug
+base: function
+function: add_tag
+title: Исправь копящиеся теги
+difficulty: 2
+lesson_section: mistakes
+statement: |
+  Функция `add_tag(tag, tags=...)` должна вернуть список тегов с добавленным `tag`. Если список не передан, функция возвращает новый список из одного тега.
+
+  Сейчас вызовы без списка «помнят» теги друг друга: второй вызов `add_tag("sale")` вернёт `["new", "sale"]`. Исправь баг.
+starter: |
+  def add_tag(tag, tags=[]):
+      tags.append(tag)
+      return tags
+reference: |
+  def add_tag(tag, tags=None):
+      if tags is None:
+          tags = []
+      tags.append(tag)
+      return tags
+tests:
+  visible: ["add_tag('new')", "add_tag('new')\nadd_tag('sale')"]
+  hidden: ["add_tag('a', ['b'])", "add_tag('x')\nadd_tag('y')\nadd_tag('z')", "t = ['q']\nadd_tag('w', t)\nt", "add_tag('vip', [])"]
+star3: [first_try]
+hints:
+  - "Это ошибка из раздела «Частые ошибки»: изменяемое значение по умолчанию."
+  - "Список по умолчанию создаётся один раз при определении функции и переживает вызовы. Новый пустой список нужно создавать внутри функции при каждом вызове."
+  - "tags=None в def и if tags is None: tags = [] внутри."
+  - "def add_tag(tag, tags=___):\n    if tags is ___:\n        tags = []\n    tags.append(tag)\n    return tags"
+  - "None — неизменяемый маркер «список не передали». Проверка is None создаёт свежий список при каждом вызове без аргумента. Если список передали, функция по-прежнему дописывает в него: так и задумано."

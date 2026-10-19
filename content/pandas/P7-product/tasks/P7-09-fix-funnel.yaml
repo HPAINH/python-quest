@@ -1,0 +1,26 @@
+id: P7-09-fix-funnel
+type: fix_bug
+base: value
+title: Исправь воронку из отчёта
+difficulty: 2
+lesson_section: mistakes
+statement: |
+  Коллега считает конверсию из просмотра в покупку — долю пользователей с покупкой среди пользователей с просмотром — и получает подозрительно маленькое число. Найди ошибку. В `result` — доля, округлённая до 4 знаков.
+setup: |
+  import pandas as pd
+  events = pd.read_csv("events.csv")
+starter: |
+  views = (events["event"] == "view").sum()
+  buys = (events["event"] == "purchase").sum()
+  result = round(buys / views, 4)
+reference: |
+  views = events.loc[events["event"] == "view", "user_id"].nunique()
+  buys = events.loc[events["event"] == "purchase", "user_id"].nunique()
+  result = round(buys / views, 4)
+star3: [first_try, "max_lines:3"]
+hints:
+  - "Типичные ошибки воронки — раздел «Частые ошибки»."
+  - "Код делит число событий на число событий. Просмотров у каждого человека много, поэтому доля маленькая. Нужно делить людей на людей."
+  - "events.loc[events[\"event\"] == \"view\", \"user_id\"].nunique()."
+  - "views = events.loc[events[\"event\"] == \"view\", ___].nunique()\nbuys = events.loc[events[\"event\"] == ___, \"user_id\"].nunique()\nresult = round(buys / views, 4)"
+  - "Конверсия по событиям — «покупок на просмотр», а не «доля покупателей». Обе метрики бывают полезны, но в отчёте должно быть ясно, какая из них посчитана."

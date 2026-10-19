@@ -1,0 +1,97 @@
+quiz:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      nums = [4, 1, 3]
+      nums.append(2)
+      print(sorted(nums), nums[-1])
+    answer: "[1, 2, 3, 4] 2"
+    explain: append добавляет 2 в конец. sorted возвращает новый отсортированный список, а nums остаётся в прежнем порядке, поэтому nums[-1] — это 2.
+    section: list-methods
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      nums = [3, 1, 2]
+      nums = nums.sort()
+      print(nums)
+    answer: "None"
+    explain: sort сортирует на месте и возвращает None. Присваивание nums = nums.sort() записывает в nums именно None.
+    section: list-methods
+  - type: fill
+    q: Впиши пропуск, чтобы программа вывела [1, 9, 25] — квадраты нечётных чисел.
+    code: |
+      nums = [1, 2, 3, 4, 5]
+      print([x * x for x in nums if ___])
+    answer: ["x % 2 == 1", "x % 2 != 0", "x % 2"]
+    expect: "[1, 9, 25]"
+    explain: Условие в генераторе оставляет только нечётные x.
+    section: comprehension
+  - type: choice
+    q: Чем return отличается от print внутри функции?
+    options: ["Ничем, это синонимы", "return отдаёт значение тому, кто вызвал функцию, а print только показывает его на экране", "print работает быстрее", "return можно писать только один раз в программе"]
+    answer: 1
+    explain: Проверка задач берёт значение, которое вернула функция. Если функция только печатает, она возвращает None.
+    section: def-basics
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      words = ["kiwi", "fig", "banana"]
+      print(sorted(words, key=len))
+    answer: "['fig', 'kiwi', 'banana']"
+    explain: key=len сортирует по длине — 3, 4, 6.
+    section: sorting
+
+express:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      a = [1, 2, 3]
+      b = a
+      b.append(4)
+      print(len(a))
+    answer: "4"
+    explain: b = a не копирует список, а даёт ему второе имя. Изменение через b видно и через a.
+    section: list-methods
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      items = [("b", 2), ("a", 2), ("c", 1)]
+      print(sorted(items, key=lambda t: (-t[1], t[0])))
+    answer: "[('a', 2), ('b', 2), ('c', 1)]"
+    explain: Сначала по убыванию второго поля, при равенстве — по алфавиту первого.
+    section: sorting
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      def f(x):
+          if x > 0:
+              return "плюс"
+          return "не плюс"
+          print("конец")
+      print(f(5), f(-1))
+    answer: "плюс не плюс"
+    explain: return сразу завершает функцию, поэтому print("конец") не выполняется никогда.
+    section: def-basics
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      m = [[1, 2], [3, 4], [5, 6]]
+      print([row[1] for row in m])
+    answer: "[2, 4, 6]"
+    explain: Генератор берёт второй элемент каждой строки вложенного списка.
+    section: comprehension
+  - type: choice
+    q: Что произойдёт при point = (3, 4); point[0] = 5?
+    options: ["point станет (5, 4)", "TypeError — кортеж неизменяемый", "point станет [5, 4]", "Ничего"]
+    answer: 1
+    explain: Кортежи, как и строки, менять нельзя.
+    section: tuples
+  - type: fill
+    q: Впиши пропуск, чтобы программа вывела [3, 2, 1].
+    code: |
+      nums = [2, 3, 1]
+      print(sorted(nums, ___))
+    answer: ["reverse=True"]
+    expect: "[3, 2, 1]"
+    explain: reverse=True сортирует по убыванию.
+    section: sorting

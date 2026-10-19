@@ -1,0 +1,31 @@
+id: C6-13-counter
+type: function
+function: make_counter
+title: Счётчик с памятью
+difficulty: 3
+lesson_section: scope
+statement: |
+  Напиши функцию `make_counter(start=0, step=1)`, которая возвращает **функцию без аргументов**. Каждый вызов этой функции возвращает следующее значение счётчика: `start + step`, `start + 2·step` и так далее. Разные счётчики не влияют друг на друга.
+starter: |
+  def make_counter(start=0, step=1):
+      pass
+reference: |
+  def make_counter(start=0, step=1):
+      value = start
+      def tick():
+          nonlocal value
+          value += step
+          return value
+      return tick
+tests:
+  visible: ["c = make_counter()\n[c(), c(), c()]", "c = make_counter(10, 5)\n[c(), c()]"]
+  hidden: ["a = make_counter()\nb = make_counter(100)\n[a(), b(), a(), b()]", "c = make_counter(step=-2)\n[c() for _ in range(4)]", "c = make_counter(0, 0)\n[c(), c()]"]
+star3: [first_try]
+buggy_variants:
+  - code: "def make_counter(start=0, step=1):\n    value = start\n    def tick():\n        return value + step\n    return tick"
+hints:
+  - "Изменить переменную внешней функции помогает nonlocal — раздел «Области видимости»."
+  - "Внутри make_counter заведи переменную с текущим значением и вложенную функцию. Вложенная функция увеличивает значение на step и возвращает его. make_counter возвращает вложенную функцию, не вызывая её."
+  - "value = start, def tick(): nonlocal value; value += step; return value, return tick."
+  - "def make_counter(start=0, step=1):\n    value = start\n    def tick():\n        ___ value\n        value += ___\n        return value\n    return ___"
+  - "Каждый вызов make_counter создаёт свою переменную value, поэтому счётчики независимы. Без nonlocal строка value += step пыталась бы изменить локальную переменную, которой ещё нет, — UnboundLocalError. Это замыкание: функция помнит переменные места, где её создали."

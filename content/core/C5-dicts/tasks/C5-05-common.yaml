@@ -1,0 +1,25 @@
+id: C5-05-common
+type: stdio
+title: Общие товары
+difficulty: 1
+lesson_section: sets
+statement: |
+  Даны две строки — артикулы товаров (целые числа) в двух каталогах через пробел. Выведи через пробел по возрастанию артикулы, которые есть в обоих каталогах. Если общих нет, выведи `нет`.
+reference: |
+  a = set(map(int, input().split()))
+  b = set(map(int, input().split()))
+  common = sorted(a & b)
+  print(*common if common else ["нет"])
+tests:
+  visible: ["1 5 3 9\n3 4 5", "1 2\n3 4"]
+  hidden: ["10\n10", "1 1 2\n2 2 1", "100 -5 7\n-5 100 8", "1 2 3\n4 5 6"]
+random: {count: 20, gen: "' '.join(str(random.randint(0, 12)) for _ in range(random.randint(1, 8))) + '\\n' + ' '.join(str(random.randint(0, 12)) for _ in range(random.randint(1, 8)))"}
+star3: [first_try]
+buggy_variants:
+  - code: "a = set(input().split())\nb = set(input().split())\ncommon = sorted(a & b)\nprint(*common if common else ['нет'])"
+hints:
+  - "Общие элементы — это пересечение множеств, раздел «Множества»."
+  - "Сделай из каждой строки множество чисел, возьми пересечение и отсортируй."
+  - "set(map(int, ...)), оператор &, sorted, print(*...)."
+  - "a = set(map(int, input().split()))\nb = set(map(int, input().split()))\ncommon = sorted(a ___ b)\nif common:\n    print(*common)\nelse:\n    print(___)"
+  - "Множество не хранит порядок, поэтому результат сортируют. Числа нужно перевести в int до сортировки: строки «100» и «7» отсортируются как текст, и «100» встанет раньше «7»."

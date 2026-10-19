@@ -1,0 +1,23 @@
+id: S4-08-predict
+type: predict
+title: Мощность и поправки
+difficulty: 2
+lesson_section: multiple
+statement: |
+  Впиши, что выведет программа.
+code: |
+  import math
+  from statsmodels.stats.multitest import multipletests
+  from statsmodels.stats.proportion import proportions_ztest
+  r = multipletests([0.04, 0.01, 0.5], method="bonferroni")
+  print(r[0].tolist(), r[1].round(2).tolist())
+  z, p = proportions_ztest([50, 50], [500, 500])
+  print(z, p)
+  print(math.ceil(3834.6), 2 * math.ceil(3834.6))
+  print(round(1 - (1 - 0.05) ** 10, 3))
+hints:
+  - "Повтори разделы «Множественные сравнения» и «Размер выборки»."
+  - "Бонферрони умножает каждый p-value на 3 и обрезает сверху единицей."
+  - "Одинаковые доли дают z = 0 и p = 1. Вероятность хотя бы одной ложной тревоги из 10 независимых тестов — 1 − 0,95¹⁰."
+  - "Четыре строки: два списка, два числа, два целых, одно число."
+  - "Ответ: «[False, True, False] [0.12, 0.03, 1.0]», «0.0 1.0», «3835 7670», «0.401»."

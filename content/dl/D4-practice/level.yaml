@@ -1,0 +1,7 @@
+code: D4
+title: Практика нейросетей
+intro: Инициализация He, L2 и dropout, оптимизатор Adam и своя сеть против MLPClassifier на данных оттока.
+minutes: 35
+expected_tasks: 6
+packages: [numpy, pandas, scipy, scikit-learn]
+data: [churn]

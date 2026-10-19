@@ -1,0 +1,36 @@
+id: D4-01-he-init
+type: function
+function: he_init
+title: Инициализация He
+difficulty: 1
+lesson_section: init
+tol: 1.0e-12
+statement: 'Напиши функцию `he_init(n_in, n_out, seed)` — матрица весов формы `(n_in, n_out)` из нормального распределения со средним 0 и стандартным отклонением `√(2 / n_in)`. Используй `np.random.default_rng(seed).normal(...)` одним вызовом.
+
+  '
+setup: "import numpy as np\n\ndef rnd(*shape, seed=0):\n    return np.random.default_rng(seed).normal(size=shape).round(3)\n"
+starter: "def he_init(n_in, n_out, seed):\n    pass\n"
+reference: "def he_init(n_in, n_out, seed):\n    return np.random.default_rng(seed).normal(0, np.sqrt(2 / n_in), (n_in, n_out))\n"
+tests:
+  visible:
+  - he_init(2, 3, 0)
+  - he_init(8, 1, 1)
+  hidden:
+  - he_init(1, 1, 2)
+  - he_init(50, 4, 3)
+  - he_init(3, 5, 4)
+random:
+  count: 15
+  gen: f'he_init({random.randint(1, 30)}, {random.randint(1, 6)}, {random.randint(0, 999)})'
+star3:
+- first_try
+- max_lines:2
+buggy_variants:
+- code: "def he_init(n_in, n_out, seed):\n    return np.random.default_rng(seed).normal(0, 2 / n_in, (n_in, n_out))"
+- code: "def he_init(n_in, n_out, seed):\n    return np.random.default_rng(seed).normal(0, np.sqrt(2 / n_out), (n_in, n_out))"
+hints:
+- Инициализация — раздел «Инициализация».
+- Второй аргумент normal — стандартное отклонение, а не дисперсия; в формуле число входов слоя.
+- np.random.default_rng(seed).normal(0, np.sqrt(2 / n_in), (n_in, n_out)).
+- "def he_init(n_in, n_out, seed):\n    return np.random.default_rng(seed).normal(0, np.sqrt(2 / ___), (n_in, ___))"
+- 'Дисперсия 2/n_in компенсирует то, что ReLU обнуляет половину сигнала: тогда разброс активаций не растёт и не затухает от слоя к слою.'

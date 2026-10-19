@@ -1,0 +1,80 @@
+quiz:
+  - type: choice
+    q: Что такое MDE?
+    options: ["Максимальный эффект теста", "Минимальный эффект, который тест должен заметить с заданной мощностью", "Средняя разница групп", "Уровень значимости"]
+    answer: 1
+    explain: MDE задают до теста — от него зависит размер выборки.
+    section: design
+  - type: choice
+    q: Нужно заметить эффект вдвое меньше. Как изменится выборка?
+    options: ["Вдвое больше", "Примерно вчетверо больше", "Не изменится", "Вдвое меньше"]
+    answer: 1
+    explain: Размер выборки обратно пропорционален квадрату эффекта.
+    section: sample-size
+  - type: choice
+    q: В тесте 50/50 в группе A 10 300 человек, в B — 9 700, SRM p-value = 0,00002. Что делать?
+    options: ["Анализировать как обычно", "Не доверять результату и искать ошибку в сплите или логировании", "Отбросить лишних из A", "Объединить группы"]
+    answer: 1
+    explain: SRM означает, что группы несопоставимы.
+    section: srm
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      from statsmodels.stats.multitest import multipletests
+      r = multipletests([0.01, 0.02, 0.3], method="bonferroni")
+      print(r[0].tolist(), r[1].round(2).tolist())
+    answer: "[True, False, False] [0.03, 0.06, 0.9]"
+    explain: Бонферрони умножает каждый p-value на число тестов.
+    section: multiple
+  - type: choice
+    q: Почему нельзя остановить тест в первый день, когда p < 0,05?
+    options: ["Мало данных для графика", "Многократные проверки резко увеличивают долю ложных открытий", "statsmodels это запрещает", "Можно"]
+    answer: 1
+    explain: Длительность фиксируют заранее.
+    section: peeking
+
+express:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      from statsmodels.stats.proportion import proportions_ztest
+      z, p = proportions_ztest([100, 100], [1000, 1000])
+      print(z, p)
+    answer: "0.0 1.0"
+    explain: Одинаковые доли — статистика 0, p-value 1.
+    section: analysis
+  - type: choice
+    q: "solve_power(effect_size=h, alpha=0.05, power=0.8) вернул 3 835. Что это?"
+    options: ["Размер всего теста", "Размер каждой группы", "Число конверсий", "Длительность в днях"]
+    answer: 1
+    explain: nobs1 — размер первой группы; при ratio=1 вторая такая же.
+    section: sample-size
+  - type: choice
+    q: Интервал для разницы конверсий B − A — [0,8 п. п.; 4,1 п. п.]. Какой вывод?
+    options: ["Эффекта нет", "Эффект положительный и значимый", "Эффект отрицательный", "Нужен SRM"]
+    answer: 1
+    explain: Весь интервал выше нуля.
+    section: analysis
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      from scipy import stats
+      print(round(stats.chisquare([5000, 5000]).pvalue, 3), stats.chisquare([5300, 4700]).pvalue < 0.001)
+    answer: "1.0 True"
+    explain: Перекос 53/47 на 10 000 человек — явный SRM.
+    section: srm
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      from statsmodels.stats.multitest import multipletests
+      r = multipletests([0.01, 0.04, 0.03], method="holm")
+      print(r[0].tolist(), r[1].round(2).tolist())
+    answer: "[True, False, False] [0.03, 0.06, 0.06]"
+    explain: Холм умножает наименьший p на 3, следующий — на 2, и так далее, сохраняя порядок.
+    section: multiple
+  - type: choice
+    q: Что входит в решение о выкатке по главной метрике?
+    options: ["Только p < 0,05", "Нет SRM, эффект значим и направлен в нужную сторону", "Только рост метрики", "Мнение команды"]
+    answer: 1
+    explain: Значимое падение — тоже «значимо».
+    section: mistakes

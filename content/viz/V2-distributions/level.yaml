@@ -1,0 +1,7 @@
+code: V2
+title: Распределения и связи
+intro: Гистограмма, ящик с усами, точечный график, корреляции и seaborn — смотрим на форму данных, а не только на среднее.
+minutes: 25
+expected_tasks: 8
+packages: [numpy, pandas, matplotlib, seaborn]
+data: [core]

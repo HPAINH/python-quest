@@ -1,0 +1,24 @@
+id: C3-01-first-last
+type: stdio
+title: Первый и последний
+difficulty: 1
+lesson_section: indexes
+statement: |
+  Дана непустая строка. Выведи через пробел её первый символ, последний символ и длину.
+reference: |
+  s = input()
+  print(s[0], s[-1], len(s))
+tests:
+  visible: ["ShopData", "x"]
+  hidden: ["ab", "Привет, мир", "12345"]
+random: {count: 15, gen: "''.join(random.choice('abcdefXYZ09') for _ in range(random.randint(1, 20)))"}
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "s = input()\nprint(s[1], s[len(s)], len(s))"
+    expect_detector: index_error
+hints:
+  - "Индексы и длина — раздел «Индексы»."
+  - "Первый символ имеет индекс 0, последний удобно взять отрицательным индексом, длину даёт len."
+  - "s[0], s[-1], len(s)."
+  - "s = input()\nprint(s[___], s[___], len(___))"
+  - "Счёт индексов идёт с нуля, поэтому s[0] — первый символ. s[-1] — последний, это то же, что s[len(s) - 1]. А s[len(s)] уже за пределами строки."

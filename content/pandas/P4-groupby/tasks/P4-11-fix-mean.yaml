@@ -1,0 +1,22 @@
+id: P4-11-fix-mean
+type: fix_bug
+base: value
+title: Исправь средний чек
+difficulty: 1
+lesson_section: mistakes
+statement: |
+  Нужен средний `amount` по каналам, округлённый до 2 знаков: колонки `channel` и `amount`. Код падает — исправь его.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+starter: |
+  result = orders.groupby("channel").mean().round(2)["amount"]
+reference: |
+  result = orders.groupby("channel")["amount"].mean().round(2)
+star3: [first_try, "max_lines:1"]
+hints:
+  - "Типичная ошибка группировки — раздел «Частые ошибки»."
+  - "mean() без выбора колонки пытается посчитать среднее во всех колонках, включая текстовые. Выбери колонку до вызова функции."
+  - "orders.groupby(\"channel\")[\"amount\"].mean()."
+  - "result = orders.groupby(\"channel\")[___].mean().round(2)"
+  - "В старых версиях pandas текстовые колонки молча отбрасывались, в pandas 3 это ошибка. Выбор колонки сразу после groupby ещё и быстрее — считается только нужное."

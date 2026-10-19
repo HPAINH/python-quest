@@ -1,0 +1,89 @@
+quiz:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      from sklearn.linear_model import LinearRegression
+      X = np.array([[0], [1], [2], [3]])
+      y = np.array([1, 3, 5, 7])
+      m = LinearRegression().fit(X, y)
+      print(round(m.coef_[0], 3), round(m.intercept_, 3), m.predict([[10]]).round(3).tolist())
+    answer: "2.0 1.0 [21.0]"
+    explain: Точная зависимость y = 2x + 1.
+    section: linreg
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      from sklearn import metrics
+      y = [10, 20, 30]
+      p = [12, 18, 33]
+      print(round(metrics.mean_absolute_error(y, p), 3), round(metrics.mean_squared_error(y, p), 3))
+    answer: "2.333 5.667"
+    explain: Ошибки 2, 2, 3; квадраты 4, 4, 9.
+    section: reg-metrics
+  - type: choice
+    q: Уходит 16% клиентов. Модель всегда говорит «не уйдёт». Какая у неё accuracy?
+    options: ["16%", "84%", "50%", "0%"]
+    answer: 1
+    explain: Поэтому на несбалансированных данных смотрят на recall, F1 и ROC-AUC.
+    section: clf-metrics
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      from sklearn import metrics
+      y = [1, 1, 0, 0, 1]
+      pred = [1, 0, 0, 1, 1]
+      print(metrics.confusion_matrix(y, pred).tolist(), metrics.precision_score(y, pred), round(metrics.recall_score(y, pred), 3))
+    answer: "[[1, 1], [1, 2]] 0.6666666666666666 0.667"
+    explain: TN = 1, FP = 1, FN = 1, TP = 2.
+    section: clf-metrics
+  - type: choice
+    q: Что произойдёт с recall, если понизить порог классификации?
+    options: ["Уменьшится", "Не уменьшится — больше объектов отмечено классом 1", "Не изменится", "Станет равен precision"]
+    answer: 1
+    explain: Вместе с recall обычно растут и ложные тревоги.
+    section: threshold
+
+express:
+  - type: choice
+    q: Почему ROC-AUC считают по predict_proba, а не по predict?
+    options: ["Так быстрее", "ROC-AUC оценивает упорядочивание по вероятностям; по меткам 0/1 теряется почти вся информация", "predict не работает", "Без разницы"]
+    answer: 1
+    explain: По меткам получится AUC одной точки порога.
+    section: mistakes
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      from sklearn import metrics
+      print(metrics.roc_auc_score([0, 0, 1, 1], [0.1, 0.4, 0.35, 0.8]))
+    answer: "0.75"
+    explain: Из четырёх пар «ушедший — оставшийся» три упорядочены верно.
+    section: clf-metrics
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      from sklearn import metrics
+      print(metrics.r2_score([1, 2, 3], [2, 2, 2]))
+    answer: "0.0"
+    explain: Прогноз средним даёт R² = 0.
+    section: reg-metrics
+  - type: choice
+    q: Чем RMSE отличается от MAE?
+    options: ["Ничем", "RMSE сильнее штрафует большие ошибки", "RMSE всегда меньше", "MAE в квадратных единицах"]
+    answer: 1
+    explain: Ошибки возводятся в квадрат до усреднения.
+    section: reg-metrics
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      prec, rec = 0.5, 1.0
+      print(round(2 * prec * rec / (prec + rec), 3))
+    answer: "0.667"
+    explain: F1 — гармоническое среднее.
+    section: clf-metrics
+  - type: choice
+    q: Что показывает вес признака в линейной регрессии?
+    options: ["Важность признака в процентах", "Изменение прогноза при росте признака на единицу при прочих равных", "Корреляцию с целью", "Вероятность"]
+    answer: 1
+    explain: Поэтому веса сравнимы только для признаков одного масштаба.
+    section: linreg

@@ -1,0 +1,33 @@
+id: S3-07-platform
+type: stat
+title: Эффект в приложении
+difficulty: 3
+lesson_section: chi2
+statement: |
+  Проверь хи-квадратом без поправки, различается ли конверсия групп в `exp_checkout` **только среди пользователей приложения** (`platform` = `app`). Запиши `p_value` (допуск ±0.00001), `reject` при alpha = 0.05 и `lift` — относительный прирост конверсии B к A (`conv_B / conv_A - 1`, допуск ±0.0001).
+setup: |
+  import pandas as pd
+  from scipy import stats
+  t = pd.read_csv("ab_metrics.csv").merge(pd.read_csv("ab_assignments.csv"), on=["user_id", "experiment"])
+outputs:
+  - var: p_value
+    tol: 0.00001
+  - var: reject
+  - var: lift
+    tol: 0.0001
+reference: |
+  c = t[(t["experiment"] == "exp_checkout") & (t["platform"] == "app")]
+  p_value = stats.chi2_contingency(pd.crosstab(c["group"], c["converted"]), correction=False)[1]
+  reject = bool(p_value < 0.05)
+  conv = c.groupby("group")["converted"].mean()
+  lift = conv["B"] / conv["A"] - 1
+star3: [first_try, "max_lines:5"]
+buggy_variants:
+  - code: "c = t[(t['experiment'] == 'exp_checkout') & (t['platform'] == 'app')]\np_value = stats.chi2_contingency(pd.crosstab(c['group'], c['converted']), correction=False)[1]\nreject = bool(p_value < 0.05)\nconv = c.groupby('group')['converted'].mean()\nlift = conv['B'] - conv['A']"
+    expect_detector: stat_value
+hints:
+  - "Хи-квадрат по сегменту — раздел «Хи-квадрат»."
+  - "Отфильтруй эксперимент и платформу, построй crosstab и посчитай тест. Прирост — отношение конверсий минус 1."
+  - "t[(t[\"experiment\"] == \"exp_checkout\") & (t[\"platform\"] == \"app\")], conv[\"B\"] / conv[\"A\"] - 1."
+  - "c = t[(t[\"experiment\"] == \"exp_checkout\") & (t[\"platform\"] == ___)]\np_value = stats.chi2_contingency(pd.crosstab(c[\"group\"], c[\"converted\"]), correction=False)[1]\nreject = bool(p_value < 0.05)\nconv = c.groupby(\"group\")[\"converted\"].mean()\nlift = conv[\"B\"] / conv[\"A\"] - ___"
+  - "Относительный прирост (+25%) и абсолютная разница (+2,5 п. п.) — разные числа, в отчёте важно, какое из них показано. Анализ сегментов после теста увеличивает шанс случайной находки — об этом уровень S4."

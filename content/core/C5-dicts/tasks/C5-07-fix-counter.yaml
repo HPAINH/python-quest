@@ -1,0 +1,32 @@
+id: C5-07-fix-counter
+type: fix_bug
+base: function
+function: top_category
+title: Исправь счётчик категорий
+difficulty: 2
+lesson_section: counting
+statement: |
+  Функция `top_category(categories)` получает непустой список категорий проданных товаров и должна вернуть самую частую категорию (при равенстве — ту, что раньше всех достигла максимума при подсчёте слева направо, то есть первую в порядке появления среди самых частых). Сейчас она падает. Исправь её.
+starter: |
+  def top_category(categories):
+      freq = {}
+      for c in categories:
+          freq[c] += 1
+      return max(freq, key=freq.get)
+reference: |
+  def top_category(categories):
+      freq = {}
+      for c in categories:
+          freq[c] = freq.get(c, 0) + 1
+      return max(freq, key=freq.get)
+tests:
+  visible: ["top_category(['чай', 'кофе', 'чай'])", "top_category(['сыр'])"]
+  hidden: ["top_category(['a', 'b'])", "top_category(['b', 'a', 'a', 'b'])", "top_category(['x', 'y', 'y', 'z', 'z', 'z'])"]
+random: {count: 20, gen: "'top_category(' + str([random.choice(['a', 'b', 'c']) for _ in range(random.randint(1, 10))]) + ')'"}
+star3: [first_try]
+hints:
+  - "Прочитай ошибку KeyError и раздел «Подсчёт частот»."
+  - "Нельзя прибавить единицу к значению, которого ещё нет. Для нового ключа нужно начать с нуля."
+  - "freq.get(c, 0) + 1."
+  - "freq[c] = freq.___(c, ___) + 1"
+  - "get(c, 0) подставляет 0 для категории, которая встретилась впервые. max с key=freq.get возвращает первый ключ с наибольшим значением в порядке добавления, а ключи в словаре хранятся в порядке первого появления."

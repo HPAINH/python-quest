@@ -1,0 +1,30 @@
+id: M3-04-importances
+type: value
+title: Главные признаки леса
+difficulty: 2
+lesson_section: importance
+same_ok: true
+statement: 'В `setup` добавь лес: `rf = make_pipeline(pre, RandomForestClassifier(n_estimators=100, min_samples_leaf=5, random_state=0)).fit(X, y)` — он уже обучен. Запиши в `result` список имён трёх признаков с наибольшей `feature_importances_`, по убыванию важности. Имена — из `get_feature_names_out()` подготовки, например `num__orders_90d`.
+
+  '
+setup: "import numpy as np\nimport pandas as pd\nfrom sklearn import metrics\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import OneHotEncoder, StandardScaler\nfrom sklearn.impute import SimpleImputer\nfrom sklearn.compose import ColumnTransformer\nfrom sklearn.pipeline import make_pipeline, Pipeline\nfrom sklearn.linear_model import LogisticRegression, LinearRegression\nfrom sklearn.tree import DecisionTreeClassifier\nfrom sklearn.ensemble import RandomForestClassifier, HistGradientBoostingClassifier, HistGradientBoostingRegressor\nfrom sklearn.inspection import permutation_importance\ndf = pd.read_csv(\"churn.csv\")\nX = df.drop(columns=[\"customer_id\", \"cancel_request\", \"churned\"])\ny = df[\"churned\"]\nif SHUFFLE:\n    y = y.sample(frac=1, random_state=1).reset_index(drop=True)\ncat = [\"city\", \"loyalty\"]\nnum = [c for c in X.columns if c not in cat]\npre = ColumnTransformer([\n    (\"num\", SimpleImputer(strategy=\"median\"), num),\n    (\"cat\", OneHotEncoder(handle_unknown=\"ignore\"), cat),\n])\nrf = make_pipeline(pre, RandomForestClassifier(n_estimators=100, min_samples_leaf=5, random_state=0)).fit(X, y)\n"
+reference: 'imp = pd.Series(rf[-1].feature_importances_, index=rf[0].get_feature_names_out())
+
+  result = imp.sort_values(ascending=False).head(3).index.tolist()
+
+  '
+star3:
+- first_try
+- max_lines:2
+buggy_variants:
+- code: 'imp = pd.Series(rf[-1].feature_importances_, index=rf[0].get_feature_names_out())
+
+    result = imp.sort_values().head(3).index.tolist()'
+hints:
+- Важность признаков — раздел «Важность признаков».
+- Важности лежат у модели — последнего шага Pipeline, а имена выходных колонок — у подготовки, первого шага. Собери из них Series и отсортируй.
+- rf[-1].feature_importances_, rf[0].get_feature_names_out(), sort_values(ascending=False).head(3).
+- 'imp = pd.Series(rf[___].feature_importances_, index=rf[___].get_feature_names_out())
+
+  result = imp.sort_values(ascending=False).head(3).index.tolist()'
+- 'Pipeline индексируется как список: rf[0] — подготовка, rf[-1] — модель. Без ascending=False получишь три самых бесполезных признака.'

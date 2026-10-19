@@ -1,0 +1,24 @@
+id: C0-08-temperature
+type: stdio
+title: Фаренгейты в Цельсии
+difficulty: 1
+lesson_section: types
+statement: |
+  Дана температура в градусах Фаренгейта — дробное число. Переведи её в градусы Цельсия по формуле `C = (F - 32) * 5 / 9` и выведи с одним знаком после запятой.
+reference: |
+  f = float(input())
+  print(f"{(f - 32) * 5 / 9:.1f}")
+tests:
+  visible: ["212", "98.6"]
+  hidden: ["32", "-40", "0", "451"]
+random: {count: 20, gen: "str(round(random.uniform(-100, 300), 1))"}
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "f = int(input())\nprint(f'{(f - 32) * 5 / 9:.1f}')"
+    expect_detector: int_parse
+hints:
+  - "Дробные числа читаются через float — раздел «Типы данных»."
+  - "Прочитай число как дробное, посчитай формулу и выведи результат с одним знаком после запятой."
+  - "float(input()), формула и f-строка с форматом .1f."
+  - "f = ___(input())\nc = (f - 32) * 5 / 9\nprint(f\"{c:___}\")"
+  - "float() понимает «98.6», а int() упал бы с ошибкой. (98.6 - 32) * 5 / 9 = 37.0, формат .1f печатает 37.0."

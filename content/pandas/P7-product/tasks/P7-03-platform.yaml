@@ -1,0 +1,25 @@
+id: P7-03-platform
+type: dataframe
+title: Конверсия сессий по платформам
+difficulty: 2
+lesson_section: conversion
+statement: |
+  Запиши в `result` для каждой платформы (`platform` из `sessions.csv`) долю сессий, в которых была хотя бы одна покупка: колонки `platform` и `conv`, доля округлена до 4 знаков.
+setup: |
+  import pandas as pd
+  events = pd.read_csv("events.csv")
+  sessions = pd.read_csv("sessions.csv")
+reference: |
+  bought = events.loc[events["event"] == "purchase", "session_id"].unique()
+  sessions["bought"] = sessions["session_id"].isin(bought)
+  result = sessions.groupby("platform")["bought"].mean().round(4).reset_index(name="conv")
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "e = events.merge(sessions, on='session_id')\nresult = e.groupby('platform')['event'].apply(lambda s: (s == 'purchase').mean()).round(4).reset_index(name='conv')"
+    expect_detector: column_values
+hints:
+  - "Доля сессий с покупкой — раздел «Конверсия»."
+  - "Найди номера сессий с покупкой, отметь их в таблице сессий булевой колонкой через isin, а потом возьми среднее по платформе."
+  - "events.loc[events[\"event\"] == \"purchase\", \"session_id\"].unique(), sessions[\"session_id\"].isin(bought), groupby(\"platform\")[\"bought\"].mean()."
+  - "bought = events.loc[events[\"event\"] == ___, \"session_id\"].unique()\nsessions[\"bought\"] = sessions[\"session_id\"].___(bought)\nresult = sessions.groupby(\"platform\")[\"bought\"].mean().round(4).reset_index(name=\"conv\")"
+  - "Знаменатель — сессии, а не события: доля событий-покупок среди всех событий — совсем другая метрика. Число покупок на сессию тоже не годится, если в сессии бывает больше одной покупки."

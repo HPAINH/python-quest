@@ -1,0 +1,26 @@
+id: P5-01-orders-clients
+type: dataframe
+title: Кто сделал заказ
+difficulty: 1
+lesson_section: merge
+sql_quest_ref: INNER JOIN
+statement: |
+  Добавь к заказам имя и город клиента. Запиши в `result` колонки `order_id`, `name`, `city`, `amount` для всех заказов.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+  customers = pd.read_csv("customers.csv")
+reference: |
+  t = orders.merge(customers, on="customer_id")
+  result = t[["order_id", "name", "city", "amount"]]
+requires: ["uses:merge"]
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "result = orders.merge(customers, on='customer_id')"
+    expect_detector: columns_mismatch
+hints:
+  - "Соединение по ключу — merge, раздел «merge»."
+  - "Общая колонка заказов и клиентов — customer_id. Соедини по ней и выбери нужные колонки."
+  - "orders.merge(customers, on=\"customer_id\")."
+  - "t = orders.merge(customers, on=___)\nresult = t[[\"order_id\", \"name\", ___, \"amount\"]]"
+  - "У каждого заказа ровно один клиент, поэтому строк столько же, сколько заказов. Это INNER JOIN: заказ без клиента в справочнике пропал бы."

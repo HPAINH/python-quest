@@ -1,0 +1,30 @@
+id: C1-03-leap
+type: stdio
+title: Високосный год
+difficulty: 2
+lesson_section: logic
+statement: |
+  Дан год. Выведи `YES`, если он високосный, и `NO`, если нет.
+
+  Год високосный, если делится на 4 и не делится на 100, либо если делится на 400.
+reference: |
+  y = int(input())
+  if (y % 4 == 0 and y % 100 != 0) or y % 400 == 0:
+      print("YES")
+  else:
+      print("NO")
+tests:
+  visible: ["2024", "1900"]
+  hidden: ["2000", "2023", "2100", "1600", "4"]
+random: {count: 25, gen: "str(random.randint(1, 3000))"}
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "y = int(input())\nif y % 4 == 0:\n    print('YES')\nelse:\n    print('NO')"
+  - code: "y = int(input())\nif y % 4 == 0 and y % 100 != 0:\n    print('Yes')\nelse:\n    print('No')"
+    expect_detector: format_case
+hints:
+  - "Нужно объединить несколько проверок через and и or — раздел «and, or, not»."
+  - "Первая часть: делится на 4 и при этом не делится на 100. Вторая: делится на 400. Год високосный, если верна хотя бы одна из частей."
+  - "y % 4 == 0, y % 100 != 0, y % 400 == 0, операторы and и or, скобки."
+  - "y = int(input())\nif (y % 4 == 0 ___ y % 100 != 0) ___ y % 400 == 0:\n    print(\"YES\")\nelse:\n    print(\"NO\")"
+  - "2024 делится на 4 и не делится на 100 — YES. 1900 делится на 100, но не на 400 — NO. 2000 делится на 400 — YES. Скобки показывают, что and считается внутри первой части. Для звезды можно уложиться в 2 строки: print(\"YES\" if ... else \"NO\")."

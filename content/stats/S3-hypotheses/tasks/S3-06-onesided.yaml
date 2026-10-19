@@ -1,0 +1,32 @@
+id: S3-06-onesided
+type: stat
+title: Баннер удерживает дольше?
+difficulty: 2
+lesson_section: ttest
+statement: |
+  Дизайнер утверждает, что баннер **увеличивает** время на сайте. Проверь одностороннюю гипотезу «B больше A» для `time_on_site` в `exp_banner` t-тестом Уэлча. Запиши `p_value` (допуск ±0.0001) и `reject` при alpha = 0.05.
+setup: |
+  import pandas as pd
+  from scipy import stats
+  t = pd.read_csv("ab_metrics.csv").merge(pd.read_csv("ab_assignments.csv"), on=["user_id", "experiment"])
+outputs:
+  - var: p_value
+    tol: 0.0001
+  - var: reject
+reference: |
+  c = t[t["experiment"] == "exp_banner"]
+  xa = c.loc[c["group"] == "A", "time_on_site"]
+  xb = c.loc[c["group"] == "B", "time_on_site"]
+  p_value = stats.ttest_ind(xb, xa, equal_var=False, alternative="greater").pvalue
+  reject = bool(p_value < 0.05)
+star3: [first_try, "max_lines:5"]
+buggy_variants:
+  - code: "c = t[t['experiment'] == 'exp_banner']\nxa = c.loc[c['group'] == 'A', 'time_on_site']\nxb = c.loc[c['group'] == 'B', 'time_on_site']\np_value = stats.ttest_ind(xa, xb, equal_var=False, alternative='greater').pvalue\nreject = bool(p_value < 0.05)"
+    expect_detector: stat_value
+  - code: "c = t[t['experiment'] == 'exp_banner']\nxa = c.loc[c['group'] == 'A', 'time_on_site']\nxb = c.loc[c['group'] == 'B', 'time_on_site']\np_value = stats.ttest_ind(xb, xa, equal_var=False).pvalue\nreject = bool(p_value < 0.05)"
+hints:
+  - "Направление гипотезы — раздел «t-тест», аргумент alternative."
+  - "Первым аргументом передай группу B, вторым — A, и укажи alternative=\"greater\": проверяем, что первая выборка больше."
+  - "stats.ttest_ind(xb, xa, equal_var=False, alternative=\"greater\").pvalue."
+  - "c = t[t[\"experiment\"] == \"exp_banner\"]\nxa = c.loc[c[\"group\"] == \"A\", \"time_on_site\"]\nxb = c.loc[c[\"group\"] == \"B\", \"time_on_site\"]\np_value = stats.ttest_ind(___, ___, equal_var=False, alternative=___).pvalue\nreject = bool(p_value < 0.05)"
+  - "«greater» относится к первому аргументу. Если поменять группы местами, проверяется обратная гипотеза, и p-value становится 1 − p. Эффекта у баннера нет — односторонний тест это не меняет."

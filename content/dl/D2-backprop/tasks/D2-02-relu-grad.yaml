@@ -1,0 +1,35 @@
+id: D2-02-relu-grad
+type: function
+function: relu_backward
+title: Обратный проход ReLU
+difficulty: 1
+lesson_section: activation-grads
+tol: 1.0e-09
+statement: 'Напиши функцию `relu_backward(dA, Z)`: `Z` — вход ReLU в прямом проходе, `dA` — градиент по выходу ReLU. Верни градиент по входу `dZ` той же формы.
+
+  '
+setup: "import numpy as np\n\ndef rnd(*shape, seed=0):\n    return np.random.default_rng(seed).normal(size=shape).round(3)\n\ndef labels(n, k, seed=0):\n    return np.random.default_rng(seed).integers(0, k, n)\n"
+starter: "def relu_backward(dA, Z):\n    pass\n"
+reference: "def relu_backward(dA, Z):\n    return dA * (Z > 0)\n"
+tests:
+  visible:
+  - relu_backward(np.array([[1.0, 2.0, 3.0]]), np.array([[-1.0, 0.0, 2.0]]))
+  hidden:
+  - relu_backward(rnd(3, 4, seed=1), rnd(3, 4, seed=2))
+  - relu_backward(np.ones((2, 2)), np.zeros((2, 2)))
+  - relu_backward(rnd(5, 1, seed=3), np.ones((5, 1)))
+random:
+  count: 15
+  gen: '(lambda a, b, s: f''relu_backward(rnd({a}, {b}, seed={s}), rnd({a}, {b}, seed={s + 1}))'')(random.randint(1, 5), random.randint(1, 5), random.randint(0, 999))'
+star3:
+- first_try
+- max_lines:2
+buggy_variants:
+- code: "def relu_backward(dA, Z):\n    return dA * (Z >= 0)"
+- code: "def relu_backward(dA, Z):\n    return np.maximum(0, dA)"
+hints:
+- Обратный проход через активацию — раздел «Производные активаций».
+- Градиент проходит там, где вход был положительным, и обнуляется в остальных местах.
+- dA * (Z > 0).
+- "def relu_backward(dA, Z):\n    return dA * (Z ___ 0)"
+- 'В нуле производная ReLU не определена — по соглашению берут 0, отсюда строгое «>». Обрезать сам градиент через max(0, dA) неверно: градиент может быть отрицательным и должен пройти.'

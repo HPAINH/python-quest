@@ -1,0 +1,31 @@
+id: C7-01-safe-int
+type: function
+function: safe_int
+title: Безопасный перевод в число
+difficulty: 1
+lesson_section: exceptions
+statement: |
+  Напиши функцию `safe_int(text, default=None)`, которая переводит строку в целое число. Если перевести не получается, функция возвращает `default`. Пробелы по краям допустимы — `int` их сам пропускает.
+starter: |
+  def safe_int(text, default=None):
+      pass
+reference: |
+  def safe_int(text, default=None):
+      try:
+          return int(text)
+      except ValueError:
+          return default
+requires: ["uses:try"]
+tests:
+  visible: ["safe_int('42')", "safe_int('н/д', 0)"]
+  hidden: ["safe_int(' -7 ')", "safe_int('')", "safe_int('3.5')", "safe_int('1 000', -1)", "safe_int('0')"]
+random: {count: 15, gen: "f'safe_int({random.choice([str(random.randint(-99, 99)), \"abc\", \"12a\", \" 5 \", \"\"])!r}, {random.choice([None, 0, -1])})'"}
+star3: [first_try]
+buggy_variants:
+  - code: "def safe_int(text, default=None):\n    if text.isdigit():\n        return int(text)\n    return default"
+hints:
+  - "Код, который может упасть, оборачивают в try — раздел «try и except»."
+  - "Попробуй перевести строку через int. Если int выбросил ValueError, верни default."
+  - "try: return int(text), except ValueError: return default."
+  - "def safe_int(text, default=None):\n    ___:\n        return int(text)\n    except ___:\n        return default"
+  - "int(' -7 ') работает: пробелы по краям и минус допустимы. Проверка isdigit() отбросила бы отрицательные числа и строки с пробелами, поэтому лучше попробовать и поймать ошибку. Ловим именно ValueError, а не все ошибки подряд."

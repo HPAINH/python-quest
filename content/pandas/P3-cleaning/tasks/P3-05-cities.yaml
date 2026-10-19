@@ -1,0 +1,25 @@
+id: P3-05-cities
+type: dataframe
+title: Сколько клиентов в каждом городе
+difficulty: 2
+lesson_section: str
+sql_quest_ref: GROUP BY с COUNT
+statement: |
+  В `customers_raw` один город записан по-разному: `Москва`, `москва`, `  МОСКВА`. Приведи города к одному виду — без пробелов по краям и **в нижнем регистре** — и запиши в `result` число строк по каждому городу через `value_counts()`. Пропуски не считай, повторы строк не удаляй.
+setup: |
+  import pandas as pd
+  raw = pd.read_csv("customers_raw.csv")
+reference: |
+  result = raw["city"].str.strip().str.lower().value_counts()
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = raw['city'].str.lower().value_counts()"
+    expect_detector: shape_rows
+  - code: "result = raw['city'].value_counts()"
+    expect_detector: shape_rows
+hints:
+  - "Методы строк — раздел «Строки: .str»."
+  - "Сначала убери пробелы по краям, потом приведи к нижнему регистру — оба шага через .str. Затем value_counts."
+  - "raw[\"city\"].str.strip().str.lower().value_counts()."
+  - "result = raw[\"city\"].str.___().str.___().value_counts()"
+  - "Без strip строки «москва» и «  москва» остаются разными, и город считается дважды. value_counts сам пропускает NaN."

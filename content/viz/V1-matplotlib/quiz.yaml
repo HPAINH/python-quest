@@ -1,0 +1,95 @@
+quiz:
+  - type: choice
+    q: Чем Figure отличается от Axes?
+    options: ["Ничем", "Figure — весь холст, Axes — отдельный график на нём", "Axes — это легенда", "Figure — только для seaborn"]
+    answer: 1
+    explain: На одной фигуре может быть несколько осей.
+    section: figure
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import matplotlib.pyplot as plt
+      fig, axes = plt.subplots(2, 3)
+      print(axes.shape, len(fig.axes))
+    answer: "(2, 3) 6"
+    explain: Сетка 2 × 3 — двумерный массив из шести осей.
+    section: subplots
+  - type: fill
+    q: Впиши метод, который добавит легенду из label линий.
+    code: |
+      import matplotlib.pyplot as plt
+      fig, ax = plt.subplots()
+      ax.plot([1, 2], [3, 4], label="app")
+      ax.___()
+      print(ax.get_legend().get_texts()[0].get_text())
+    answer: ["legend"]
+    expect: "app"
+    explain: Легенда берёт подписи из аргумента label.
+    section: labels
+  - type: choice
+    q: Какой график выбрать, чтобы сравнить выручку пяти городов?
+    options: ["Линию", "Столбцы", "Точечный", "Гистограмму"]
+    answer: 1
+    explain: Столбцы сравнивают значения по категориям; линия — для времени.
+    section: bar
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import matplotlib.pyplot as plt
+      fig, ax = plt.subplots()
+      ax.bar(["a", "b", "c"], [3, 1, 2])
+      print(len(ax.patches), [float(p.get_height()) for p in ax.patches])
+    answer: "3 [3.0, 1.0, 2.0]"
+    explain: Каждый столбец — прямоугольник в ax.patches.
+    section: bar
+
+express:
+  - type: choice
+    q: Почему для нескольких графиков лучше рисовать через ax, а не через plt?
+    options: ["plt не умеет несколько графиков", "Явный ax показывает, на каких осях рисуем, и не зависит от «текущих» осей", "ax рисует быстрее", "Разницы нет"]
+    answer: 1
+    explain: plt рисует на текущих осях, а какие они — легко перепутать.
+    section: figure
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import matplotlib.pyplot as plt
+      fig, ax = plt.subplots()
+      ax.plot([1, 2, 3], [4, 5, 6])
+      ax.plot([1, 2, 3], [6, 5, 4])
+      print(len(ax.lines))
+    answer: "2"
+    explain: Каждый вызов plot добавляет линию.
+    section: line
+  - type: choice
+    q: Почему при barh данные сортируют по возрастанию?
+    options: ["Так требует matplotlib", "Первая строка рисуется снизу, и после сортировки по возрастанию лидер окажется сверху", "Чтобы не было ошибки", "Это ошибка"]
+    answer: 1
+    explain: Ось Y у barh идёт снизу вверх.
+    section: bar
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import matplotlib.pyplot as plt
+      fig, ax = plt.subplots()
+      ax.set_xlabel("Месяц")
+      print(repr(ax.get_title()), ax.get_xlabel())
+    answer: "'' Месяц"
+    explain: Заголовок не задан — пустая строка.
+    section: labels
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import matplotlib.pyplot as plt
+      fig, axes = plt.subplots(1, 2)
+      axes[1].bar([1, 2], [5, 6])
+      print(len(axes[0].patches), len(axes[1].patches))
+    answer: "0 2"
+    explain: Столбцы нарисованы только на правых осях.
+    section: subplots
+  - type: choice
+    q: Что делает fig.tight_layout()?
+    options: ["Сохраняет картинку", "Раздвигает графики, чтобы подписи не налезали", "Удаляет пустые оси", "Сортирует данные"]
+    answer: 1
+    explain: Полезно, когда на фигуре несколько осей.
+    section: subplots

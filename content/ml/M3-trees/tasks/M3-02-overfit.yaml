@@ -1,0 +1,54 @@
+id: M3-02-overfit
+type: stat
+title: Измерь переобучение
+difficulty: 2
+lesson_section: tree
+statement: 'Раздели `X`, `y` (25%, `stratify=y`, `random_state=42`). Обучи на train Pipeline из `pre` и `DecisionTreeClassifier(random_state=0)` **без ограничений**. Запиши `train_auc` и `test_auc` (допуск ±0.0001) и `overfit` — `True`, если разница больше 0.1.
+
+  '
+setup: "import numpy as np\nimport pandas as pd\nfrom sklearn import metrics\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import OneHotEncoder, StandardScaler\nfrom sklearn.impute import SimpleImputer\nfrom sklearn.compose import ColumnTransformer\nfrom sklearn.pipeline import make_pipeline, Pipeline\nfrom sklearn.linear_model import LogisticRegression, LinearRegression\nfrom sklearn.tree import DecisionTreeClassifier\nfrom sklearn.ensemble import RandomForestClassifier, HistGradientBoostingClassifier, HistGradientBoostingRegressor\nfrom sklearn.inspection import permutation_importance\ndf = pd.read_csv(\"churn.csv\")\nX = df.drop(columns=[\"customer_id\", \"cancel_request\", \"churned\"])\ny = df[\"churned\"]\nif SHUFFLE:\n    y = y.sample(frac=1, random_state=1).reset_index(drop=True)\ncat = [\"city\", \"loyalty\"]\nnum = [c for c in X.columns if c not in cat]\npre = ColumnTransformer([\n    (\"num\", SimpleImputer(strategy=\"median\"), num),\n    (\"cat\", OneHotEncoder(handle_unknown=\"ignore\"), cat),\n])\n"
+outputs:
+- var: train_auc
+  tol: 0.0001
+- var: test_auc
+  tol: 0.0001
+- var: overfit
+reference: 'X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, stratify=y, random_state=42)
+
+  t = make_pipeline(pre, DecisionTreeClassifier(random_state=0)).fit(X_train, y_train)
+
+  train_auc = metrics.roc_auc_score(y_train, t.predict_proba(X_train)[:, 1])
+
+  test_auc = metrics.roc_auc_score(y_test, t.predict_proba(X_test)[:, 1])
+
+  overfit = bool(train_auc - test_auc > 0.1)
+
+  '
+star3:
+- first_try
+- max_lines:5
+buggy_variants:
+- code: 'X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, stratify=y, random_state=42)
+
+    t = make_pipeline(pre, DecisionTreeClassifier(max_depth=4, random_state=0)).fit(X_train, y_train)
+
+    train_auc = metrics.roc_auc_score(y_train, t.predict_proba(X_train)[:, 1])
+
+    test_auc = metrics.roc_auc_score(y_test, t.predict_proba(X_test)[:, 1])
+
+    overfit = bool(train_auc - test_auc > 0.1)'
+  expect_detector: stat_value
+hints:
+- Переобучение — раздел «Дерево решений».
+- Раздели данные, обучи дерево без max_depth на train и посчитай ROC-AUC по вероятностям на обеих частях.
+- metrics.roc_auc_score(y_train, t.predict_proba(X_train)[:, 1]) и то же для теста.
+- 'X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, stratify=y, random_state=42)
+
+  t = make_pipeline(pre, DecisionTreeClassifier(random_state=0)).fit(X_train, y_train)
+
+  train_auc = metrics.roc_auc_score(y_train, t.predict_proba(___)[:, 1])
+
+  test_auc = metrics.roc_auc_score(y_test, t.predict_proba(___)[:, 1])
+
+  overfit = bool(train_auc - test_auc > 0.1)'
+- На train почти 1.0 — каждое значение запомнено. На test — немногим лучше случайного. Это и есть переобучение.

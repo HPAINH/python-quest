@@ -1,0 +1,7 @@
+code: V1
+title: matplotlib
+intro: Фигура и оси, линии и столбцы, подписи, легенда и несколько графиков на одной картинке.
+minutes: 25
+expected_tasks: 8
+packages: [numpy, pandas, matplotlib]
+data: [core]

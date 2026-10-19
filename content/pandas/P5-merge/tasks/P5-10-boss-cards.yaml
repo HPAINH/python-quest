@@ -1,0 +1,47 @@
+id: P5-10-boss-cards
+type: dataframe
+title: "Босс: карточки клиентов"
+difficulty: 3
+boss: true
+lesson_section: how
+statement: |
+  CRM-команда просит две таблицы. Учитывай только **доставленные** заказы.
+
+  1. `cards` — для **каждого** клиента: `customer_id`, `name`, `n_orders` (число доставленных заказов, 0 если нет), `revenue` (их сумма `amount`, 0 если нет, округлить до 2 знаков). По убыванию `revenue`, при равенстве — по возрастанию `customer_id`.
+  2. `by_dept` — выручка доставленных заказов по отделам (`department` из `categories`) по позициям `order_items`: колонки `department` и `revenue` (выручка позиции `quantity * unit_price * (1 - discount)`, округлить до 2 знаков), по убыванию `revenue`.
+setup: |
+  import pandas as pd
+  customers = pd.read_csv("customers.csv")
+  orders = pd.read_csv("orders.csv")
+  items = pd.read_csv("order_items.csv")
+  products = pd.read_csv("products.csv")
+  categories = pd.read_csv("categories.csv")
+outputs:
+  - var: cards
+    title: карточки клиентов
+    ordered: true
+  - var: by_dept
+    title: выручка по отделам
+    ordered: true
+reference: |
+  delivered = orders[orders["status"] == "delivered"]
+  stats = delivered.groupby("customer_id").agg(n_orders=("order_id", "count"), revenue=("amount", "sum")).reset_index()
+  cards = customers[["customer_id", "name"]].merge(stats, on="customer_id", how="left")
+  cards[["n_orders", "revenue"]] = cards[["n_orders", "revenue"]].fillna(0)
+  cards["revenue"] = cards["revenue"].round(2)
+  cards = cards.sort_values(["revenue", "customer_id"], ascending=[False, True])
+  items["revenue"] = items["quantity"] * items["unit_price"] * (1 - items["discount"])
+  t = items.merge(delivered[["order_id"]], on="order_id")
+  t = t.merge(products[["product_id", "category_id"]], on="product_id").merge(categories[["category_id", "department"]], on="category_id")
+  by_dept = t.groupby("department")["revenue"].sum().round(2).reset_index().sort_values("revenue", ascending=False)
+star3: [first_try]
+buggy_variants:
+  - code: "delivered = orders[orders['status'] == 'delivered']\nstats = delivered.groupby('customer_id').agg(n_orders=('order_id', 'count'), revenue=('amount', 'sum')).reset_index()\ncards = customers[['customer_id', 'name']].merge(stats, on='customer_id')\ncards['revenue'] = cards['revenue'].round(2)\ncards = cards.sort_values(['revenue', 'customer_id'], ascending=[False, True])\nitems['revenue'] = items['quantity'] * items['unit_price'] * (1 - items['discount'])\nt = items.merge(delivered[['order_id']], on='order_id')\nt = t.merge(products[['product_id', 'category_id']], on='product_id').merge(categories[['category_id', 'department']], on='category_id')\nby_dept = t.groupby('department')['revenue'].sum().round(2).reset_index().sort_values('revenue', ascending=False)"
+    expect_detector: merge_inner
+  - code: "delivered = orders[orders['status'] == 'delivered']\nstats = delivered.groupby('customer_id').agg(n_orders=('order_id', 'count'), revenue=('amount', 'sum')).reset_index()\ncards = customers[['customer_id', 'name']].merge(stats, on='customer_id', how='left')\ncards[['n_orders', 'revenue']] = cards[['n_orders', 'revenue']].fillna(0)\ncards['revenue'] = cards['revenue'].round(2)\ncards = cards.sort_values(['revenue', 'customer_id'], ascending=[False, True])\nitems['revenue'] = items['quantity'] * items['unit_price'] * (1 - items['discount'])\nt = items.merge(products[['product_id', 'category_id']], on='product_id').merge(categories[['category_id', 'department']], on='category_id')\nby_dept = t.groupby('department')['revenue'].sum().round(2).reset_index().sort_values('revenue', ascending=False)"
+hints:
+  - "Всё из уровня: left-соединение, чтобы сохранить всех клиентов, fillna для нулей и цепочка merge до отдела."
+  - "Сначала посчитай статистику доставленных заказов по клиентам, потом присоедини её к клиентам через how=\"left\" и замени пропуски нулями. Для отделов: оставь позиции доставленных заказов (merge с их order_id), затем товар → категория → отдел."
+  - "customers[[...]].merge(stats, on=\"customer_id\", how=\"left\"), fillna(0), items.merge(delivered[[\"order_id\"]], on=\"order_id\")."
+  - "delivered = orders[orders[\"status\"] == \"delivered\"]\nstats = delivered.groupby(\"customer_id\").agg(n_orders=(\"order_id\", \"count\"), revenue=(\"amount\", \"sum\")).reset_index()\ncards = customers[[\"customer_id\", \"name\"]].merge(stats, on=\"customer_id\", how=___)\ncards[[\"n_orders\", \"revenue\"]] = cards[[\"n_orders\", \"revenue\"]].___(0)\ncards[\"revenue\"] = cards[\"revenue\"].round(2)\ncards = cards.sort_values([\"revenue\", \"customer_id\"], ascending=[False, True])\nitems[\"revenue\"] = items[\"quantity\"] * items[\"unit_price\"] * (1 - items[\"discount\"])\nt = items.merge(delivered[[___]], on=\"order_id\")\nt = t.merge(products[[\"product_id\", \"category_id\"]], on=\"product_id\").merge(categories[[\"category_id\", ___]], on=\"category_id\")\nby_dept = t.groupby(\"department\")[\"revenue\"].sum().round(2).reset_index().sort_values(\"revenue\", ascending=False)"
+  - "Статистику выгоднее посчитать до соединения: тогда к клиентам присоединяется одна строка на клиента и размножения нет. merge с delivered[[\"order_id\"]] работает как фильтр «позиции только доставленных заказов» — inner-соединение отбрасывает остальные."

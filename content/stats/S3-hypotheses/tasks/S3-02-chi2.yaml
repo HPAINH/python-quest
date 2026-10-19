@@ -1,0 +1,32 @@
+id: S3-02-chi2
+type: stat
+title: Хи-квадрат для конверсии
+difficulty: 2
+lesson_section: chi2
+statement: |
+  Проверь хи-квадратом без поправки Йейтса, различается ли конверсия групп в `exp_checkout`. Запиши `p_value` (допуск ±0.00001) и `reject` — отвергаем ли H0 при alpha = 0.05.
+setup: |
+  import pandas as pd
+  from scipy import stats
+  t = pd.read_csv("ab_metrics.csv").merge(pd.read_csv("ab_assignments.csv"), on=["user_id", "experiment"])
+outputs:
+  - var: p_value
+    tol: 0.00001
+  - var: reject
+reference: |
+  c = t[t["experiment"] == "exp_checkout"]
+  table = pd.crosstab(c["group"], c["converted"])
+  p_value = stats.chi2_contingency(table, correction=False)[1]
+  reject = bool(p_value < 0.05)
+star3: [first_try, "max_lines:4"]
+buggy_variants:
+  - code: "c = t[t['experiment'] == 'exp_checkout']\ntable = pd.crosstab(c['group'], c['converted'])\np_value = stats.chi2_contingency(table)[1]\nreject = bool(p_value < 0.05)"
+    expect_detector: stat_value
+  - code: "c = t[t['experiment'] == 'exp_checkout']\ntable = pd.crosstab(c['group'], c['converted'])\np_value = stats.chi2_contingency(table, correction=False)[0]\nreject = bool(p_value < 0.05)"
+    expect_detector: stat_value
+hints:
+  - "Хи-квадрат — раздел «Хи-квадрат»."
+  - "Построй таблицу «группа × converted» через crosstab и передай её в chi2_contingency с correction=False. p-value — второй элемент результата."
+  - "pd.crosstab(c[\"group\"], c[\"converted\"]), stats.chi2_contingency(table, correction=False)[1]."
+  - "c = t[t[\"experiment\"] == \"exp_checkout\"]\ntable = pd.crosstab(c[\"group\"], c[___])\np_value = stats.chi2_contingency(table, correction=___)[1]\nreject = bool(p_value < ___)"
+  - "chi2_contingency возвращает статистику, p-value, степени свободы и ожидаемые частоты — именно в таком порядке. Поправка Йейтса делает тест консервативнее и немного увеличивает p-value."

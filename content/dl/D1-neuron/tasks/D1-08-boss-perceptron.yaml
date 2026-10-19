@@ -1,0 +1,55 @@
+id: D1-08-boss-perceptron
+type: function
+title: 'Босс: перцептрон'
+difficulty: 3
+boss: true
+lesson_section: perceptron
+tol: 1.0e-09
+statement: 'Собери перцептрон в два шага.
+
+
+  **Шаг 1.** `predict(X, w, b)` — для матрицы объектов возвращает массив меток: 1, если `x·w + b ≥ 0`, иначе 0.
+
+
+  **Шаг 2.** `train_perceptron(X, y, epochs=10, lr=1.0)` — начинает с нулевых весов и `b = 0`, `epochs` раз проходит по объектам **по порядку** и после каждого объекта обновляет `w += lr·(y − pred)·x`, `b += lr·(y − pred)`, где `pred` — предсказание для этого объекта по текущим весам. Возвращает массив `[w₁, …, w_d, b]` (`np.append(w, b)`).
+
+  '
+setup: "import numpy as np\n\ndef rnd(*shape, seed=0):\n    return np.random.default_rng(seed).normal(size=shape).round(3)\ndef toy(n, seed):\n    X = rnd(n, 2, seed=seed)\n    y = (X @ np.array([1.5, -1.0]) + 0.3 > 0).astype(int)\n    return X, y\n"
+starter: "def predict(X, w, b):\n    pass\n\n\ndef train_perceptron(X, y, epochs=10, lr=1.0):\n    pass\n"
+reference: "def predict(X, w, b):\n    return (X @ w + b >= 0).astype(int)\n\ndef train_perceptron(X, y, epochs=10, lr=1.0):\n    w = np.zeros(X.shape[1])\n    b = 0.0\n    for _ in range(epochs):\n        for xi, yi in zip(X, y):\n            pred = int(xi @ w + b >= 0)\n            w = w + lr * (yi - pred) * xi\n            b = b + lr * (yi - pred)\n    return np.append(w, b)\n"
+steps:
+- title: Предсказание
+  function: predict
+  tests:
+    visible:
+    - predict(np.array([[2.0, 1.0], [-1.0, -2.0]]), np.array([1.0, 1.0]), 0.0)
+    hidden:
+    - predict(rnd(6, 3, seed=1), rnd(3, seed=2), 0.5)
+    - predict(np.zeros((2, 2)), np.ones(2), 0.0)
+    - predict(rnd(5, 2, seed=3), np.array([1.0, -1.0]), -0.2)
+  random:
+    count: 10
+    gen: '(lambda n, d, s: f''predict(rnd({n}, {d}, seed={s}), rnd({d}, seed={s + 1}), {round(random.uniform(-1, 1), 2)})'')(random.randint(1, 8), random.randint(1, 4), random.randint(0, 999))'
+- title: Обучение
+  function: train_perceptron
+  tests:
+    visible:
+    - train_perceptron(np.array([[2.0, 1.0], [1.0, 3.0], [-1.0, -2.0], [-2.0, 1.0]]), np.array([1, 1, 0, 0]), epochs=5)
+    hidden:
+    - train_perceptron(*toy(20, 1))
+    - train_perceptron(*toy(40, 2), epochs=3, lr=0.5)
+    - train_perceptron(*toy(10, 3), epochs=1)
+  random:
+    count: 10
+    gen: f'train_perceptron(*toy({random.randint(5, 40)}, {random.randint(0, 999)}), epochs={random.randint(1, 6)}, lr={random.choice([0.1, 0.5, 1.0])})'
+star3:
+- first_try
+buggy_variants:
+- code: "def predict(X, w, b):\n    return (X @ w + b >= 0).astype(int)\n\ndef train_perceptron(X, y, epochs=10, lr=1.0):\n    w = np.zeros(X.shape[1])\n    b = 0.0\n    for _ in range(epochs):\n        pred = predict(X, w, b)\n        w = w + lr * (y - pred) @ X\n        b = b + lr * (y - pred).sum()\n    return np.append(w, b)"
+- code: "def predict(X, w, b):\n    return (X @ w + b > 0).astype(int)\n\ndef train_perceptron(X, y, epochs=10, lr=1.0):\n    w = np.zeros(X.shape[1])\n    b = 0.0\n    for _ in range(epochs):\n        for xi, yi in zip(X, y):\n            pred = int(xi @ w + b >= 0)\n            w = w + lr * (yi - pred) * xi\n            b = b + lr * (yi - pred)\n    return np.append(w, b)\n"
+hints:
+- Перцептрон — раздел «Перцептрон».
+- 'predict — сравнение взвешенной суммы с нулём по всей матрице сразу. В обучении два цикла: по эпохам и по объектам; веса меняются сразу после каждого объекта.'
+- '(X @ w + b >= 0).astype(int); for xi, yi in zip(X, y): pred = int(xi @ w + b >= 0); w += lr * (yi - pred) * xi.'
+- "def train_perceptron(X, y, epochs=10, lr=1.0):\n    w = np.zeros(X.shape[1])\n    b = 0.0\n    for _ in range(epochs):\n        for xi, yi in zip(X, y):\n            pred = int(xi @ w + b >= ___)\n            w = w + lr * (yi - pred) * ___\n            b = b + lr * (___)\n    return np.append(w, b)"
+- 'Классический перцептрон обновляет веса после каждого объекта — пакетное обновление по всей выборке даёт другие веса. Граница «≥ 0» важна: при нулевых весах все объекты сначала предсказываются как 1.'

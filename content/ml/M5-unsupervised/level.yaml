@@ -1,0 +1,7 @@
+code: M5
+title: Без учителя
+intro: KMeans, масштаб и выбор числа кластеров, PCA и сегментация клиентов.
+minutes: 30
+expected_tasks: 8
+packages: [numpy, pandas, scipy, scikit-learn]
+data: [churn]

@@ -1,0 +1,34 @@
+id: D2-05-numeric
+type: function
+function: numeric_grad
+title: Численный градиент
+difficulty: 2
+lesson_section: numeric
+tol: 1.0e-06
+statement: 'Напиши функцию `numeric_grad(f, x, eps=1e-5)`: `f` принимает одномерный массив и возвращает число. Верни массив той же формы, что `x`, где элемент i — центральная разность `(f(x + eps·eᵢ) − f(x − eps·eᵢ)) / (2·eps)`. Исходный `x` менять нельзя. В `setup` есть функции `sq`, `wave`, `tanh2` для экспериментов.
+
+  '
+setup: "import numpy as np\n\ndef rnd(*shape, seed=0):\n    return np.random.default_rng(seed).normal(size=shape).round(3)\n\ndef labels(n, k, seed=0):\n    return np.random.default_rng(seed).integers(0, k, n)\n\ndef sq(v):\n    return (v ** 2).sum()\n\ndef wave(v):\n    return np.sin(v).sum() + (v[0] * v[-1])\n\ndef tanh2(v):\n    return (np.tanh(v) ** 2).sum()\n"
+starter: "def numeric_grad(f, x, eps=1e-5):\n    pass\n"
+reference: "def numeric_grad(f, x, eps=1e-5):\n    g = np.zeros_like(x, dtype=float)\n    for i in range(x.size):\n        d = np.zeros_like(x, dtype=float)\n        d[i] = eps\n        g[i] = (f(x + d) - f(x - d)) / (2 * eps)\n    return g\n"
+tests:
+  visible:
+  - numeric_grad(sq, np.array([1.0, -2.0, 3.0]))
+  hidden:
+  - numeric_grad(wave, rnd(4, seed=1))
+  - numeric_grad(tanh2, rnd(5, seed=2))
+  - numeric_grad(sq, np.zeros(2))
+random:
+  count: 12
+  gen: f'numeric_grad({random.choice(["sq", "wave", "tanh2"])}, rnd({random.randint(2, 6)}, seed={random.randint(0, 999)}))'
+star3:
+- first_try
+buggy_variants:
+- code: "def numeric_grad(f, x, eps=1e-5):\n    g = np.zeros_like(x)\n    for i in range(x.size):\n        d = np.zeros_like(x)\n        d[i] = eps\n        g[i] = (f(x + d) - f(x)) / eps\n    return g"
+- code: "def numeric_grad(f, x, eps=1e-5):\n    return (f(x + eps) - f(x - eps)) / (2 * eps) * np.ones_like(x)"
+hints:
+- Численная проверка — раздел «Численная проверка».
+- Для каждого элемента создай вектор сдвига с eps на i-й позиции, посчитай f слева и справа и раздели разность на 2·eps.
+- 'for i in range(x.size): d = np.zeros_like(x); d[i] = eps; g[i] = (f(x + d) - f(x - d)) / (2 * eps).'
+- "def numeric_grad(f, x, eps=1e-5):\n    g = np.zeros_like(x, dtype=float)\n    for i in range(x.size):\n        d = np.zeros_like(x, dtype=float)\n        d[i] = ___\n        g[i] = (f(x + d) - f(x - ___)) / (2 * eps)\n    return g"
+- Односторонняя разность (f(x + eps) − f(x)) / eps точна только до eps, центральная — до eps², поэтому её и используют для проверки. Сдвиг всех элементов сразу даёт сумму производных, а не градиент.

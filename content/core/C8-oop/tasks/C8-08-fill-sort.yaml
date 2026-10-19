@@ -1,0 +1,50 @@
+id: C8-08-fill-sort
+type: fill_gaps
+base: function
+function: sort_orders
+title: Сортировка заказов
+difficulty: 2
+lesson_section: dunder
+statement: |
+  Заказы должны сортироваться по убыванию суммы, а при равной сумме — по возрастанию номера. Для этого у класса `Order` есть метод `__lt__`. Функция `sort_orders(pairs)` получает список пар `(номер, сумма)` и возвращает номера в нужном порядке.
+
+  Заполни пропуски.
+template: |
+  class Order:
+      def __init__(self, oid, amount):
+          self.oid = oid
+          self.amount = amount
+
+      def ___(self, other):
+          if self.amount != other.amount:
+              return self.amount ___ other.amount
+          return self.oid < other.oid
+
+  def sort_orders(pairs):
+      orders = [Order(o, a) for o, a in pairs]
+      return [o.oid for o in ___(orders)]
+reference: |
+  class Order:
+      def __init__(self, oid, amount):
+          self.oid = oid
+          self.amount = amount
+
+      def __lt__(self, other):
+          if self.amount != other.amount:
+              return self.amount > other.amount
+          return self.oid < other.oid
+
+  def sort_orders(pairs):
+      orders = [Order(o, a) for o, a in pairs]
+      return [o.oid for o in sorted(orders)]
+tests:
+  visible: ["sort_orders([(1, 500), (2, 990), (3, 500)])", "sort_orders([])"]
+  hidden: ["sort_orders([(7, 1)])", "sort_orders([(3, 5), (2, 5), (1, 5)])", "sort_orders([(1, 1), (2, 2), (3, 3)])"]
+random: {count: 15, gen: "f'sort_orders({[(i, random.randint(1, 4)) for i in random.sample(range(1, 30), random.randint(0, 8))]})'"}
+star3: [first_try]
+hints:
+  - "Сортировка объектов вызывает метод сравнения «меньше» — раздел «Специальные методы»."
+  - "«Меньше» здесь значит «идёт раньше». Раньше идёт заказ с большей суммой, а при равенстве — с меньшим номером."
+  - "Имя метода __lt__, оператор > для сумм, функция sorted."
+  - "Первый пропуск — специальный метод сравнения «меньше». Второй — знак, при котором больший заказ окажется «меньше». Третий — функция сортировки."
+  - "sorted сравнивает объекты через <, а < вызывает __lt__. Возвращая self.amount > other.amount, мы объявляем большой заказ «меньшим» — так он встаёт в начало. Тот же порядок даёт key=lambda o: (-o.amount, o.oid), но здесь задача на __lt__."

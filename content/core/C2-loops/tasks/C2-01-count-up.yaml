@@ -1,0 +1,28 @@
+id: C2-01-count-up
+type: stdio
+title: От 1 до n
+difficulty: 1
+lesson_section: for-range
+statement: |
+  Дано натуральное число `n`. Выведи все числа от 1 до `n` включительно, каждое на своей строке.
+starter: |
+  n = int(input())
+reference: |
+  n = int(input())
+  for i in range(1, n + 1):
+      print(i)
+requires: ["uses:for"]
+tests:
+  visible: ["3", "1"]
+  hidden: ["2", "10", "57"]
+random: {count: 10, gen: "str(random.randint(1, 200))"}
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "n = int(input())\nfor i in range(1, n):\n    print(i)"
+    expect_detector: range_bounds
+hints:
+  - "Это цикл for с range — раздел «for и range»."
+  - "Пройди по числам от 1 до n и выведи каждое. Помни, что правая граница range не включается."
+  - "for i in range(1, n + 1) и print(i) внутри цикла."
+  - "n = int(input())\nfor i in range(___, ___):\n    print(i)"
+  - "range(1, n + 1) даёт 1, 2, …, n: правая граница n + 1 не входит, поэтому n входит. print внутри цикла печатает каждое число на новой строке."

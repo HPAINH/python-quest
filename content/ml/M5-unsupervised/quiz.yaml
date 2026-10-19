@@ -1,0 +1,81 @@
+quiz:
+  - type: choice
+    q: Что минимизирует KMeans?
+    options: ["Число кластеров", "Сумму квадратов расстояний от точек до центров их кластеров", "Силуэт", "Дисперсию признаков"]
+    answer: 1
+    explain: Эта сумма называется инерцией.
+    section: kmeans
+  - type: choice
+    q: Почему перед KMeans признаки стандартизируют?
+    options: ["Так быстрее", "Иначе признак с большим разбросом доминирует в расстояниях", "KMeans не принимает целые числа", "Чтобы было меньше кластеров"]
+    answer: 1
+    explain: Чек в рублях перевесит число заказов.
+    section: scaling
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      from sklearn.cluster import KMeans
+      X = np.array([[0.0], [0.2], [10.0], [10.4]])
+      km = KMeans(2, n_init=10, random_state=0).fit(X)
+      print(sorted(km.cluster_centers_.ravel().round(2).tolist()), round(km.inertia_, 2))
+    answer: "[0.1, 10.2] 0.1"
+    explain: Центры — средние кластеров, инерция — 0.01 + 0.01 + 0.04 + 0.04.
+    section: kmeans
+  - type: choice
+    q: Силуэт для k = 2, 3, 4 равен 0.41, 0.58, 0.47. Какое k выбрать?
+    options: ["2", "3", "4", "Нужно больше"]
+    answer: 1
+    explain: Чем выше силуэт, тем лучше разделены кластеры.
+    section: choose-k
+  - type: choice
+    q: Что показывает explained_variance_ratio_ у PCA?
+    options: ["Важность признаков для цели", "Долю общей дисперсии, которую объясняет каждая компонента", "Корреляцию компонент", "Ошибку восстановления"]
+    answer: 1
+    explain: Сумма по всем компонентам — 1.
+    section: pca
+
+express:
+  - type: choice
+    q: Почему нельзя выбирать k по минимальной инерции?
+    options: ["Она не считается", "Инерция всегда падает с ростом k — минимум будет при k = числу точек", "Она растёт с k", "Можно"]
+    answer: 1
+    explain: Смотрят на «локоть» или на силуэт.
+    section: choose-k
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      r = np.array([0.5, 0.3, 0.15, 0.05])
+      print(np.cumsum(r).round(2).tolist(), int(np.argmax(np.cumsum(r) >= 0.9)) + 1)
+    answer: "[0.5, 0.8, 0.95, 1.0] 3"
+    explain: Три компоненты набирают 95% дисперсии.
+    section: pca
+  - type: choice
+    q: Почему «кластер 3» нельзя называть «спящими клиентами» без проверки?
+    options: ["Номера кластеров случайны и меняются от запуска к запуску", "Кластер 3 всегда самый большой", "KMeans сортирует кластеры", "Можно"]
+    answer: 0
+    explain: Смысл кластеру дают средние признаков, а не номер.
+    section: segments
+  - type: choice
+    q: Что делает n_init=10 в KMeans?
+    options: ["10 кластеров", "10 запусков с разных начальных центров, выбирается лучший по инерции", "10 итераций", "10 признаков"]
+    answer: 1
+    explain: Один запуск может застрять в плохом решении.
+    section: kmeans
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      from sklearn.decomposition import PCA
+      X = np.array([[1.0, 2.0], [2.0, 4.0], [3.0, 6.0]])
+      print(PCA().fit(X).explained_variance_ratio_.round(3).tolist())
+    answer: "[1.0, 0.0]"
+    explain: Точки лежат на одной прямой — одна компонента объясняет всё.
+    section: pca
+  - type: choice
+    q: Доли дисперсии всех компонент почти равны. Что это значит?
+    options: ["PCA сломался", "Признаки слабо связаны, сжать их без больших потерь не получится", "Данные нормальные", "Нужно больше компонент"]
+    answer: 1
+    explain: PCA полезен, когда признаки сильно коррелируют.
+    section: pca

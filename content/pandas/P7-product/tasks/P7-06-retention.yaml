@@ -1,0 +1,31 @@
+id: P7-06-retention
+type: dataframe
+title: Таблица retention
+difficulty: 3
+lesson_section: retention
+statement: |
+  Построй таблицу retention: строки — месячные когорты регистрации (строки вида `2026-03`), колонки — смещения 0, 1, 2, … месяцев, в ячейках — доля пользователей когорты, у которых была сессия в этом месяце, округлённая до 3 знаков. Сочетания, которых нет в данных, — 0. Запиши в `result`.
+setup: |
+  import pandas as pd
+  users = pd.read_csv("users.csv", parse_dates=["signup_date"])
+  sessions = pd.read_csv("sessions.csv", parse_dates=["start_time"])
+reference: |
+  users["cohort"] = users["signup_date"].dt.to_period("M")
+  s = sessions.merge(users[["user_id", "cohort"]], on="user_id")
+  s["offset"] = (s["start_time"].dt.to_period("M") - s["cohort"]).apply(lambda d: d.n)
+  active = s.groupby(["cohort", "offset"])["user_id"].nunique().unstack(fill_value=0)
+  size = users.groupby("cohort")["user_id"].nunique()
+  result = active.div(size, axis=0).round(3)
+  result.index = result.index.astype(str)
+  result.columns = [str(c) for c in result.columns]
+ordered: true
+star3: [first_try]
+buggy_variants:
+  - code: "users['cohort'] = users['signup_date'].dt.to_period('M')\ns = sessions.merge(users[['user_id', 'cohort']], on='user_id')\ns['offset'] = (s['start_time'].dt.to_period('M') - s['cohort']).apply(lambda d: d.n)\nactive = s.groupby(['cohort', 'offset'])['user_id'].count().unstack(fill_value=0)\nsize = users.groupby('cohort')['user_id'].nunique()\nresult = active.div(size, axis=0).round(3)\nresult.index = result.index.astype(str)\nresult.columns = [str(c) for c in result.columns]"
+    expect_detector: column_values
+hints:
+  - "Когорты и retention — разделы «Когорты» и «Retention»."
+  - "Добавь к сессиям когорту пользователя, посчитай смещение месяца сессии от месяца когорты, затем число уникальных пользователей по паре (когорта, смещение), разверни смещения в колонки и раздели на размер когорты."
+  - "s[\"offset\"] = (s[\"start_time\"].dt.to_period(\"M\") - s[\"cohort\"]).apply(lambda d: d.n), groupby([\"cohort\", \"offset\"])[\"user_id\"].nunique().unstack(fill_value=0), active.div(size, axis=0)."
+  - "users[\"cohort\"] = users[\"signup_date\"].dt.to_period(\"M\")\ns = sessions.merge(users[[\"user_id\", \"cohort\"]], on=___)\ns[\"offset\"] = (s[\"start_time\"].dt.to_period(\"M\") - s[\"cohort\"]).apply(lambda d: d.___)\nactive = s.groupby([\"cohort\", \"offset\"])[\"user_id\"].nunique().unstack(fill_value=___)\nsize = users.groupby(\"cohort\")[\"user_id\"].nunique()\nresult = active.div(size, axis=___).round(3)\nresult.index = result.index.astype(str)\nresult.columns = [str(c) for c in result.columns]"
+  - "count считает сессии, а не людей: retention вышел бы больше 1. Делить на активных в месяце 0 почти то же, что на размер когорты, но не всегда: зарегистрированный без сессии в месяце регистрации выпадает из знаменателя. Колонка 0 у нас близка к 1, потому что первая сессия — в день регистрации."

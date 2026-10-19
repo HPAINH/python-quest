@@ -1,0 +1,20 @@
+id: C3-10-email
+type: stdio
+title: Домен почты
+difficulty: 1
+lesson_section: methods
+statement: |
+  Дан адрес электронной почты, в нём ровно один символ `@`. Выведи домен — часть после `@` — в нижнем регистре.
+reference: |
+  email = input()
+  print(email[email.find("@") + 1:].lower())
+tests:
+  visible: ["anna.k@Shop.RU", "x@y.com"]
+  hidden: ["a@b", "first.last@sub.domain.org", "UPPER@MAIL.RU"]
+star3: [first_try, "max_lines:2"]
+hints:
+  - "Найти символ поможет find или split — разделы «Методы строк» и «split и join»."
+  - "Найди позицию @ и возьми всё после неё, затем переведи в нижний регистр. Другой путь — разделить строку по @ и взять вторую часть."
+  - "email.find(\"@\") и срез, либо email.split(\"@\")[1]; метод lower()."
+  - "email = input()\nat = email.find(___)\nprint(email[at + ___:].lower())"
+  - "find возвращает индекс @, срез с at + 1 начинается сразу после него. Вариант через split короче: email.split(\"@\")[1].lower() — вторая часть после разделителя."

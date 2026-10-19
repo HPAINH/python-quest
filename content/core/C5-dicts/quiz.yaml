@@ -1,0 +1,93 @@
+quiz:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      d = {"a": 1, "b": 2}
+      d["a"] = 10
+      d["c"] = 3
+      print(len(d), d["a"], d.get("z", 0))
+    answer: "3 10 0"
+    explain: Присваивание по существующему ключу заменяет значение, по новому — добавляет пару. get возвращает значение по умолчанию для отсутствующего ключа.
+    section: dict-methods
+  - type: fill
+    q: Впиши пропуск, чтобы счётчик работал и для новых слов.
+    code: |
+      freq = {}
+      for w in ["a", "b", "a"]:
+          freq[w] = ___ + 1
+      print(freq["a"])
+    answer: ["freq.get(w, 0)"]
+    expect: "2"
+    explain: freq.get(w, 0) даёт 0 для нового слова и текущее значение для встречавшегося.
+    section: counting
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      a = {1, 2, 3}
+      b = {2, 3, 4}
+      print(sorted(a & b), sorted(a - b))
+    answer: "[2, 3] [1]"
+    explain: Пересечение — общие элементы, разность — элементы a, которых нет в b.
+    section: sets
+  - type: choice
+    q: Чем создать пустое множество?
+    options: ["{}", "set()", "[]", "()"]
+    answer: 1
+    explain: "{} создаёт пустой словарь. Пустое множество — только set()."
+    section: sets
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      g = {}
+      for k, v in [("x", 1), ("y", 2), ("x", 3)]:
+          g.setdefault(k, []).append(v)
+      print(g)
+    answer: "{'x': [1, 3], 'y': [2]}"
+    explain: setdefault создаёт пустой список для нового ключа и возвращает список, к которому добавляется значение.
+    section: nested
+
+express:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      freq = {"кофе": 3, "чай": 5, "сыр": 5}
+      print(max(freq, key=freq.get))
+    answer: "чай"
+    explain: max по ключу freq.get выбирает ключ с наибольшим значением. При равенстве побеждает первый встреченный — чай.
+    section: counting
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      d = {"b": 2, "a": 3, "c": 1}
+      print([k for k, v in sorted(d.items(), key=lambda p: p[1])])
+    answer: "['c', 'b', 'a']"
+    explain: Пары сортируются по значению — 1, 2, 3 — и из каждой берётся ключ.
+    section: dict-methods
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      print(len(set("mississippi")))
+    answer: "4"
+    explain: Уникальные буквы — m, i, s, p.
+    section: sets
+  - type: choice
+    q: Какая операция даст клиентов, которые были в сентябре, но не вернулись в октябре?
+    options: ["sep & oct", "sep | oct", "sep - oct", "oct - sep"]
+    answer: 2
+    explain: Разность sep - oct оставляет тех, кто есть в сентябре и отсутствует в октябре.
+    section: sets
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      user = {"name": "Аня", "tags": ["vip", "new"]}
+      user["tags"].append("sale")
+      print(len(user["tags"]), user["tags"][-1])
+    answer: "3 sale"
+    explain: Значение по ключу tags — список, его можно менять методами списков.
+    section: nested
+  - type: choice
+    q: Почему freq[w] += 1 падает на первом же слове?
+    options: ["+= не работает со словарями", "Ключа w ещё нет в словаре — KeyError", "Слова нельзя использовать как ключи", "Нужно писать freq.w += 1"]
+    answer: 1
+    explain: Чтобы прибавить, нужно прочитать текущее значение, а его нет. Используй freq.get(w, 0) + 1.
+    section: counting

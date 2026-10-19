@@ -1,0 +1,27 @@
+id: P4-01-channel-revenue
+type: dataframe
+title: Выручка по каналам
+difficulty: 1
+lesson_section: groupby
+sql_quest_ref: GROUP BY с SUM
+statement: |
+  Запиши в `result` выручку по каналам продаж — сумму `amount` **доставленных** заказов (`status` равен `delivered`) по каждому `channel`, округлённую до 2 знаков. Колонки `channel` и `amount`.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+reference: |
+  delivered = orders[orders["status"] == "delivered"]
+  result = delivered.groupby("channel")["amount"].sum().round(2)
+requires: ["uses:groupby"]
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "result = orders.groupby('channel')['amount'].sum().round(2)"
+    expect_detector: column_values
+  - code: "delivered = orders[orders['status'] == 'delivered']\nresult = delivered.groupby('channel')['amount'].mean().round(2)"
+    expect_detector: column_values
+hints:
+  - "Сумма по группам — раздел «groupby»."
+  - "Сначала оставь доставленные заказы, затем сгруппируй по каналу и сложи суммы."
+  - "orders[orders[\"status\"] == \"delivered\"].groupby(\"channel\")[\"amount\"].sum()."
+  - "delivered = orders[orders[\"status\"] == ___]\nresult = delivered.groupby(___)[\"amount\"].sum().round(2)"
+  - "Фильтр до группировки — аналог WHERE: отменённые заказы не должны попасть в выручку. Подписи-ключи результата превратятся в колонку channel."

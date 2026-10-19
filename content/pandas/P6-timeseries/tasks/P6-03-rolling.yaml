@@ -1,0 +1,27 @@
+id: P6-03-rolling
+type: dataframe
+title: Скользящее среднее за неделю
+difficulty: 2
+lesson_section: rolling
+statement: |
+  Посчитай выручку всех заказов по дням (все дни подряд) и её скользящее среднее за 7 дней. Запиши в `result` таблицу за сентябрь 2026 года с колонками `revenue` (сумма за день) и `avg7` (среднее за 7 дней, включая текущий). Индекс — даты, оба числа округли до 2 знаков.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv", parse_dates=["order_date"])
+reference: |
+  daily = orders.resample("D", on="order_date")["amount"].sum()
+  t = pd.DataFrame({"revenue": daily, "avg7": daily.rolling(7).mean()}).round(2)
+  result = t.loc["2026-09"]
+ordered: true
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "daily = orders.resample('D', on='order_date')['amount'].sum()\nt = pd.DataFrame({'revenue': daily, 'avg7': daily.loc['2026-09'].rolling(7).mean()}).round(2)\nresult = t.loc['2026-09']"
+    expect_detector: column_values
+  - code: "daily = orders.resample('D', on='order_date')['amount'].sum()\nt = pd.DataFrame({'revenue': daily, 'avg7': daily.rolling(7, center=True).mean()}).round(2)\nresult = t.loc['2026-09']"
+    expect_detector: column_values
+hints:
+  - "Скользящее окно — раздел «rolling»."
+  - "Сначала дневной ряд за весь период, потом rolling(7).mean(), и только в конце срез сентября — иначе первые дни месяца потеряют предыдущую неделю."
+  - "orders.resample(\"D\", on=\"order_date\")[\"amount\"].sum(), daily.rolling(7).mean(), t.loc[\"2026-09\"]."
+  - "daily = orders.resample(\"D\", on=\"order_date\")[\"amount\"].sum()\nt = pd.DataFrame({\"revenue\": daily, \"avg7\": daily.rolling(___).mean()}).round(2)\nresult = t.loc[___]"
+  - "Если вырезать сентябрь до rolling, у 1–6 сентября окно неполное и получится NaN. center=True ставит окно вокруг дня и подглядывает в будущее — для отчёта «на сегодня» так нельзя."

@@ -1,0 +1,23 @@
+id: C4-06-sort-words
+type: stdio
+title: Слова по длине
+difficulty: 2
+lesson_section: sorting
+statement: |
+  Дана строка из слов через пробел. Выведи слова через пробел, отсортированные по убыванию длины, а при одинаковой длине — по алфавиту.
+reference: |
+  words = input().split()
+  print(*sorted(words, key=lambda w: (-len(w), w)))
+tests:
+  visible: ["sql python ml pandas", "bb aa c"]
+  hidden: ["a", "abc abd abb", "zz z zzz y", "data data"]
+random: {count: 20, gen: "' '.join(''.join(random.choice('abc') for _ in range(random.randint(1, 4))) for _ in range(random.randint(1, 9)))"}
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "words = input().split()\nprint(*sorted(words, key=len, reverse=True))"
+hints:
+  - "Сортировка с ключом — раздел «Сортировка»."
+  - "Ключ сортировки — пара: длина со знаком минус (для убывания) и само слово (для алфавита при равной длине)."
+  - "sorted(words, key=lambda w: (-len(w), w)) и print(*...)."
+  - "words = input().split()\nprint(*sorted(words, key=lambda w: (___, ___)))"
+  - "Кортежи сравниваются по первому полю, а при равенстве — по второму. -len(w) делает длинные слова «меньше», поэтому они идут первыми. Если просто перевернуть сортировку по длине, слова одной длины встанут не по алфавиту."

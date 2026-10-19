@@ -1,0 +1,33 @@
+id: M1-05-columns
+type: value
+title: Сколько признаков после подготовки
+difficulty: 2
+lesson_section: pipeline
+statement: 'Собери `ColumnTransformer`: числовые колонки (все, кроме `city` и `loyalty`) — `SimpleImputer(strategy="median")` и `StandardScaler`, категориальные — `OneHotEncoder(handle_unknown="ignore")`. Обучи его на всём `X` и запиши `shape` — форму результата (кортеж) и `names` — список имён выходных колонок из `get_feature_names_out()`.
+
+  '
+setup: "import numpy as np\nimport pandas as pd\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import OneHotEncoder, StandardScaler\nfrom sklearn.impute import SimpleImputer\nfrom sklearn.compose import ColumnTransformer\nfrom sklearn.pipeline import make_pipeline, Pipeline\nfrom sklearn.linear_model import LogisticRegression\ndf = pd.read_csv(\"churn.csv\")\nX = df.drop(columns=[\"customer_id\", \"cancel_request\", \"churned\"])\ny = df[\"churned\"]\nif SHUFFLE:\n    y = y.sample(frac=1, random_state=1).reset_index(drop=True)\n"
+outputs:
+- var: shape
+- var: names
+reference: "cat = [\"city\", \"loyalty\"]\nnum = [c for c in X.columns if c not in cat]\npre = ColumnTransformer([\n    (\"num\", make_pipeline(SimpleImputer(strategy=\"median\"), StandardScaler()), num),\n    (\"cat\", OneHotEncoder(handle_unknown=\"ignore\"), cat),\n])\nout = pre.fit_transform(X)\nshape = out.shape\nnames = pre.get_feature_names_out().tolist()\n"
+star3:
+- first_try
+buggy_variants:
+- code: 'cat = [''city'', ''loyalty'']
+
+    num = [c for c in X.columns if c not in cat]
+
+    pre = ColumnTransformer([(''num'', make_pipeline(SimpleImputer(strategy=''median''), StandardScaler()), num), (''cat'', OneHotEncoder(handle_unknown=''ignore''), cat)], remainder=''drop'')
+
+    out = pre.fit_transform(X[num + [''city'']])
+
+    shape = out.shape
+
+    names = pre.get_feature_names_out().tolist()'
+hints:
+- ColumnTransformer — раздел «Pipeline и ColumnTransformer».
+- 'Перечисли категориальные колонки, остальные — числовые. В ColumnTransformer передай два набора шагов: для чисел — pipeline из импьютера и scaler, для категорий — кодировщик.'
+- ColumnTransformer([("num", make_pipeline(SimpleImputer(strategy="median"), StandardScaler()), num), ("cat", OneHotEncoder(handle_unknown="ignore"), cat)]).
+- "cat = [\"city\", \"loyalty\"]\nnum = [c for c in X.columns if c not in cat]\npre = ColumnTransformer([\n    (\"num\", make_pipeline(SimpleImputer(strategy=\"median\"), ___()), num),\n    (\"cat\", OneHotEncoder(handle_unknown=___), cat),\n])\nout = pre.fit_transform(X)\nshape = out.shape\nnames = pre.get_feature_names_out().tolist()"
+- 'Имена получают префикс шага: num__days_since_last, cat__city_Москва. Число колонок — числовые плюс по одной на каждое значение категорий.'

@@ -1,0 +1,35 @@
+id: D4-04-adam
+type: function
+function: adam_step
+title: Шаг Adam
+difficulty: 2
+lesson_section: adam
+tol: 1.0e-09
+statement: 'Напиши функцию `adam_step(w, g, m, v, t, lr=0.001, b1=0.9, b2=0.999, eps=1e-8)` — один шаг Adam для массива весов `w` с градиентом `g`, средними `m`, `v` и номером шага `t` (с единицы). Обнови `m` и `v`, поправь смещение делением на `1 − b1ᵗ` и `1 − b2ᵗ` и верни кортеж `(w_new, m_new, v_new)`.
+
+  '
+setup: "import numpy as np\n\ndef rnd(*shape, seed=0):\n    return np.random.default_rng(seed).normal(size=shape).round(3)\n"
+starter: "def adam_step(w, g, m, v, t, lr=0.001, b1=0.9, b2=0.999, eps=1e-8):\n    pass\n"
+reference: "def adam_step(w, g, m, v, t, lr=0.001, b1=0.9, b2=0.999, eps=1e-8):\n    m = b1 * m + (1 - b1) * g\n    v = b2 * v + (1 - b2) * g ** 2\n    m_hat = m / (1 - b1 ** t)\n    v_hat = v / (1 - b2 ** t)\n    return w - lr * m_hat / (np.sqrt(v_hat) + eps), m, v\n"
+tests:
+  visible:
+  - adam_step(np.array([1.0, -2.0]), np.array([0.5, 4.0]), np.zeros(2), np.zeros(2), 1)
+  hidden:
+  - adam_step(rnd(3, seed=1), rnd(3, seed=2), rnd(3, seed=3) * 0.1, np.abs(rnd(3, seed=4)), 5, lr=0.01)
+  - adam_step(rnd(2, 2, seed=5), rnd(2, 2, seed=6), np.zeros((2, 2)), np.zeros((2, 2)), 1, lr=0.1)
+  - adam_step(np.zeros(2), np.zeros(2), np.zeros(2), np.zeros(2), 3)
+random:
+  count: 10
+  gen: '(lambda s: f''adam_step(rnd(3, seed={s}), rnd(3, seed={s + 1}), rnd(3, seed={s + 2}) * 0.1, np.abs(rnd(3, seed={s + 3})) * 0.1, {random.randint(1, 50)}, lr={random.choice([0.001, 0.01, 0.1])})'')(random.randint(0, 999))'
+star3:
+- first_try
+- max_lines:6
+buggy_variants:
+- code: "def adam_step(w, g, m, v, t, lr=0.001, b1=0.9, b2=0.999, eps=1e-8):\n    m = b1 * m + (1 - b1) * g\n    v = b2 * v + (1 - b2) * g ** 2\n    return w - lr * m / (np.sqrt(v) + eps), m, v"
+- code: "def adam_step(w, g, m, v, t, lr=0.001, b1=0.9, b2=0.999, eps=1e-8):\n    m = b1 * m + (1 - b1) * g\n    v = b2 * v + (1 - b2) * g\n    m_hat = m / (1 - b1 ** t)\n    v_hat = v / (1 - b2 ** t)\n    return w - lr * m_hat / (np.sqrt(v_hat) + eps), m, v"
+hints:
+- Adam — раздел «Adam».
+- 'Четыре строки: новое m, новое v (по квадрату градиента), поправленные m̂ и v̂, шаг w − lr·m̂/(√v̂ + eps). Возвращай m и v без поправки — её делают заново на каждом шаге.'
+- m = b1 * m + (1 - b1) * g; v = b2 * v + (1 - b2) * g ** 2; m / (1 - b1 ** t); v / (1 - b2 ** t).
+- "def adam_step(w, g, m, v, t, lr=0.001, b1=0.9, b2=0.999, eps=1e-8):\n    m = b1 * m + (1 - b1) * g\n    v = b2 * v + (1 - b2) * g ** ___\n    m_hat = m / (1 - b1 ** ___)\n    v_hat = v / (1 - b2 ** t)\n    return w - lr * m_hat / (np.sqrt(___) + eps), m, v"
+- 'Без поправки на первом шаге m = 0.1·g, v = 0.001·g², и шаг получается в √0.001/0.1 ≈ 0.32 раза меньше задуманного. Поправка исчезает сама: при больших t знаменатели близки к 1.'

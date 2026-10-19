@@ -1,0 +1,32 @@
+id: C6-02-clamp
+type: function
+function: clamp
+title: Ограничить диапазоном
+difficulty: 1
+lesson_section: params
+statement: |
+  Напиши функцию `clamp(x, lo=0, hi=100)`, которая возвращает `x`, если он лежит между `lo` и `hi` включительно. Если `x` меньше `lo`, функция возвращает `lo`, если больше `hi` — возвращает `hi`. Гарантируется `lo <= hi`.
+starter: |
+  def clamp(x, lo=0, hi=100):
+      pass
+reference: |
+  def clamp(x, lo=0, hi=100):
+      if x < lo:
+          return lo
+      if x > hi:
+          return hi
+      return x
+tests:
+  visible: ["clamp(150)", "clamp(-5, -3, 3)"]
+  hidden: ["clamp(50)", "clamp(0)", "clamp(100)", "clamp(7, hi=5)", "clamp(-1, lo=-10)", "clamp(2.5, 1, 2)"]
+random: {count: 25, gen: "(lambda a, b: f'clamp({random.randint(-50, 150)}, {min(a, b)}, {max(a, b)})')(random.randint(-20, 60), random.randint(40, 120))"}
+star3: [first_try]
+buggy_variants:
+  - code: "def clamp(x, lo, hi):\n    return max(lo, min(x, hi))"
+    expect_detector: missing_argument
+hints:
+  - "Значения по умолчанию задаются в def — раздел «Параметры и аргументы»."
+  - "Сначала проверь, не меньше ли x нижней границы, потом — не больше ли верхней. Если ни то ни другое, верни x."
+  - "Параметры lo=0 и hi=100, два if с return. Короткий вариант: max(lo, min(x, hi))."
+  - "def clamp(x, lo=___, hi=___):\n    if x < lo:\n        return ___\n    if x > hi:\n        return ___\n    return x"
+  - "Значения по умолчанию позволяют вызвать clamp(150) с одним аргументом — тогда lo = 0, hi = 100, и ответ 100. Вызов clamp(7, hi=5) меняет только верхнюю границу. Однострочник max(lo, min(x, hi)) делает то же самое."

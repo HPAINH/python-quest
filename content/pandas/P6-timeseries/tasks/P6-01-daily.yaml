@@ -1,0 +1,26 @@
+id: P6-01-daily
+type: dataframe
+title: Выручка по дням
+difficulty: 1
+lesson_section: resample
+sql_quest_ref: GROUP BY по дате
+statement: |
+  Запиши в `result` выручку **доставленных** заказов по дням за август 2026 года включительно: индекс — даты, значения — сумма `amount`, округлённая до 2 знаков. Дни без доставленных заказов должны быть в ряду с нулём.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv", parse_dates=["order_date"])
+reference: |
+  delivered = orders[orders["status"] == "delivered"]
+  daily = delivered.resample("D", on="order_date")["amount"].sum().round(2)
+  result = daily.loc["2026-08-01":"2026-08-31"]
+ordered: true
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "daily = orders.resample('D', on='order_date')['amount'].sum().round(2)\nresult = daily.loc['2026-08-01':'2026-08-31']"
+    expect_detector: column_values
+hints:
+  - "Свёртка по дням — resample, раздел «resample»; срез по датам — раздел «Даты в индексе»."
+  - "Отфильтруй доставленные заказы, сверни их по дням и сложи суммы. Потом возьми срез августа по индексу."
+  - "delivered.resample(\"D\", on=\"order_date\")[\"amount\"].sum(), daily.loc[\"2026-08-01\":\"2026-08-31\"]."
+  - "delivered = orders[orders[\"status\"] == ___]\ndaily = delivered.resample(___, on=\"order_date\")[\"amount\"].sum().round(2)\nresult = daily.loc[\"2026-08-01\":___]"
+  - "groupby по дате даёт только дни, где были заказы, а resample — все дни подряд, пустые с нулём. Срез по строковым датам включает обе границы."

@@ -1,0 +1,42 @@
+id: C8-01-point
+type: function
+function: Point
+title: Точка склада
+difficulty: 1
+lesson_section: classes
+statement: |
+  Напиши класс `Point` для точек на карте склада:
+  - конструктор `Point(x, y)` сохраняет координаты в атрибуты `x` и `y`;
+  - метод `dist(other)` возвращает расстояние до другой точки, округлённое до 2 знаков;
+  - метод `move(dx, dy)` сдвигает точку и ничего не возвращает.
+starter: |
+  class Point:
+      def __init__(self, x, y):
+          pass
+reference: |
+  class Point:
+      def __init__(self, x, y):
+          self.x = x
+          self.y = y
+
+      def dist(self, other):
+          return round(((self.x - other.x) ** 2 + (self.y - other.y) ** 2) ** 0.5, 2)
+
+      def move(self, dx, dy):
+          self.x += dx
+          self.y += dy
+requires: ["uses:class"]
+tests:
+  visible: ["p = Point(0, 0)\np.dist(Point(3, 4))", "p = Point(1, 2)\np.move(5, -2)\n(p.x, p.y)"]
+  hidden: ["Point(1, 1).dist(Point(1, 1))", "a = Point(-1, -1)\nb = Point(2, 3)\n(a.dist(b), b.dist(a))", "p = Point(0, 0)\np.move(1, 1)\np.move(1, 1)\np.dist(Point(0, 0))"]
+random: {count: 15, gen: "f'Point({random.randint(-9, 9)}, {random.randint(-9, 9)}).dist(Point({random.randint(-9, 9)}, {random.randint(-9, 9)}))'"}
+star3: [first_try]
+buggy_variants:
+  - code: "class Point:\n    def __init__(self, x, y):\n        x = x\n        y = y\n    def dist(self, other):\n        return round(((self.x - other.x) ** 2 + (self.y - other.y) ** 2) ** 0.5, 2)\n    def move(self, dx, dy):\n        self.x += dx\n        self.y += dy"
+    expect_detector: attribute_error
+hints:
+  - "Атрибуты объекта задаются через self в __init__ — раздел «Классы и объекты»."
+  - "В конструкторе сохрани x и y в self. В dist посчитай расстояние по теореме Пифагора между self и other. В move прибавь сдвиги к своим координатам."
+  - "self.x = x, ((self.x - other.x) ** 2 + (self.y - other.y) ** 2) ** 0.5, round(..., 2), self.x += dx."
+  - "class Point:\n    def __init__(self, x, y):\n        self.x = ___\n        self.y = ___\n\n    def dist(self, other):\n        return round(((self.x - other.x) ** 2 + (self.y - ___) ** 2) ** 0.5, 2)\n\n    def move(self, dx, dy):\n        self.x ___ dx\n        self.y += dy"
+  - "Без self. значение остаётся локальной переменной __init__ и пропадает, поэтому p.x потом даёт AttributeError. move меняет объект на месте и не возвращает ничего — как list.append."

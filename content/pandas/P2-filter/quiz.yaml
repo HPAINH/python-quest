@@ -1,0 +1,97 @@
+quiz:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      df = pd.DataFrame({"a": [5, 1, 8, 3], "b": ["x", "y", "x", "x"]})
+      print(len(df[(df["a"] > 2) & (df["b"] == "x")]))
+    answer: "3"
+    explain: Условиям одновременно удовлетворяют строки с a = 5, 8 и 3.
+    section: filter
+  - type: choice
+    q: Чем loc отличается от iloc?
+    options: ["Ничем", "loc выбирает по подписям и маскам, iloc — по позициям", "iloc работает только со строками", "loc быстрее"]
+    answer: 1
+    explain: df.iloc[0] — первая по порядку строка, df.loc[0] — строка с подписью 0.
+    section: loc-iloc
+  - type: fill
+    q: Впиши метод, чтобы оставить строки с каналом app или web.
+    code: |
+      import pandas as pd
+      s = pd.Series(["app", "offline", "web"])
+      print(s[s.___(["app", "web"])].tolist())
+    answer: ["isin"]
+    expect: "['app', 'web']"
+    explain: isin проверяет, входит ли значение в список.
+    section: filter
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      df = pd.DataFrame({"id": [1, 2, 3], "v": [10, 30, 30]})
+      print(df.sort_values(["v", "id"], ascending=[False, False])["id"].tolist())
+    answer: "[3, 2, 1]"
+    explain: Сначала по v по убыванию, при равенстве — по id тоже по убыванию.
+    section: sort
+  - type: choice
+    q: Почему orders[маска]["delivery_cost"] = 0 не меняет orders?
+    options: ["Так менять можно только числа", "Первый шаг создаёт копию, и присваивание меняет её, а не исходную таблицу", "Нужно писать == 0", "delivery_cost нельзя менять"]
+    answer: 1
+    explain: Используй один шаг через loc — orders.loc[маска, "delivery_cost"] = 0.
+    section: loc-iloc
+
+express:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      df = pd.DataFrame({"v": [10, 20, 30, 40]}, index=[5, 6, 7, 8])
+      print(df.iloc[1:3]["v"].tolist(), df.loc[6:7, "v"].tolist())
+    answer: "[20, 30] [20, 30]"
+    explain: iloc[1:3] — позиции 1 и 2. loc[6:7] — подписи 6 и 7 включительно.
+    section: loc-iloc
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      df = pd.DataFrame({"d": ["2026-08-31", "2026-09-01", "2026-09-30", "2026-10-01"]})
+      print(df["d"].between("2026-09-01", "2026-09-30").sum())
+    answer: "2"
+    explain: between включает обе границы, а даты ISO сравниваются как строки правильно.
+    section: filter
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      df = pd.DataFrame({"a": [1, 5, 9]})
+      lim = 4
+      print(df.query("a > @lim")["a"].tolist())
+    answer: "[5, 9]"
+    explain: "@ подставляет внешнюю переменную в строку query."
+    section: query
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      df = pd.DataFrame({"a": [3, 1, 2]})
+      r = df.sort_values("a", inplace=True)
+      print(r, df["a"].tolist())
+    answer: "None [1, 2, 3]"
+    explain: inplace=True меняет таблицу на месте и возвращает None.
+    section: sort
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      df = pd.DataFrame({"a": [1, 2, 3, 4]})
+      f = df[df["a"] % 2 == 0]
+      print(f.index.tolist(), f.reset_index(drop=True).index.tolist())
+    answer: "[1, 3] [0, 1]"
+    explain: Фильтр сохраняет старые подписи строк, reset_index нумерует заново.
+    section: filter
+  - type: choice
+    q: Что вернёт df.nlargest(3, "amount")?
+    options: ["Три наибольших значения amount списком", "Три строки таблицы с наибольшим amount, по убыванию", "Номера трёх строк", "Таблицу без трёх строк"]
+    answer: 1
+    explain: nlargest возвращает строки целиком — как сортировка по убыванию и head(3).
+    section: sort

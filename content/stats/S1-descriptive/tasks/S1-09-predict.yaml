@@ -1,0 +1,22 @@
+id: S1-09-predict
+type: predict
+title: Распределения в цифрах
+difficulty: 2
+lesson_section: distributions
+statement: |
+  Впиши, что выведет программа.
+code: |
+  import numpy as np
+  import pandas as pd
+  from scipy import stats
+  x = pd.Series([2, 4, 4, 4, 6])
+  print(x.mean(), x.median(), round(x.std(), 3), round(np.std(x.values), 3))
+  print(round(stats.binom.pmf(0, n=3, p=0.5), 3), round(stats.binom.sf(0, n=3, p=0.5), 3))
+  print(round(stats.norm.sf(0), 2), round(stats.norm.ppf(0.5), 2))
+  print(((x - x.mean()) / x.std()).round(2).tolist())
+hints:
+  - "Повтори разделы «Центр», «Разброс» и «Распределения»."
+  - "Сумма квадратов отклонений от 4 равна 8. Делим на 4 (n − 1) или на 5 (n) и берём корень."
+  - "P(X = 0) при трёх подбрасываниях — 1/8; sf(0) — вероятность хотя бы одного успеха. Нормальное симметрично: sf(0) и ppf(0.5) — половина и ноль."
+  - "Четыре строки: четыре числа, два, два и список из пяти z-оценок."
+  - "Ответ: «4.0 4.0 1.414 1.265», «0.125 0.875», «0.5 0.0», «[-1.41, 0.0, 0.0, 0.0, 1.41]»."

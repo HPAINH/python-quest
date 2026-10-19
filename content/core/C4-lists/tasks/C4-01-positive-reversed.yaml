@@ -1,0 +1,22 @@
+id: C4-01-positive-reversed
+type: stdio
+title: Положительные наоборот
+difficulty: 1
+lesson_section: list-methods
+statement: |
+  В строке через пробел даны целые числа. Выведи через пробел только положительные из них в обратном порядке. Если положительных нет, выведи пустую строку.
+reference: |
+  nums = list(map(int, input().split()))
+  pos = [x for x in nums if x > 0]
+  print(*pos[::-1])
+tests:
+  visible: ["3 -1 5 0 -2 7", "-1 4 -2 9"]
+  hidden: ["5", "0 0 0", "-1 -2", "1 2 3 4", "-5 10 -5 20"]
+random: {count: 20, gen: "' '.join(str(random.randint(-9, 9)) for _ in range(random.randint(1, 15)))"}
+star3: [first_try, "max_lines:2"]
+hints:
+  - "Отбор элементов и разворот списка — разделы «Методы списков» и «Генераторы списков»."
+  - "Прочитай числа в список, оставь только положительные, разверни и выведи через пробел."
+  - "list(map(int, input().split())), [x for x in nums if x > 0], срез [::-1], print(*список)."
+  - "nums = list(map(int, input().split()))\npos = [x for x in nums if x ___ 0]\nprint(*pos[___])"
+  - "Звёздочка в print(*pos) раскладывает список на отдельные аргументы, и print печатает их через пробел без скобок и запятых. Для пустого списка выводится пустая строка. Ноль — не положительное число, поэтому условие строгое."

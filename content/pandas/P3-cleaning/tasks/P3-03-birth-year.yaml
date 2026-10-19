@@ -1,0 +1,25 @@
+id: P3-03-birth-year
+type: dataframe
+title: Год рождения из выгрузки
+difficulty: 2
+lesson_section: types
+statement: |
+  В `customers_raw` год рождения записан текстом, а неизвестный год — строкой `н/д`. Запиши в `result` клиентов с известным годом: колонки `customer_id` и `birth_year`, где `birth_year` — число. Исходный порядок, дубликаты строк пока не трогай.
+setup: |
+  import pandas as pd
+  raw = pd.read_csv("customers_raw.csv")
+reference: |
+  raw["birth_year"] = pd.to_numeric(raw["birth_year"], errors="coerce")
+  result = raw.dropna(subset=["birth_year"])[["customer_id", "birth_year"]]
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "result = raw[raw['birth_year'] != 'н/д'][['customer_id', 'birth_year']]"
+    expect_detector: column_dtype
+  - code: "raw['birth_year'] = pd.to_numeric(raw['birth_year'], errors='coerce')\nresult = raw[['customer_id', 'birth_year']]"
+    expect_detector: shape_rows
+hints:
+  - "Текст в число — раздел «Типы», удаление пропусков — раздел «Пропуски»."
+  - "pd.to_numeric с errors=\"coerce\" превратит «н/д» в пропуск. Потом удали строки с пропуском в этой колонке."
+  - "pd.to_numeric(raw[\"birth_year\"], errors=\"coerce\"), dropna(subset=[\"birth_year\"])."
+  - "raw[\"birth_year\"] = pd.to_numeric(raw[\"birth_year\"], errors=___)\nresult = raw.dropna(subset=[___])[[\"customer_id\", \"birth_year\"]]"
+  - "Фильтр != \"н/д\" убирает нужные строки, но годы так и остаются текстом — посчитать возраст не выйдет. Без errors=\"coerce\" to_numeric упал бы на первой же строке «н/д»."

@@ -1,0 +1,33 @@
+id: P4-03-agg
+type: dataframe
+title: Отчёт по каналам
+difficulty: 2
+lesson_section: agg
+statement: |
+  Запиши в `result` отчёт по каналам по всем заказам. Колонки:
+  - `channel`;
+  - `n_orders` — число заказов;
+  - `revenue` — сумма `amount`, округлённая до 2 знаков;
+  - `avg_check` — средний `amount`, округлённый до 2 знаков;
+  - `clients` — число разных клиентов.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+reference: |
+  result = orders.groupby("channel").agg(
+      n_orders=("order_id", "count"),
+      revenue=("amount", "sum"),
+      avg_check=("amount", "mean"),
+      clients=("customer_id", "nunique"),
+  ).round(2)
+requires: ["uses:agg"]
+star3: [first_try, "max_lines:6"]
+buggy_variants:
+  - code: "result = orders.groupby('channel').agg(n_orders=('order_id', 'count'), revenue=('amount', 'sum'), avg_check=('amount', 'mean'), clients=('customer_id', 'count')).round(2)"
+    expect_detector: column_values
+hints:
+  - "Несколько показателей за раз — agg, раздел «agg»."
+  - "Используй именованную агрегацию: имя_колонки=(\"исходная колонка\", \"функция\"). Число разных клиентов — nunique."
+  - "agg(n_orders=(\"order_id\", \"count\"), revenue=(\"amount\", \"sum\"), avg_check=(\"amount\", \"mean\"), clients=(\"customer_id\", \"nunique\"))."
+  - "result = orders.groupby(\"channel\").agg(\n    n_orders=(\"order_id\", ___),\n    revenue=(\"amount\", \"sum\"),\n    avg_check=(\"amount\", ___),\n    clients=(\"customer_id\", ___),\n).round(2)"
+  - "count по customer_id считает заказы, а не клиентов: клиент с пятью заказами учитывается пять раз. nunique — аналог COUNT(DISTINCT)."

@@ -1,0 +1,48 @@
+id: S2-10-boss-ab
+type: dataframe
+title: "Босс: интервалы для конверсии"
+difficulty: 3
+boss: true
+lesson_section: ci-prop
+statement: |
+  Для эксперимента `exp_checkout` подготовь интервальные оценки конверсии (`converted`).
+
+  1. `table` — таблица с индексом `group` (`A`, `B`) и колонками `n`, `conv`, `low`, `high` — 95% интервал по нормальному приближению; `conv`, `low`, `high` округлены до 4 знаков.
+  2. `diff_ci` — 95% интервал для разницы конверсий B − A по нормальному приближению: SE = √(pA(1 − pA)/nA + pB(1 − pB)/nB). Допуск ±0.0001.
+  3. `significant` — `True`, если весь интервал разницы выше нуля.
+setup: |
+  import numpy as np
+  import pandas as pd
+  from scipy import stats
+  m = pd.read_csv("ab_metrics.csv")
+  a = pd.read_csv("ab_assignments.csv")
+outputs:
+  - var: table
+    title: конверсия по группам
+  - var: diff_ci
+    tol: 0.0001
+  - var: significant
+reference: |
+  t = m[m["experiment"] == "exp_checkout"].merge(a, on=["user_id", "experiment"])
+  z = stats.norm.ppf(0.975)
+  g = t.groupby("group")["converted"]
+  n = g.size()
+  p = g.mean()
+  se = np.sqrt(p * (1 - p) / n)
+  table = pd.DataFrame({"n": n, "conv": p.round(4), "low": (p - z * se).round(4), "high": (p + z * se).round(4)})
+  d = p["B"] - p["A"]
+  se_d = np.sqrt(p["A"] * (1 - p["A"]) / n["A"] + p["B"] * (1 - p["B"]) / n["B"])
+  diff_ci = (d - z * se_d, d + z * se_d)
+  significant = bool(diff_ci[0] > 0)
+star3: [first_try]
+buggy_variants:
+  - code: "t = m.merge(a, on=['user_id', 'experiment'])\nz = stats.norm.ppf(0.975)\ng = t.groupby('group')['converted']\nn = g.size()\np = g.mean()\nse = np.sqrt(p * (1 - p) / n)\ntable = pd.DataFrame({'n': n, 'conv': p.round(4), 'low': (p - z * se).round(4), 'high': (p + z * se).round(4)})\nd = p['B'] - p['A']\nse_d = np.sqrt(p['A'] * (1 - p['A']) / n['A'] + p['B'] * (1 - p['B']) / n['B'])\ndiff_ci = (d - z * se_d, d + z * se_d)\nsignificant = bool(diff_ci[0] > 0)"
+    expect_detector: column_values
+  - code: "t = m[m['experiment'] == 'exp_checkout'].merge(a, on=['user_id', 'experiment'])\nz = stats.norm.ppf(0.975)\ng = t.groupby('group')['converted']\nn = g.size()\np = g.mean()\nse = np.sqrt(p * (1 - p) / n)\ntable = pd.DataFrame({'n': n, 'conv': p.round(4), 'low': (p - z * se).round(4), 'high': (p + z * se).round(4)})\nd = p['B'] - p['A']\nse_d = se['A'] + se['B']\ndiff_ci = (d - z * se_d, d + z * se_d)\nsignificant = bool(diff_ci[0] > 0)"
+    expect_detector: stat_value
+hints:
+  - "Всё из уровня: доля, её SE и интервал, только по группам и для разницы."
+  - "Соедини метрики с группами, оставь exp_checkout. По группе посчитай n и долю, SE и границы — векторно для обеих групп сразу. Для разницы дисперсии двух групп складываются под корнем."
+  - "g = t.groupby(\"group\")[\"converted\"], g.size(), g.mean(), np.sqrt(p * (1 - p) / n), np.sqrt(pA(1 − pA)/nA + pB(1 − pB)/nB)."
+  - "t = m[m[\"experiment\"] == \"exp_checkout\"].merge(a, on=[\"user_id\", \"experiment\"])\nz = stats.norm.ppf(0.975)\ng = t.groupby(\"group\")[\"converted\"]\nn = g.size()\np = g.___()\nse = np.sqrt(p * (1 - p) / n)\ntable = pd.DataFrame({\"n\": n, \"conv\": p.round(4), \"low\": (p - z * se).round(4), \"high\": (p + z * se).round(4)})\nd = p[\"B\"] - p[\"A\"]\nse_d = np.sqrt(p[\"A\"] * (1 - p[\"A\"]) / n[\"A\"] + p[\"B\"] * (1 - p[\"B\"]) / n[\"B\"])\ndiff_ci = (d - z * se_d, d + z * ___)\nsignificant = bool(diff_ci[0] > ___)"
+  - "Стандартные ошибки не складываются напрямую — складываются дисперсии, а SE разницы — корень из суммы. Сумма SE даёт слишком широкий интервал и пропускает реальные эффекты. Пересекающиеся интервалы групп ещё не значат, что разницы нет: правильно смотреть на интервал самой разницы."

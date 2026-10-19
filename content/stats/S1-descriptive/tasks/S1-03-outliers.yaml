@@ -1,0 +1,30 @@
+id: S1-03-outliers
+type: stat
+title: Выбросы по правилу IQR
+difficulty: 2
+lesson_section: zscore
+statement: |
+  Найди выбросы в `amount` всех заказов по правилу IQR: значения меньше Q1 − 1,5·IQR или больше Q3 + 1,5·IQR. Запиши в `n_out` их число (целое), в `share_out` — долю среди всех заказов (допуск ±0.0001).
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+outputs:
+  - var: n_out
+  - var: share_out
+    tol: 0.0001
+reference: |
+  a = orders["amount"]
+  q1, q3 = a.quantile(0.25), a.quantile(0.75)
+  iqr = q3 - q1
+  mask = (a < q1 - 1.5 * iqr) | (a > q3 + 1.5 * iqr)
+  n_out = int(mask.sum())
+  share_out = mask.mean()
+star3: [first_try, "max_lines:6"]
+buggy_variants:
+  - code: "a = orders['amount']\nz = (a - a.mean()) / a.std()\nmask = z.abs() > 3\nn_out = int(mask.sum())\nshare_out = mask.mean()"
+hints:
+  - "Правило IQR — раздел «Стандартизация и выбросы»."
+  - "Посчитай квартили и IQR, построй маску из двух условий через | и посчитай сумму и среднее маски."
+  - "a.quantile(0.25), a.quantile(0.75), (a < q1 - 1.5 * iqr) | (a > q3 + 1.5 * iqr), mask.sum(), mask.mean()."
+  - "a = orders[\"amount\"]\nq1, q3 = a.quantile(0.25), a.quantile(0.75)\niqr = q3 - ___\nmask = (a < q1 - 1.5 * iqr) ___ (a > q3 + 1.5 * iqr)\nn_out = int(mask.sum())\nshare_out = mask.___()"
+  - "Нижняя граница у положительно скошенных сумм часто отрицательная, и нижних выбросов нет — но условие всё равно пишут целиком. Правило |z| > 3 предполагает нормальность и для скошенных данных находит меньше выбросов."

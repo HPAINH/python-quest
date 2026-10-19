@@ -1,0 +1,39 @@
+id: S3-03-ztest
+type: stat
+title: z-тест для баннера
+difficulty: 2
+lesson_section: ztest
+statement: |
+  Проверь z-тестом для двух долей, различается ли конверсия групп в `exp_banner`. Запиши `z` для разницы B − A (допуск ±0.001), двусторонний `p_value` (допуск ±0.00001) и `reject` при alpha = 0.05.
+setup: |
+  import numpy as np
+  import pandas as pd
+  from scipy import stats
+  t = pd.read_csv("ab_metrics.csv").merge(pd.read_csv("ab_assignments.csv"), on=["user_id", "experiment"])
+outputs:
+  - var: z
+    tol: 0.001
+  - var: p_value
+    tol: 0.00001
+  - var: reject
+reference: |
+  c = t[t["experiment"] == "exp_banner"]
+  g = c.groupby("group")["converted"].agg(["sum", "size"])
+  xa, na = g.loc["A"]
+  xb, nb = g.loc["B"]
+  p = (xa + xb) / (na + nb)
+  z = (xb / nb - xa / na) / np.sqrt(p * (1 - p) * (1 / na + 1 / nb))
+  p_value = 2 * stats.norm.sf(abs(z))
+  reject = bool(p_value < 0.05)
+star3: [first_try, "max_lines:8"]
+buggy_variants:
+  - code: "c = t[t['experiment'] == 'exp_banner']\ng = c.groupby('group')['converted'].agg(['sum', 'size'])\nxa, na = g.loc['A']\nxb, nb = g.loc['B']\np = (xa + xb) / (na + nb)\nz = (xb / nb - xa / na) / np.sqrt(p * (1 - p) * (1 / na + 1 / nb))\np_value = stats.norm.sf(abs(z))\nreject = bool(p_value < 0.05)"
+    expect_detector: stat_sided
+  - code: "c = t[t['experiment'] == 'exp_banner']\ng = c.groupby('group')['converted'].agg(['sum', 'size'])\nxa, na = g.loc['A']\nxb, nb = g.loc['B']\np = (xa + xb) / (na + nb)\nz = (xa / na - xb / nb) / np.sqrt(p * (1 - p) * (1 / na + 1 / nb))\np_value = 2 * stats.norm.sf(abs(z))\nreject = bool(p_value < 0.05)"
+    expect_detector: stat_sign
+hints:
+  - "Формула — раздел «z-тест для долей»."
+  - "Посчитай число конверсий и участников по группам. Общая доля — сумма конверсий на сумму участников. z — разница долей B − A, делённая на SE. p-value двусторонний."
+  - "agg([\"sum\", \"size\"]), p = (xa + xb) / (na + nb), np.sqrt(p * (1 - p) * (1 / na + 1 / nb)), 2 * stats.norm.sf(abs(z))."
+  - "c = t[t[\"experiment\"] == \"exp_banner\"]\ng = c.groupby(\"group\")[\"converted\"].agg([\"sum\", \"size\"])\nxa, na = g.loc[\"A\"]\nxb, nb = g.loc[\"B\"]\np = (xa + xb) / (na + nb)\nz = (xb / nb - xa / na) / np.sqrt(p * (1 - p) * (1 / ___ + 1 / ___))\np_value = ___ * stats.norm.sf(abs(z))\nreject = bool(p_value < 0.05)"
+  - "Без множителя 2 получается односторонний p-value — вдвое меньше нужного. Для баннера эффекта нет, и правильный ответ — не отвергать H0: это тоже результат, а не провал теста."

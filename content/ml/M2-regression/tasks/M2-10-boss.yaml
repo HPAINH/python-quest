@@ -1,0 +1,51 @@
+id: M2-10-boss
+type: model
+title: 'Босс: прогноз спроса'
+difficulty: 3
+boss: true
+lesson_section: why
+statement: 'Отдел закупок хочет прогноз продаж по дням для новых товаров. Обучи на всех `Xd`, `yd` модель, которая на скрытой выборке других товаров даёт MAE не больше 6.0 штук, и запиши её в `model`. Линейная регрессия даёт около 7.7 — нужно что-то, что видит нелинейные связи: например, `HistGradientBoostingRegressor` из `sklearn.ensemble` после кодирования категории.
+
+  '
+setup: "import numpy as np\nimport pandas as pd\nfrom sklearn import metrics\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import OneHotEncoder, StandardScaler\nfrom sklearn.impute import SimpleImputer\nfrom sklearn.compose import ColumnTransformer\nfrom sklearn.pipeline import make_pipeline, Pipeline\nfrom sklearn.linear_model import LogisticRegression, LinearRegression\ndd = pd.read_csv(\"demand.csv\", parse_dates=[\"date\"])\ndd[\"month\"] = dd[\"date\"].dt.month\nXd = dd.drop(columns=[\"date\", \"product_id\", \"units\"])\nyd = dd[\"units\"]\nif SHUFFLE:\n    yd = yd.sample(frac=1, random_state=1).reset_index(drop=True)\npre_d = ColumnTransformer([(\"cat\", OneHotEncoder(handle_unknown=\"ignore\"), [\"category\"])], remainder=\"passthrough\")\n"
+model:
+  var: model
+  metric: mae
+  threshold: 6.0
+  test_setup: 'import pandas as pd
+
+    _d = pd.read_csv("demand.csv", parse_dates=["date"])
+
+    _d["month"] = _d["date"].dt.month
+
+    X_test = _d.drop(columns=["date", "product_id", "units"])
+
+    y_test = _d["units"]
+
+    '
+  data: demand
+  baseline: 'from sklearn.dummy import DummyRegressor
+
+    model = DummyRegressor().fit(Xd, yd)'
+reference: 'from sklearn.ensemble import HistGradientBoostingRegressor
+
+  model = make_pipeline(pre_d, HistGradientBoostingRegressor(random_state=0))
+
+  model.fit(Xd, yd)
+
+  '
+star3:
+- first_try
+buggy_variants:
+- code: model = make_pipeline(pre_d, LinearRegression()).fit(Xd, yd)
+  expect_detector: model_metric
+hints:
+- Регрессия и её метрика — разделы урока; бустинг подробно — уровень M3.
+- 'Возьми тот же pre_d, а вместо LinearRegression поставь градиентный бустинг. Деревья сами находят пороги и взаимодействия: «холодно и это суп», «праздник и акция».'
+- from sklearn.ensemble import HistGradientBoostingRegressor; make_pipeline(pre_d, HistGradientBoostingRegressor(random_state=0)).fit(Xd, yd).
+- 'from sklearn.ensemble import HistGradientBoostingRegressor
+
+  model = make_pipeline(pre_d, ___(random_state=0))
+
+  model.fit(Xd, yd)'
+- Линейная модель считает, что эффект температуры одинаков для мороженого и супа, а это не так. Бустинг строит много маленьких деревьев, каждое исправляет ошибки предыдущих, и находит такие взаимодействия сам.

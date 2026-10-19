@@ -1,0 +1,37 @@
+id: C7-02-parse-age
+type: function
+function: parse_age
+title: Проверка возраста
+difficulty: 2
+lesson_section: raise
+statement: |
+  Напиши функцию `parse_age(text)`, которая возвращает возраст клиента целым числом.
+
+  - Если строку нельзя перевести в число, `int` сам выбросит `ValueError` — пусть так и будет.
+  - Если возраст меньше 14 или больше 120, функция выбрасывает `ValueError`.
+
+  В проверке используется помощник `raises(функция)`: он возвращает название выброшенного исключения или `None`.
+starter: |
+  def parse_age(text):
+      pass
+reference: |
+  def parse_age(text):
+      age = int(text)
+      if age < 14 or age > 120:
+          raise ValueError(f"возраст вне диапазона: {age}")
+      return age
+requires: ["uses:raise"]
+tests:
+  visible: ["parse_age('30')", "raises(lambda: parse_age('250'))"]
+  hidden: ["parse_age(' 14 ')", "parse_age('120')", "raises(lambda: parse_age('13'))", "raises(lambda: parse_age('сорок'))", "raises(lambda: parse_age('121'))", "raises(lambda: parse_age('45'))"]
+random: {count: 15, gen: "f'raises(lambda: parse_age({str(random.randint(-5, 140))!r}))'"}
+star3: [first_try]
+buggy_variants:
+  - code: "def parse_age(text):\n    age = int(text)\n    if age < 14 or age > 120:\n        return None\n    return age"
+  - code: "def parse_age(text):\n    age = int(text)\n    if age <= 14 or age >= 120:\n        raise ValueError('bad')\n    return age"
+hints:
+  - "Свои ошибки выбрасывают через raise — раздел «raise»."
+  - "Переведи строку в число. Потом проверь диапазон и, если возраст за его пределами, выброси ValueError с понятным сообщением. Иначе верни возраст."
+  - "int(text), if age < 14 or age > 120: raise ValueError(...)."
+  - "def parse_age(text):\n    age = int(text)\n    if age < ___ or age > ___:\n        ___ ValueError(\"возраст вне диапазона\")\n    return age"
+  - "raises(lambda: parse_age('250')) вызывает функцию и возвращает «ValueError», если она выбросила это исключение. Возврат None вместо ошибки скрыл бы проблему: вызывающий код не узнал бы, что данные плохие. Границы 14 и 120 допустимы, поэтому сравнения строгие."

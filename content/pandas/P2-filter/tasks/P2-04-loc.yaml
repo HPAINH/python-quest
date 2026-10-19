@@ -1,0 +1,22 @@
+id: P2-04-loc
+type: dataframe
+title: Клиенты из Казани
+difficulty: 1
+lesson_section: loc-iloc
+statement: |
+  Запиши в `result` имена и уровни лояльности клиентов из Казани — колонки `name` и `loyalty`.
+setup: |
+  import pandas as pd
+  customers = pd.read_csv("customers.csv")
+reference: |
+  result = customers.loc[customers["city"] == "Казань", ["name", "loyalty"]]
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = customers.loc[customers['city'] == 'казань', ['name', 'loyalty']]"
+    expect_detector: shape_rows
+hints:
+  - "Строки и колонки одновременно выбирает loc — раздел «loc и iloc»."
+  - "В loc первым передай маску города, вторым — список колонок."
+  - "customers.loc[customers[\"city\"] == \"Казань\", [\"name\", \"loyalty\"]]."
+  - "result = customers.loc[customers[\"city\"] == ___, [\"name\", ___]]"
+  - "Сравнение строк чувствительно к регистру: «казань» не совпадёт ни с одной строкой. Вне loc то же самое записывается в два шага: customers[маска][[колонки]]."

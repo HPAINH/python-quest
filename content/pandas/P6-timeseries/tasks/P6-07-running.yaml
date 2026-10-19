@@ -1,0 +1,28 @@
+id: P6-07-running
+type: dataframe
+title: Накопительная выручка клиента
+difficulty: 2
+lesson_section: rank
+sql_quest_ref: SUM() OVER (ORDER BY)
+statement: |
+  Для клиентов с `customer_id` от 1 до 20 посчитай накопительную сумму доставленных заказов в порядке дат (при одной дате — по `order_id`). Запиши в `result` колонки `customer_id`, `order_date`, `order_id`, `running` (округли до 2 знаков) в этом порядке строк.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv", parse_dates=["order_date"])
+reference: |
+  t = orders[(orders["status"] == "delivered") & orders["customer_id"].between(1, 20)]
+  t = t.sort_values(["customer_id", "order_date", "order_id"])
+  t["running"] = t.groupby("customer_id")["amount"].cumsum().round(2)
+  result = t[["customer_id", "order_date", "order_id", "running"]]
+ordered: true
+star3: [first_try, "max_lines:4"]
+buggy_variants:
+  - code: "t = orders[(orders['status'] == 'delivered') & orders['customer_id'].between(1, 20)]\nt = t.sort_values(['customer_id', 'order_date', 'order_id'])\nt['running'] = t['amount'].cumsum().round(2)\nresult = t[['customer_id', 'order_date', 'order_id', 'running']]"
+    expect_detector: column_values
+  - code: "t = orders[(orders['status'] == 'delivered') & orders['customer_id'].between(1, 20)]\nt['running'] = t.groupby('customer_id')['amount'].cumsum().round(2)\nresult = t[['customer_id', 'order_date', 'order_id', 'running']]"
+hints:
+  - "Накопительный итог — cumsum, раздел «rank и cumsum»."
+  - "Отфильтруй заказы, отсортируй по клиенту, дате и номеру, затем сложи суммы накопительно внутри клиента."
+  - "t.sort_values([\"customer_id\", \"order_date\", \"order_id\"]), t.groupby(\"customer_id\")[\"amount\"].cumsum()."
+  - "t = orders[(orders[\"status\"] == \"delivered\") & orders[\"customer_id\"].between(1, 20)]\nt = t.sort_values([___, \"order_date\", \"order_id\"])\nt[\"running\"] = t.groupby(\"customer_id\")[\"amount\"].___().round(2)\nresult = t[[\"customer_id\", \"order_date\", \"order_id\", \"running\"]]"
+  - "cumsum без groupby не обнуляется на новом клиенте. Без сортировки накопление идёт в порядке строк файла, а не дат — в SQL за это отвечает ORDER BY внутри OVER."

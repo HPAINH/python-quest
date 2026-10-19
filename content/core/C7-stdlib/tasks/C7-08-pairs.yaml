@@ -1,0 +1,34 @@
+id: C7-08-pairs
+type: function
+function: gift_pairs
+title: Пары подарков в бюджет
+difficulty: 2
+lesson_section: itertools-math
+statement: |
+  Покупатель хочет взять два **разных** товара, уложившись в бюджет. Напиши функцию `gift_pairs(items, budget)`: `items` — список пар `(название, цена)`, функция возвращает список пар названий `(a, b)` с суммой цен не больше бюджета. Внутри пары названия по алфавиту, список пар отсортирован.
+starter: |
+  from itertools import combinations
+
+  def gift_pairs(items, budget):
+      pass
+reference: |
+  from itertools import combinations
+
+  def gift_pairs(items, budget):
+      out = []
+      for (n1, p1), (n2, p2) in combinations(items, 2):
+          if p1 + p2 <= budget:
+              out.append(tuple(sorted((n1, n2))))
+      return sorted(out)
+requires: ["uses:combinations"]
+tests:
+  visible: ["gift_pairs([('чай', 450), ('кофе', 990), ('сыр', 1290), ('мёд', 600)], 1500)", "gift_pairs([('a', 10)], 100)"]
+  hidden: ["gift_pairs([], 10)", "gift_pairs([('x', 5), ('y', 5)], 10)", "gift_pairs([('x', 5), ('y', 5)], 9)", "gift_pairs([('b', 1), ('a', 1), ('c', 1)], 2)"]
+random: {count: 20, gen: "f'gift_pairs({[(c, random.randint(1, 20)) for c in random.sample(\"abcdefg\", random.randint(0, 6))]}, {random.randint(5, 30)})'"}
+star3: [first_try]
+hints:
+  - "Все пары без повторов даёт combinations — раздел «itertools и math»."
+  - "Перебери все пары товаров через combinations(items, 2). Если сумма цен укладывается в бюджет, добавь пару названий, отсортировав их внутри. В конце отсортируй весь список."
+  - "combinations(items, 2), распаковка (n1, p1), (n2, p2), tuple(sorted(...)), sorted(out)."
+  - "from itertools import combinations\n\ndef gift_pairs(items, budget):\n    out = []\n    for (n1, p1), (n2, p2) in combinations(items, ___):\n        if p1 + p2 ___ budget:\n            out.append(tuple(sorted((n1, n2))))\n    return ___(out)"
+  - "combinations не берёт один товар дважды и не повторяет пары в другом порядке — ровно то, что нужно. Вложенные циклы for i, for j > i делают то же самое, но длиннее. Граница бюджета включительно: <=."

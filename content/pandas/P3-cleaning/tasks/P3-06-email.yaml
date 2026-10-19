@@ -1,0 +1,26 @@
+id: P3-06-email
+type: dataframe
+title: Почтовые домены
+difficulty: 2
+lesson_section: str
+statement: |
+  Почты в `customers_raw` записаны с пробелами и в разном регистре. Запиши в `result` таблицу с колонками `customer_id`, `email` (без пробелов по краям, в нижнем регистре) и `domain` — часть после `@`. Все строки, исходный порядок.
+setup: |
+  import pandas as pd
+  raw = pd.read_csv("customers_raw.csv")
+reference: |
+  raw["email"] = raw["email"].str.strip().str.lower()
+  raw["domain"] = raw["email"].str.split("@").str[1]
+  result = raw[["customer_id", "email", "domain"]]
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "raw['email'] = raw['email'].str.lower()\nraw['domain'] = raw['email'].str.split('@').str[1]\nresult = raw[['customer_id', 'email', 'domain']]"
+    expect_detector: column_values
+  - code: "raw['email'] = raw['email'].str.strip().str.lower()\nraw['domain'] = raw['email'].str.split('@').str[0]\nresult = raw[['customer_id', 'email', 'domain']]"
+    expect_detector: column_values
+hints:
+  - "strip, lower и split — раздел «Строки: .str»."
+  - "Очисти почту и запиши её обратно. Домен — второй элемент после разбиения строки по «@»."
+  - "raw[\"email\"].str.strip().str.lower(), raw[\"email\"].str.split(\"@\").str[1]."
+  - "raw[\"email\"] = raw[\"email\"].str.___().str.lower()\nraw[\"domain\"] = raw[\"email\"].str.split(\"@\").str[___]\nresult = raw[[\"customer_id\", \"email\", \"domain\"]]"
+  - ".str[1] после split берёт второй элемент списка в каждой строке. Без strip пробелы остаются в начале почты и в конце домена — «mail.ru » не совпадёт с «mail.ru»."

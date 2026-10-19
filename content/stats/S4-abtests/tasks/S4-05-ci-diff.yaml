@@ -1,0 +1,34 @@
+id: S4-05-ci-diff
+type: stat
+title: Интервал для разницы
+difficulty: 2
+lesson_section: analysis
+statement: |
+  Посчитай 95% интервал для разницы конверсий B − A в `exp_checkout` через `confint_proportions_2indep` методом `wald` и относительный прирост `uplift = conv_B / conv_A − 1`. Запиши `ci` (пара, допуск ±0.00001) и `uplift` (допуск ±0.0001).
+setup: |
+  import pandas as pd
+  from statsmodels.stats.proportion import confint_proportions_2indep
+  t = pd.read_csv("ab_metrics.csv").merge(pd.read_csv("ab_assignments.csv"), on=["user_id", "experiment"])
+outputs:
+  - var: ci
+    tol: 0.00001
+  - var: uplift
+    tol: 0.0001
+reference: |
+  g = t[t["experiment"] == "exp_checkout"].groupby("group")["converted"].agg(["sum", "size"])
+  xb, nb = g.loc["B"]
+  xa, na = g.loc["A"]
+  ci = confint_proportions_2indep(xb, nb, xa, na, method="wald")
+  uplift = (xb / nb) / (xa / na) - 1
+star3: [first_try, "max_lines:5"]
+buggy_variants:
+  - code: "g = t[t['experiment'] == 'exp_checkout'].groupby('group')['converted'].agg(['sum', 'size'])\nxb, nb = g.loc['B']\nxa, na = g.loc['A']\nci = confint_proportions_2indep(xa, na, xb, nb, method='wald')\nuplift = (xb / nb) / (xa / na) - 1"
+    expect_detector: stat_value
+  - code: "g = t[t['experiment'] == 'exp_checkout'].groupby('group')['converted'].agg(['sum', 'size'])\nxb, nb = g.loc['B']\nxa, na = g.loc['A']\nci = confint_proportions_2indep(xb, nb, xa, na, method='wald')\nuplift = xb / nb - xa / na"
+    expect_detector: stat_value
+hints:
+  - "Интервал для разницы — раздел «Анализ результата»."
+  - "Аргументы идут парами: конверсии и размер первой группы, затем второй. Первая — B, потому что считаем B − A."
+  - "confint_proportions_2indep(xb, nb, xa, na, method=\"wald\"), (xb / nb) / (xa / na) - 1."
+  - "g = t[t[\"experiment\"] == \"exp_checkout\"].groupby(\"group\")[\"converted\"].agg([\"sum\", \"size\"])\nxb, nb = g.loc[\"B\"]\nxa, na = g.loc[\"A\"]\nci = confint_proportions_2indep(___, nb, ___, na, method=\"wald\")\nuplift = (xb / nb) / (xa / na) - ___"
+  - "Поменяв группы, получишь интервал для A − B — с обратными знаками. Абсолютный эффект (+2,5 п. п.) и относительный (+25%) — оба нужны в отчёте, но путать их нельзя."

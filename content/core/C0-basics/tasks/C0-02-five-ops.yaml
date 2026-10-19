@@ -1,0 +1,27 @@
+id: C0-02-five-ops
+type: stdio
+title: Пять операций
+difficulty: 1
+lesson_section: arithmetic
+statement: |
+  В одной строке через пробел даны два целых числа `a` и `b` (`b` не равно 0).
+  Выведи в одну строку через пробел: сумму, разность, произведение, целую часть от деления `a` на `b` и остаток от деления.
+reference: |
+  a, b = map(int, input().split())
+  print(a + b, a - b, a * b, a // b, a % b)
+tests:
+  visible: ["7 3", "20 5"]
+  hidden: ["1 1", "100 7", "0 9"]
+random: {count: 25, gen: "f'{random.randint(0, 500)} {random.randint(1, 50)}'"}
+star3: [first_try]
+buggy_variants:
+  - code: "a, b = int(input())\nprint(a + b, a - b, a * b, a // b, a % b)"
+    expect_detector: unpack_int_input
+  - code: "a, b = map(int, input().split())\nprint(a + b, a - b, a * b, a / b, a % b)"
+    expect_detector: slash_instead_floordiv
+hints:
+  - "Два числа в одной строке читаются через split — раздел «Ввод: input», а операции — в разделе «Арифметика»."
+  - "Прочитай строку, раздели её на два числа и выведи пять выражений одним print через запятую."
+  - "map(int, input().split()) для ввода; операторы +, -, *, //, %."
+  - "a, b = map(int, ___)\nprint(a + b, ___, ___, a // b, ___)"
+  - "map(int, input().split()) превращает строку «7 3» в два числа. print с несколькими аргументами печатает их через пробел. // — целая часть деления, % — остаток. Обычное / дало бы дробь 2.333…"

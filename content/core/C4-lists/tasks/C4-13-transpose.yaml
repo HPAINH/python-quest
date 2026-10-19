@@ -1,0 +1,29 @@
+id: C4-13-transpose
+type: function
+function: transpose
+title: Транспонирование
+difficulty: 3
+lesson_section: comprehension
+statement: |
+  Напиши функцию `transpose(m)`, которая получает прямоугольную таблицу — список строк одинаковой длины — и возвращает транспонированную: строки становятся столбцами. Пустая таблица `[]` даёт `[]`.
+starter: |
+  def transpose(m):
+      pass
+reference: |
+  def transpose(m):
+      if not m:
+          return []
+      return [[row[j] for row in m] for j in range(len(m[0]))]
+tests:
+  visible: ["transpose([[1, 2, 3], [4, 5, 6]])", "transpose([[7]])"]
+  hidden: ["transpose([])", "transpose([[1], [2], [3]])", "transpose([[1, 2], [3, 4], [5, 6]])"]
+random: {count: 20, gen: "(lambda r, c: f'transpose({[[random.randint(0, 9) for _ in range(c)] for _ in range(r)]})')(random.randint(1, 5), random.randint(1, 5))"}
+star3: [first_try]
+buggy_variants:
+  - code: "def transpose(m):\n    return [[row[j] for j in range(len(m[0]))] for row in m]"
+hints:
+  - "Вложенный генератор списка — раздел «Генераторы списков»."
+  - "Новая строка номер j — это j-й элемент каждой старой строки. Таких новых строк столько, сколько столбцов было в исходной таблице."
+  - "[[row[j] for row in m] for j in range(len(m[0]))] и проверка пустой таблицы."
+  - "def transpose(m):\n    if not m:\n        return ___\n    return [[row[___] for row in m] for j in range(len(m[___]))]"
+  - "Внешний генератор перебирает номера столбцов j, внутренний собирает j-й элемент из каждой строки. Для пустой таблицы m[0] не существует, поэтому её проверяют заранее: not m истинно для пустого списка."

@@ -1,0 +1,48 @@
+id: S3-10-boss-report
+type: dataframe
+title: "Босс: итоги двух тестов"
+difficulty: 3
+boss: true
+lesson_section: why
+statement: |
+  Подведи итоги обоих экспериментов. Создай две переменные.
+
+  1. `report` — таблица с колонками `experiment`, `metric`, `p_value`, `reject`. Для каждого эксперимента (`exp_checkout`, `exp_banner`) две строки:
+     - `metric` = `conversion` — хи-квадрат без поправки по `converted`;
+     - `metric` = `revenue` — t-тест Уэлча по `revenue` всех участников, B против A.
+
+     `p_value` округли до 5 знаков, `reject` — при alpha = 0.05. Порядок строк любой.
+  2. `ship` — `True`, если в `exp_checkout` конверсия значимо выросла (H0 отвергнута и конверсия B больше A).
+setup: |
+  import pandas as pd
+  from scipy import stats
+  t = pd.read_csv("ab_metrics.csv").merge(pd.read_csv("ab_assignments.csv"), on=["user_id", "experiment"])
+outputs:
+  - var: report
+    title: итоговая таблица
+  - var: ship
+    title: выкатываем?
+reference: |
+  rows = []
+  for exp in ["exp_checkout", "exp_banner"]:
+      c = t[t["experiment"] == exp]
+      p_conv = stats.chi2_contingency(pd.crosstab(c["group"], c["converted"]), correction=False)[1]
+      p_rev = stats.ttest_ind(c.loc[c["group"] == "B", "revenue"], c.loc[c["group"] == "A", "revenue"], equal_var=False).pvalue
+      rows.append({"experiment": exp, "metric": "conversion", "p_value": round(p_conv, 5), "reject": bool(p_conv < 0.05)})
+      rows.append({"experiment": exp, "metric": "revenue", "p_value": round(p_rev, 5), "reject": bool(p_rev < 0.05)})
+  report = pd.DataFrame(rows)
+  c = t[t["experiment"] == "exp_checkout"]
+  conv = c.groupby("group")["converted"].mean()
+  ship = bool(report.loc[(report["experiment"] == "exp_checkout") & (report["metric"] == "conversion"), "reject"].iloc[0] and conv["B"] > conv["A"])
+star3: [first_try]
+buggy_variants:
+  - code: "rows = []\nfor exp in ['exp_checkout', 'exp_banner']:\n    c = t[t['experiment'] == exp]\n    p_conv = stats.chi2_contingency(pd.crosstab(c['group'], c['converted']))[1]\n    p_rev = stats.ttest_ind(c.loc[c['group'] == 'B', 'revenue'], c.loc[c['group'] == 'A', 'revenue'], equal_var=False).pvalue\n    rows.append({'experiment': exp, 'metric': 'conversion', 'p_value': round(p_conv, 5), 'reject': bool(p_conv < 0.05)})\n    rows.append({'experiment': exp, 'metric': 'revenue', 'p_value': round(p_rev, 5), 'reject': bool(p_rev < 0.05)})\nreport = pd.DataFrame(rows)\nship = True"
+    expect_detector: column_values
+  - code: "rows = []\nfor exp in ['exp_checkout', 'exp_banner']:\n    c = t[t['experiment'] == exp]\n    p_conv = stats.chi2_contingency(pd.crosstab(c['group'], c['converted']), correction=False)[1]\n    p_rev = stats.ttest_ind(c.loc[c['group'] == 'B', 'revenue'], c.loc[c['group'] == 'A', 'revenue']).pvalue\n    rows.append({'experiment': exp, 'metric': 'conversion', 'p_value': round(p_conv, 5), 'reject': bool(p_conv < 0.05)})\n    rows.append({'experiment': exp, 'metric': 'revenue', 'p_value': round(p_rev, 5), 'reject': bool(p_rev < 0.05)})\nreport = pd.DataFrame(rows)\nship = True"
+    expect_detector: column_values
+hints:
+  - "Всё из уровня: хи-квадрат для долей, t-тест Уэлча для средних, правило решения."
+  - "В цикле по экспериментам посчитай два p-value и добавь две строки-словаря в список. Таблица собирается из списка словарей через pd.DataFrame. Для ship проверь и значимость, и направление."
+  - "stats.chi2_contingency(pd.crosstab(...), correction=False)[1], stats.ttest_ind(b, a, equal_var=False).pvalue, pd.DataFrame(rows)."
+  - "rows = []\nfor exp in [\"exp_checkout\", \"exp_banner\"]:\n    c = t[t[\"experiment\"] == exp]\n    p_conv = stats.chi2_contingency(pd.crosstab(c[\"group\"], c[\"converted\"]), correction=___)[1]\n    p_rev = stats.ttest_ind(c.loc[c[\"group\"] == \"B\", \"revenue\"], c.loc[c[\"group\"] == \"A\", \"revenue\"], equal_var=___).pvalue\n    rows.append({\"experiment\": exp, \"metric\": \"conversion\", \"p_value\": round(p_conv, 5), \"reject\": bool(p_conv < 0.05)})\n    rows.append({...})\nreport = pd.DataFrame(rows)\n..."
+  - "Значимость без направления — ловушка: тест мог «значимо» показать падение. Решение о выкатке принимают по главной метрике, заранее выбранной до теста; остальные метрики — контрольные."

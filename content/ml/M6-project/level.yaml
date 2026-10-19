@@ -1,0 +1,7 @@
+code: M6
+title: Финальный проект
+intro: Отток клиентов ShopData от сырых данных до денег — разведка, признаки, модель без утечек и порог под бизнес-задачу.
+minutes: 40
+expected_tasks: 6
+packages: [numpy, pandas, scipy, scikit-learn]
+data: [churn]

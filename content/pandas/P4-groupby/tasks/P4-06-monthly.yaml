@@ -1,0 +1,25 @@
+id: P4-06-monthly
+type: dataframe
+title: Выручка по месяцам
+difficulty: 2
+lesson_section: groupby
+statement: |
+  Запиши в `result` выручку доставленных заказов по месяцам: колонки `month` (строка вида `2026-03`) и `revenue` (сумма `amount`, округлённая до 2 знаков), по возрастанию месяца.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+reference: |
+  delivered = orders[orders["status"] == "delivered"].copy()
+  delivered["month"] = delivered["order_date"].str[:7]
+  result = delivered.groupby("month")["amount"].sum().round(2).reset_index(name="revenue")
+ordered: true
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "delivered = orders[orders['status'] == 'delivered'].copy()\ndelivered['month'] = delivered['order_date'].str[5:7]\nresult = delivered.groupby('month')['amount'].sum().round(2).reset_index(name='revenue')"
+    expect_detector: shape_rows
+hints:
+  - "Ключ группировки можно сначала вычислить — раздел «groupby»; срез строк — уровень P3."
+  - "Добавь колонку month — первые 7 символов даты. Затем сгруппируй по ней. groupby сам сортирует ключи по возрастанию."
+  - "delivered[\"order_date\"].str[:7], groupby(\"month\")[\"amount\"].sum()."
+  - "delivered = orders[orders[\"status\"] == \"delivered\"].copy()\ndelivered[\"month\"] = delivered[\"order_date\"].str[___]\nresult = delivered.groupby(\"month\")[\"amount\"].sum().round(2).reset_index(name=___)"
+  - "Только номер месяца (str[5:7]) склеил бы одинаковые месяцы разных лет. Для настоящих дат тот же ключ даёт dt.to_period(\"M\"). copy() защищает от предупреждения о записи в срез."

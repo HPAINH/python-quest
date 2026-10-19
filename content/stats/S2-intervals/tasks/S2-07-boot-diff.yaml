@@ -1,0 +1,36 @@
+id: S2-07-boot-diff
+type: stat
+title: Разница выручки в A/B-тесте
+difficulty: 3
+lesson_section: bootstrap
+statement: |
+  В эксперименте `exp_checkout` построй 95% bootstrap-интервал для разницы средней выручки на пользователя **B − A** (`revenue` из `ab_metrics.csv`, группа — из `ab_assignments.csv`). 1000 повторов: на каждом шаге выборка с возвращением из A и отдельно из B, генератор `rng` уже создан. Запиши `ci` (допуск ±5 ₽) и `zero_inside` — `True`, если 0 внутри интервала.
+setup: |
+  import numpy as np
+  import pandas as pd
+  m = pd.read_csv("ab_metrics.csv")
+  a = pd.read_csv("ab_assignments.csv")
+  rng = np.random.default_rng(SEED)
+outputs:
+  - var: ci
+    tol: 5
+  - var: zero_inside
+reference: |
+  t = m[m["experiment"] == "exp_checkout"].merge(a, on=["user_id", "experiment"])
+  ra = t.loc[t["group"] == "A", "revenue"].to_numpy()
+  rb = t.loc[t["group"] == "B", "revenue"].to_numpy()
+  diffs = [rng.choice(rb, len(rb)).mean() - rng.choice(ra, len(ra)).mean() for _ in range(1000)]
+  ci = tuple(np.percentile(diffs, [2.5, 97.5]))
+  zero_inside = bool(ci[0] <= 0 <= ci[1])
+star3: [first_try, "max_lines:6"]
+buggy_variants:
+  - code: "t = m[m['experiment'] == 'exp_checkout'].merge(a, on=['user_id', 'experiment'])\nra = t.loc[t['group'] == 'A', 'revenue'].to_numpy()\nrb = t.loc[t['group'] == 'B', 'revenue'].to_numpy()\ndiffs = [rng.choice(ra, len(ra)).mean() - rng.choice(rb, len(rb)).mean() for _ in range(1000)]\nci = tuple(np.percentile(diffs, [2.5, 97.5]))\nzero_inside = bool(ci[0] <= 0 <= ci[1])"
+    expect_detector: stat_value
+  - code: "t = m.merge(a, on=['user_id', 'experiment'])\nra = t.loc[t['group'] == 'A', 'revenue'].to_numpy()\nrb = t.loc[t['group'] == 'B', 'revenue'].to_numpy()\ndiffs = [rng.choice(rb, len(rb)).mean() - rng.choice(ra, len(ra)).mean() for _ in range(1000)]\nci = tuple(np.percentile(diffs, [2.5, 97.5]))\nzero_inside = bool(ci[0] <= 0 <= ci[1])"
+    expect_detector: stat_value
+hints:
+  - "Bootstrap для разницы — раздел «Bootstrap»; соединение по двум ключам — уровень P5."
+  - "Соедини метрики с группами по user_id и experiment, оставь exp_checkout, раздели выручку на A и B. В цикле ресемплируй каждую группу отдельно и записывай разность средних B − A."
+  - "merge(a, on=[\"user_id\", \"experiment\"]), rng.choice(rb, len(rb)).mean() - rng.choice(ra, len(ra)).mean(), np.percentile(diffs, [2.5, 97.5])."
+  - "t = m[m[\"experiment\"] == ___].merge(a, on=[\"user_id\", \"experiment\"])\nra = t.loc[t[\"group\"] == \"A\", \"revenue\"].to_numpy()\nrb = t.loc[t[\"group\"] == \"B\", \"revenue\"].to_numpy()\ndiffs = [rng.choice(___, len(rb)).mean() - rng.choice(ra, len(ra)).mean() for _ in range(1000)]\nci = tuple(np.percentile(diffs, [2.5, 97.5]))\nzero_inside = bool(ci[0] <= 0 <= ___)"
+  - "A − B даёт зеркальный интервал с другим знаком. Ресемплировать группы нужно отдельно: перемешав их вместе, мы потеряли бы саму разницу. Если 0 внутри интервала, данные не позволяют утверждать, что B приносит больше."

@@ -1,0 +1,30 @@
+id: S2-01-se
+type: stat
+title: Стандартная ошибка
+difficulty: 1
+lesson_section: se
+statement: |
+  Посчитай стандартную ошибку среднего `amount` для заказов канала `web`. Запиши в `se`, допуск ±0.01.
+setup: |
+  import numpy as np
+  import pandas as pd
+  from scipy import stats
+  orders = pd.read_csv("orders.csv")
+outputs:
+  - var: se
+    tol: 0.01
+reference: |
+  a = orders.loc[orders["channel"] == "web", "amount"]
+  se = a.std() / np.sqrt(len(a))
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "a = orders.loc[orders['channel'] == 'web', 'amount']\nse = a.std()"
+    expect_detector: stat_value
+  - code: "a = orders.loc[orders['channel'] == 'web', 'amount']\nse = a.std() / len(a)"
+    expect_detector: stat_value
+hints:
+  - "Формула — раздел «Стандартная ошибка»."
+  - "Выборочное стандартное отклонение, делённое на корень из числа наблюдений."
+  - "a.std() / np.sqrt(len(a)) или stats.sem(a)."
+  - "a = orders.loc[orders[\"channel\"] == \"web\", \"amount\"]\nse = a.std() / np.___(len(a))"
+  - "std описывает разброс отдельных заказов, SE — разброс среднего. Делить нужно на корень из n, а не на n."

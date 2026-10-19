@@ -1,0 +1,39 @@
+id: C4-11-merge
+type: function
+function: merge
+title: Слияние отсортированных
+difficulty: 3
+lesson_section: list-methods
+statement: |
+  Напиши функцию `merge(a, b)`, которая получает два списка, отсортированных по неубыванию, и возвращает один отсортированный список из всех их элементов.
+
+  Не используй `sorted`, `sort`, `min` и `max`: иди по обоим спискам одновременно двумя индексами.
+starter: |
+  def merge(a, b):
+      pass
+reference: |
+  def merge(a, b):
+      i = j = 0
+      out = []
+      while i < len(a) and j < len(b):
+          if a[i] <= b[j]:
+              out.append(a[i])
+              i += 1
+          else:
+              out.append(b[j])
+              j += 1
+      return out + a[i:] + b[j:]
+requires: ["no_call:sort", "no_call:sorted", "no_call:min", "no_call:max"]
+tests:
+  visible: ["merge([1, 4, 9], [2, 3, 10])", "merge([], [5, 6])"]
+  hidden: ["merge([], [])", "merge([1], [])", "merge([2, 2], [2])", "merge([-5, 0, 5], [-10, 10])", "merge([1, 2, 3], [4, 5, 6])"]
+random: {count: 30, gen: "'merge(' + str(sorted(random.randint(-9, 9) for _ in range(random.randint(0, 7)))) + ', ' + str(sorted(random.randint(-9, 9) for _ in range(random.randint(0, 7)))) + ')'"}
+star3: [first_try]
+buggy_variants:
+  - code: "def merge(a, b):\n    i = j = 0\n    out = []\n    while i < len(a) and j < len(b):\n        if a[i] <= b[j]:\n            out.append(a[i])\n            i += 1\n        else:\n            out.append(b[j])\n            j += 1\n    return out"
+hints:
+  - "Два индекса и append — раздел «Методы списков»."
+  - "Держи индексы i и j. Пока оба списка не кончились, бери меньший из текущих элементов a[i] и b[j] и сдвигай его индекс. Когда один список кончился, допиши остаток другого."
+  - "while i < len(a) and j < len(b), сравнение a[i] <= b[j], append, срезы a[i:] и b[j:]."
+  - "def merge(a, b):\n    i = j = 0\n    out = []\n    while i < len(a) ___ j < len(b):\n        if a[i] <= b[j]:\n            out.append(a[i])\n            i += 1\n        else:\n            out.append(___)\n            j += 1\n    return out + a[___:] + b[___:]"
+  - "Это шаг сортировки слиянием. Цикл останавливается, как только один список исчерпан, а в другом может остаться хвост, и он уже отсортирован — его просто дописывают срезом. Без хвостов теряются последние элементы."

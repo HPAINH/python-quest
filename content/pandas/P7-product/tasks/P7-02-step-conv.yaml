@@ -1,0 +1,27 @@
+id: P7-02-step-conv
+type: dataframe
+title: Конверсия шагов
+difficulty: 2
+lesson_section: conversion
+statement: |
+  Продолжи воронку из прошлой задачи. Запиши в `result` таблицу с колонками `event`, `users`, `step_conv` (доля от предыдущего шага, у `view` — пропуск) и `total_conv` (доля от шага `view`). Доли округли до 4 знаков, порядок шагов — по воронке.
+setup: |
+  import pandas as pd
+  events = pd.read_csv("events.csv")
+  steps = ["view", "add_to_cart", "checkout", "purchase"]
+reference: |
+  f = events.groupby("event")["user_id"].nunique().reindex(steps)
+  result = pd.DataFrame({"users": f, "step_conv": (f / f.shift(1)).round(4), "total_conv": (f / f.iloc[0]).round(4)}).rename_axis("event")
+ordered: true
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "f = events.groupby('event')['user_id'].nunique().reindex(steps)\nresult = pd.DataFrame({'users': f, 'step_conv': (f.shift(1) / f).round(4), 'total_conv': (f / f.iloc[0]).round(4)}).rename_axis('event')"
+    expect_detector: column_values
+  - code: "f = events.groupby('event')['user_id'].nunique().reindex(steps)\nresult = pd.DataFrame({'users': f, 'step_conv': (f / f.shift(1)).round(4), 'total_conv': (f / f.sum()).round(4)}).rename_axis('event')"
+    expect_detector: column_values
+hints:
+  - "Пошаговая и общая конверсия — раздел «Конверсия»."
+  - "Пошаговая конверсия — деление шага на предыдущий, предыдущий даёт shift(1). Общая — деление на первый шаг."
+  - "f / f.shift(1), f / f.iloc[0]."
+  - "f = events.groupby(\"event\")[\"user_id\"].nunique().reindex(steps)\nresult = pd.DataFrame({\"users\": f, \"step_conv\": (f / f.___(1)).round(4), \"total_conv\": (f / f.iloc[___]).round(4)}).rename_axis(\"event\")"
+  - "Деление на сумму всех шагов не имеет смысла: люди на шагах пересекаются. Пошаговая конверсия показывает, на каком переходе теряется больше всего — туда и смотрит продуктовая команда."

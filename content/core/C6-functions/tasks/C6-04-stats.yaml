@@ -1,0 +1,28 @@
+id: C6-04-stats
+type: function
+function: stats
+title: Три показателя сразу
+difficulty: 1
+lesson_section: return
+statement: |
+  Напиши функцию `stats(nums)`, которая получает непустой список чисел и возвращает кортеж из трёх значений: минимум, максимум и среднее, округлённое до 2 знаков через `round`.
+starter: |
+  def stats(nums):
+      pass
+reference: |
+  def stats(nums):
+      return min(nums), max(nums), round(sum(nums) / len(nums), 2)
+tests:
+  visible: ["stats([4, 9, 1])", "stats([5])"]
+  hidden: ["stats([-1, -2, -3])", "stats([0.5, 0.25])", "stats([10, 20, 30, 41])"]
+random: {count: 20, gen: "f'stats({[random.randint(-100, 100) for _ in range(random.randint(1, 10))]})'"}
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "def stats(nums):\n    return [min(nums), max(nums), round(sum(nums) / len(nums), 2)]"
+    expect_detector: type_mismatch
+hints:
+  - "Несколько значений возвращаются через запятую — раздел «return»."
+  - "Посчитай минимум, максимум и среднее и верни их одной строкой return через запятую."
+  - "min, max, sum, len, round(..., 2)."
+  - "def stats(nums):\n    return min(nums), ___(nums), round(sum(nums) / ___(nums), 2)"
+  - "return a, b, c возвращает кортеж (a, b, c). Квадратные скобки сделали бы список — это другой тип, и проверка его не примет. Вызывающий код распакует кортеж: lo, hi, avg = stats(nums)."

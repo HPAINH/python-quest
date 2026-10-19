@@ -1,0 +1,23 @@
+id: N1-07-weeks
+type: array
+title: Продажи по неделям
+difficulty: 2
+lesson_section: reshape
+statement: |
+  В массиве `daily` — продажи за несколько полных недель подряд (длина делится на 7). Разложи их в таблицу «неделя × день недели»: каждая строка — одна неделя из 7 дней. Запиши таблицу в `result`.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  weeks = int(rng.integers(2, 7))
+  daily = rng.integers(50, 300, size=weeks * 7)
+reference: |
+  result = daily.reshape(-1, 7)
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = daily.reshape(7, -1)"
+hints:
+  - "Форму меняет reshape — раздел «Форма и reshape»."
+  - "В каждой строке должно быть 7 элементов, а число строк NumPy может вычислить сам."
+  - "daily.reshape(-1, 7)."
+  - "result = daily.reshape(___, 7)"
+  - "reshape заполняет таблицу по строкам, поэтому первые 7 дней становятся первой строкой. reshape(7, -1) даст 7 строк — значения разложатся неправильно, даже если форма случайно совпадёт."

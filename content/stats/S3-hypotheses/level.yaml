@@ -1,0 +1,7 @@
+code: S3
+title: Проверка гипотез
+intro: H0 и p-value, t-тест Уэлча, Манна-Уитни, хи-квадрат и z-тест для долей, ошибки I и II рода — на двух реальных по структуре A/B-тестах.
+minutes: 35
+expected_tasks: 10
+packages: [numpy, pandas, scipy]
+data: [ab]

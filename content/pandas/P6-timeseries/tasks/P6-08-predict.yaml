@@ -1,0 +1,22 @@
+id: P6-08-predict
+type: predict
+title: Сдвиги и окна
+difficulty: 2
+lesson_section: shift
+statement: |
+  Впиши, что выведет программа.
+code: |
+  import pandas as pd
+  idx = pd.to_datetime(["2026-03-01", "2026-03-02", "2026-03-04", "2026-03-05"])
+  s = pd.Series([10, 30, 20, 40], index=idx)
+  d = s.resample("D").sum()
+  print(d.tolist())
+  print(d.rolling(2).sum().tolist())
+  print(s.shift(1).tolist(), s.diff().tolist())
+  print(s.rank(ascending=False).astype(int).tolist(), s.cumsum().tolist())
+hints:
+  - "Повтори разделы «resample», «rolling», «shift» и «rank»."
+  - "resample добавит пропущенный день 3 марта с нулём. rolling(2) по ряду из пяти дней даст NaN в первой строке."
+  - "shift и diff работают по исходному ряду s из четырёх значений, а не по d."
+  - "Четыре строки, в каждой — один или два списка."
+  - "Ответ: «[10, 30, 0, 20, 40]», «[nan, 40.0, 30.0, 20.0, 60.0]», «[nan, 10.0, 30.0, 20.0] [nan, 20.0, -10.0, 20.0]», «[4, 2, 3, 1] [10, 40, 60, 100]»."

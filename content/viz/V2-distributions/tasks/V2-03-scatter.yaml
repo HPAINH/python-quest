@@ -1,0 +1,33 @@
+id: V2-03-scatter
+type: plot
+title: Частота и выручка клиента
+difficulty: 2
+lesson_section: scatter
+statement: |
+  Для каждого клиента посчитай число **доставленных** заказов и их суммарную выручку. Построй точечный график: по X — число заказов, по Y — выручка. Только клиенты, у которых есть доставленные заказы. Подпиши обе оси.
+setup: |
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  import seaborn as sns
+  orders = pd.read_csv("orders.csv")
+plot:
+  labels: true
+reference: |
+  d = orders[orders["status"] == "delivered"]
+  t = d.groupby("customer_id").agg(n=("order_id", "count"), revenue=("amount", "sum"))
+  fig, ax = plt.subplots()
+  ax.scatter(t["n"], t["revenue"], s=10)
+  ax.set_xlabel("Заказов")
+  ax.set_ylabel("Выручка, ₽")
+star3: [first_try]
+buggy_variants:
+  - code: "d = orders[orders['status'] == 'delivered']\nt = d.groupby('customer_id').agg(n=('order_id', 'count'), revenue=('amount', 'sum'))\nfig, ax = plt.subplots()\nax.scatter(t['revenue'], t['n'])\nax.set_xlabel('Выручка')\nax.set_ylabel('Заказов')"
+    expect_detector: plot_xy_swap
+  - code: "t = orders.groupby('customer_id').agg(n=('order_id', 'count'), revenue=('amount', 'sum'))\nfig, ax = plt.subplots()\nax.scatter(t['n'], t['revenue'])\nax.set_xlabel('Заказов')\nax.set_ylabel('Выручка')"
+    expect_detector: plot_count
+hints:
+  - "Точечный график — раздел «Точечный график»; агрегаты по клиенту — уровень P4."
+  - "Отфильтруй доставленные заказы, сгруппируй по клиенту и посчитай два показателя через agg. Каждая точка — клиент."
+  - "d.groupby(\"customer_id\").agg(n=(\"order_id\", \"count\"), revenue=(\"amount\", \"sum\")), ax.scatter(t[\"n\"], t[\"revenue\"])."
+  - "d = orders[orders[\"status\"] == \"delivered\"]\nt = d.groupby(\"customer_id\").agg(n=(\"order_id\", ___), revenue=(\"amount\", ___))\nfig, ax = plt.subplots()\nax.scatter(t[___], t[\"revenue\"])\nax.set_xlabel(\"...\")\nax.set_ylabel(\"...\")"
+  - "По X — то, от чего зависит результат (число заказов), по Y — сам результат (выручка). Облако вытянуто вверх-вправо: чем больше заказов, тем больше выручка, а разброс по вертикали — это разный средний чек."

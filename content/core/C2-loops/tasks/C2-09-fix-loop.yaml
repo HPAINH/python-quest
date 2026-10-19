@@ -1,0 +1,34 @@
+id: C2-09-fix-loop
+type: fix_bug
+base: stdio
+title: Исправь зависание
+difficulty: 1
+lesson_section: while
+statement: |
+  Программа должна выводить сумму чисел от 1 до `n`, но зависает. Найди и исправь ошибку, оставив цикл `while`.
+starter: |
+  n = int(input())
+  total = 0
+  i = 1
+  while i <= n:
+      total += i
+  print(total)
+reference: |
+  n = int(input())
+  total = 0
+  i = 1
+  while i <= n:
+      total += i
+      i += 1
+  print(total)
+requires: ["uses:while"]
+tests:
+  visible: ["5", "1"]
+  hidden: ["0", "100", "12345"]
+star3: [first_try]
+hints:
+  - "Нажми «Запустить» и прочитай подсказку о бесконечном цикле. Раздел «Цикл while»."
+  - "Условие while зависит от i. Меняется ли i внутри цикла?"
+  - "В теле цикла не хватает строки, которая увеличивает i."
+  - "while i <= n:\n    total += i\n    i ___ 1"
+  - "Без i += 1 переменная i всегда равна 1, условие i <= n всегда истинно, и цикл не заканчивается. После добавления i проходит 1, 2, …, n, и цикл останавливается на n + 1."

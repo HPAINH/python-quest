@@ -1,0 +1,30 @@
+id: C1-01-even
+type: stdio
+title: Чётное или нечётное
+difficulty: 1
+lesson_section: if-else
+statement: |
+  Дано целое число. Выведи `чётное`, если оно чётное, и `нечётное` в противном случае.
+starter: |
+  n = int(input())
+reference: |
+  n = int(input())
+  if n % 2 == 0:
+      print("чётное")
+  else:
+      print("нечётное")
+requires: ["uses:if"]
+tests:
+  visible: ["4", "7"]
+  hidden: ["0", "-3", "-8", "1000001"]
+random: {count: 20, gen: "str(random.randint(-10**6, 10**6))"}
+star3: [first_try]
+buggy_variants:
+  - code: "n = int(input())\nif n % 2 = 0:\n    print('чётное')\nelse:\n    print('нечётное')"
+    expect_detector: assign_in_condition
+hints:
+  - "Чётность проверяется остатком от деления — раздел «if и else»."
+  - "Если остаток от деления на 2 равен нулю, число чётное, иначе — нечётное."
+  - "n % 2 == 0, if и else."
+  - "n = int(input())\nif n % 2 == ___:\n    print(\"чётное\")\n___:\n    print(\"нечётное\")"
+  - "n % 2 даёт 0 для чётных чисел и 1 для нечётных — в Python даже для отрицательных: -3 % 2 == 1. Сравнение пишется через ==, после условия и после else ставится двоеточие."

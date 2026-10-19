@@ -1,0 +1,7 @@
+code: S2
+title: Доверительные интервалы
+intro: Стандартная ошибка, интервалы для среднего и доли, размер выборки и bootstrap для любой метрики.
+minutes: 30
+expected_tasks: 10
+packages: [numpy, pandas, scipy]
+data: [core, ab]

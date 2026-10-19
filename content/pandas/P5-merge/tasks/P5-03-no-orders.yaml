@@ -1,0 +1,27 @@
+id: P5-03-no-orders
+type: dataframe
+title: Клиенты без заказов
+difficulty: 2
+lesson_section: how
+sql_quest_ref: LEFT JOIN … IS NULL
+statement: |
+  Найди клиентов, у которых нет ни одного заказа. Запиши в `result` колонки `customer_id` и `name`, по возрастанию `customer_id`. Используй `merge`.
+setup: |
+  import pandas as pd
+  customers = pd.read_csv("customers.csv")
+  orders = pd.read_csv("orders.csv")
+reference: |
+  t = customers.merge(orders[["customer_id"]].drop_duplicates(), on="customer_id", how="left", indicator=True)
+  result = t.loc[t["_merge"] == "left_only", ["customer_id", "name"]].sort_values("customer_id")
+requires: ["uses:merge"]
+ordered: true
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "t = customers.merge(orders, on='customer_id', how='left', indicator=True)\nresult = t.loc[t['_merge'] == 'both', ['customer_id', 'name']].sort_values('customer_id')"
+    expect_detector: shape_rows
+hints:
+  - "Поиск строк без пары — раздел «Виды соединений», indicator."
+  - "Сделай left-соединение клиентов с заказами и indicator=True. Клиенты без заказов получат _merge равный left_only."
+  - "customers.merge(orders, on=\"customer_id\", how=\"left\", indicator=True), t[\"_merge\"] == \"left_only\"."
+  - "t = customers.merge(orders[[\"customer_id\"]].drop_duplicates(), on=\"customer_id\", how=___, indicator=True)\nresult = t.loc[t[\"_merge\"] == ___, [\"customer_id\", \"name\"]].sort_values(\"customer_id\")"
+  - "drop_duplicates у ключей заказов нужен, чтобы клиент с десятью заказами не дал десять строк. Без merge то же даёт ~customers[\"customer_id\"].isin(orders[\"customer_id\"]) — аналог NOT IN."

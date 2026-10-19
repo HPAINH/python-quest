@@ -1,0 +1,28 @@
+id: S4-07-segments
+type: dataframe
+title: Эффект по платформам
+difficulty: 2
+lesson_section: analysis
+statement: |
+  Для `exp_checkout` запиши в `result` таблицу с колонками `platform`, `conv_a`, `conv_b` (конверсии, 4 знака) и `p_value` — z-тест `proportions_ztest` для B против A внутри платформы (5 знаков).
+setup: |
+  import pandas as pd
+  from statsmodels.stats.proportion import proportions_ztest
+  t = pd.read_csv("ab_metrics.csv").merge(pd.read_csv("ab_assignments.csv"), on=["user_id", "experiment"])
+reference: |
+  rows = []
+  for plat, c in t[t["experiment"] == "exp_checkout"].groupby("platform"):
+      g = c.groupby("group")["converted"].agg(["sum", "size"])
+      z, p = proportions_ztest([g.loc["B", "sum"], g.loc["A", "sum"]], [g.loc["B", "size"], g.loc["A", "size"]])
+      rows.append({"platform": plat, "conv_a": round(g.loc["A", "sum"] / g.loc["A", "size"], 4), "conv_b": round(g.loc["B", "sum"] / g.loc["B", "size"], 4), "p_value": round(p, 5)})
+  result = pd.DataFrame(rows)
+star3: [first_try]
+buggy_variants:
+  - code: "rows = []\nfor plat, c in t.groupby('platform'):\n    g = c.groupby('group')['converted'].agg(['sum', 'size'])\n    z, p = proportions_ztest([g.loc['B', 'sum'], g.loc['A', 'sum']], [g.loc['B', 'size'], g.loc['A', 'size']])\n    rows.append({'platform': plat, 'conv_a': round(g.loc['A', 'sum'] / g.loc['A', 'size'], 4), 'conv_b': round(g.loc['B', 'sum'] / g.loc['B', 'size'], 4), 'p_value': round(p, 5)})\nresult = pd.DataFrame(rows)"
+    expect_detector: column_values
+hints:
+  - "Анализ по сегментам — раздел «Анализ результата»; цикл по groupby — уровень P4."
+  - "Оставь эксперимент, пройди циклом по группам платформ: внутри посчитай конверсии и z-тест и добавь строку-словарь в список."
+  - "for plat, c in df.groupby(\"platform\"): ..., proportions_ztest([xb, xa], [nb, na]), pd.DataFrame(rows)."
+  - "rows = []\nfor plat, c in t[t[\"experiment\"] == ___].groupby(\"platform\"):\n    g = c.groupby(\"group\")[\"converted\"].agg([\"sum\", \"size\"])\n    z, p = proportions_ztest([g.loc[\"B\", \"sum\"], g.loc[\"A\", \"sum\"]], [g.loc[\"B\", \"size\"], g.loc[\"A\", \"size\"]])\n    rows.append({...})\nresult = pd.DataFrame(rows)"
+  - "Цикл по groupby отдаёт пары (ключ, кусок таблицы). Сегментный анализ полезен, но каждая новая разбивка — ещё одно сравнение: значимый сегмент при незначимом общем эффекте почти всегда случайность."

@@ -1,0 +1,24 @@
+id: P5-09-predict
+type: predict
+title: Что даст соединение
+difficulty: 2
+lesson_section: how
+statement: |
+  Впиши, что выведет программа.
+code: |
+  import pandas as pd
+  clients = pd.DataFrame({"id": [1, 2, 3], "city": ["Казань", "Москва", "Самара"]})
+  orders = pd.DataFrame({"id": [1, 1, 3, 4], "amount": [100, 200, 50, 70]})
+  inner = clients.merge(orders, on="id")
+  left = clients.merge(orders, on="id", how="left")
+  outer = clients.merge(orders, on="id", how="outer")
+  print(len(inner), len(left), len(outer))
+  print(left["amount"].isna().sum(), outer["city"].isna().sum())
+  print(left.groupby("city")["amount"].sum().tolist())
+  print(inner.groupby("city").size().to_dict())
+hints:
+  - "Повтори раздел «Виды соединений»."
+  - "У клиента 1 два заказа, у 2 — ни одного, у 3 — один. Заказ клиента 4 не находит пары."
+  - "inner: 3 строки, left: 3 + строка клиента 2 с NaN, outer: left + строка заказа 4 без города."
+  - "Четыре строки: три числа, два числа, список сумм по городам (алфавит), словарь."
+  - "Ответ: «3 4 5», «1 1», «[300.0, 0.0, 50.0]», «{'Казань': 2, 'Самара': 1}». Сумма группы Москва из одного NaN — 0. Колонка с NaN становится float."

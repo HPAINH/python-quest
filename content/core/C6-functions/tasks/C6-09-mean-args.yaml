@@ -1,0 +1,30 @@
+id: C6-09-mean-args
+type: function
+function: mean
+title: Среднее любого числа значений
+difficulty: 1
+lesson_section: args-kwargs
+statement: |
+  Напиши функцию `mean(*nums)`, которая принимает любое число чисел и возвращает их среднее. Если аргументов нет, функция возвращает `None`.
+starter: |
+  def mean(*nums):
+      pass
+reference: |
+  def mean(*nums):
+      if not nums:
+          return None
+      return sum(nums) / len(nums)
+tests:
+  visible: ["mean(1, 2, 3, 4)", "mean()"]
+  hidden: ["mean(5)", "mean(-1, 1)", "mean(0.1, 0.2)", "mean(*range(1, 101))"]
+random: {count: 20, gen: "'mean(' + ', '.join(str(random.randint(-50, 50)) for _ in range(random.randint(0, 8))) + ')'"}
+star3: [first_try]
+buggy_variants:
+  - code: "def mean(*nums):\n    return sum(nums) / len(nums)"
+    expect_detector: zero_division
+hints:
+  - "Звёздочка перед параметром собирает аргументы в кортеж — раздел «*args и **kwargs»."
+  - "nums — кортеж всех переданных чисел. Если он пустой, верни None, иначе — сумму, делённую на количество."
+  - "if not nums: return None; sum(nums) / len(nums)."
+  - "def mean(*nums):\n    if ___ nums:\n        return ___\n    return sum(nums) / len(nums)"
+  - "Пустой кортеж в условии считается ложным, поэтому if not nums ловит вызов без аргументов. Без этой проверки mean() падает с делением на ноль. Вызов mean(*range(1, 101)) раскладывает range в 100 аргументов."

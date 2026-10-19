@@ -1,0 +1,100 @@
+quiz:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      df = pd.DataFrame({"k": ["a", "b", "a", "b", "a"], "v": [1, 2, 3, 4, 5]})
+      print(df.groupby("k")["v"].sum().tolist())
+    answer: "[9, 6]"
+    explain: Группа a — 1 + 3 + 5, группа b — 2 + 4. Ключи идут по алфавиту.
+    section: groupby
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      df = pd.DataFrame({"k": ["a", "a", "b"], "v": [1.0, None, 3.0]})
+      print(df.groupby("k")["v"].count().tolist(), df.groupby("k").size().tolist())
+    answer: "[1, 1] [2, 1]"
+    explain: count не считает пропуски, size считает все строки группы.
+    section: groupby
+  - type: fill
+    q: Впиши метод, чтобы каждая строка получила сумму своей группы.
+    code: |
+      import pandas as pd
+      df = pd.DataFrame({"k": ["a", "b", "a"], "v": [1, 2, 3]})
+      print(df.groupby("k")["v"].___("sum").tolist())
+    answer: ["transform"]
+    expect: "[4, 2, 4]"
+    explain: transform возвращает результат той же длины, что исходная таблица.
+    section: transform
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      df = pd.DataFrame({"k": ["a", "b", "a"], "v": [10, 20, 30]})
+      t = df.groupby("k").agg(n=("v", "count"), top=("v", "max"))
+      print(t.loc["a", "n"], t.loc["a", "top"], list(t.columns))
+    answer: "2 30 ['n', 'top']"
+    explain: Именованная агрегация задаёт имена колонок результата.
+    section: agg
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      df = pd.DataFrame({"r": ["x", "x", "y"], "c": ["p", "q", "p"], "v": [1, 2, 3]})
+      print(df.pivot_table(index="r", columns="c", values="v", aggfunc="sum", fill_value=0).values.tolist())
+    answer: "[[1, 2], [3, 0]]"
+    explain: Сочетания y–q нет, fill_value ставит 0.
+    section: pivot
+
+express:
+  - type: choice
+    q: Чем transform("sum") отличается от sum() после groupby?
+    options: ["Ничем", "transform возвращает значение группы для каждой исходной строки", "transform работает только с числами", "sum быстрее, а результат тот же"]
+    answer: 1
+    explain: sum сжимает группу в одну строку, transform — нет.
+    section: transform
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      df = pd.DataFrame({"k": ["a", "b", "a", "c"], "v": [5, 1, 7, 2]})
+      t = df.groupby("k")["v"].sum()
+      print(t[t > 2].index.tolist())
+    answer: "['a']"
+    explain: Суммы — a 12, b 1, c 2. Фильтр после группировки — аналог HAVING.
+    section: agg
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      df = pd.DataFrame({"k": ["a", "a", "b"], "v": [3, 9, 4]})
+      print(df.sort_values("v", ascending=False).groupby("k").head(1)["v"].tolist())
+    answer: "[9, 4]"
+    explain: После сортировки по убыванию head(1) берёт максимум в каждой группе.
+    section: transform
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      df = pd.DataFrame({"k": ["a", "b", "a"], "c": ["x", "x", "y"]})
+      print(df.groupby(["k", "c"]).size().reset_index(name="n")["n"].tolist())
+    answer: "[1, 1, 1]"
+    explain: Три разных сочетания — по одной строке в каждом.
+    section: groupby
+  - type: choice
+    q: Почему orders.groupby("channel").mean() падает в pandas 3?
+    options: ["mean не работает с groupby", "Среднее пытается посчитаться по всем колонкам, включая текстовые", "Нужно сначала reset_index", "channel — текст"]
+    answer: 1
+    explain: Выбирай колонку явно — groupby("channel")["amount"].mean().
+    section: mistakes
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      a = pd.Series(["x", "y", "x", "x"])
+      b = pd.Series([1, 1, 2, 2])
+      print(pd.crosstab(a, b).values.tolist())
+    answer: "[[1, 2], [1, 0]]"
+    explain: x встречается с 1 один раз и с 2 два раза, y — один раз с 1.
+    section: pivot

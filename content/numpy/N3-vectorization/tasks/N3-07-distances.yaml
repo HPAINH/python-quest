@@ -1,0 +1,25 @@
+id: N3-07-distances
+type: vectorize
+title: Расстояния до склада
+difficulty: 2
+lesson_section: broadcasting
+statement: |
+  `points` — координаты точек доставки, форма `(n, 2)`. `depot` — координаты склада, форма `(2,)`. Запиши в `result` массив евклидовых расстояний от склада до каждой точки, округлённых до 3 знаков через `np.round`. Циклы запрещены.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  points = np.round(rng.uniform(0, 50, size=(100_000, 2)), 3)
+  depot = np.round(rng.uniform(10, 40, size=2), 3)
+reference: |
+  result = np.round(np.sqrt(((points - depot) ** 2).sum(axis=1)), 3)
+max_ms: 1500
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = np.round(np.sqrt(((points - depot) ** 2).sum(axis=0)), 3)"
+    expect_detector: axis_confusion
+hints:
+  - "Вычитание строки из матрицы — раздел «Broadcasting», сумма по строкам — раздел «Оси»."
+  - "points - depot вычтет координаты склада из каждой точки. Возведи разности в квадрат, сложи по каждой строке, извлеки корень."
+  - "(points - depot) ** 2, .sum(axis=1), np.sqrt, np.round(..., 3)."
+  - "result = np.round(np.sqrt(((points - ___) ** 2).sum(axis=___)), 3)"
+  - "depot формы (2,) совмещается с каждой строкой (n, 2). Сумма по axis=1 складывает dx² и dy² внутри строки. С axis=0 получилось бы два числа — суммы по всем точкам, а не по одному на точку."

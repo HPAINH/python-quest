@@ -1,0 +1,32 @@
+id: S1-02-spread
+type: stat
+title: Разброс чека в приложении
+difficulty: 1
+lesson_section: spread
+statement: |
+  Для заказов канала `app` посчитай выборочное стандартное отклонение `amount` (деление на n − 1) и межквартильный размах. Запиши в `std_app` и `iqr_app`, допуск ±0.01.
+setup: |
+  import numpy as np
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+outputs:
+  - var: std_app
+    tol: 0.01
+  - var: iqr_app
+    tol: 0.01
+reference: |
+  a = orders.loc[orders["channel"] == "app", "amount"]
+  std_app = a.std()
+  iqr_app = a.quantile(0.75) - a.quantile(0.25)
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "a = orders.loc[orders['channel'] == 'app', 'amount']\nstd_app = np.std(a.values)\niqr_app = a.quantile(0.75) - a.quantile(0.25)"
+    expect_detector: stat_value
+  - code: "a = orders.loc[orders['channel'] == 'app', 'amount']\nstd_app = a.std()\niqr_app = a.max() - a.min()"
+    expect_detector: stat_value
+hints:
+  - "Разброс и квантили — раздел «Разброс»."
+  - "Оставь суммы канала app. std у pandas уже выборочное. IQR — разность квантилей 0,75 и 0,25."
+  - "a.std(), a.quantile(0.75) - a.quantile(0.25)."
+  - "a = orders.loc[orders[\"channel\"] == \"app\", \"amount\"]\nstd_app = a.___()\niqr_app = a.quantile(___) - a.quantile(___)"
+  - "np.std по умолчанию делит на n — на выборке из тысяч заказов разница в копейках, но больше допуска. Размах max − min зависит от одного выброса, IQR — нет."

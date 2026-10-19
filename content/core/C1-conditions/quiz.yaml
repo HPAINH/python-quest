@@ -1,0 +1,107 @@
+quiz:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      x = 15
+      if x > 10:
+          print("A")
+      elif x > 5:
+          print("B")
+      else:
+          print("C")
+    answer: "A"
+    explain: Python выполняет первую подходящую ветку. 15 > 10, поэтому выведется A, а elif даже не проверяется.
+    section: elif
+  - type: choice
+    q: Какое условие проверяет, что n делится на 3?
+    options: ["n / 3 == 0", "n % 3 == 0", "n // 3 == 0", "n % 3 = 0"]
+    answer: 1
+    explain: Остаток от деления на 3 равен нулю — значит, делится нацело. Одиночный = в условии — синтаксическая ошибка.
+    section: if-else
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      a = 5
+      b = 0
+      print(a > 3 and b > 3)
+      print(a > 3 or b > 3)
+      print(not a > 3)
+    answer: "False\nTrue\nFalse"
+    explain: and истинно, только если обе части истинны; or — если хотя бы одна; not меняет True на False.
+    section: logic
+  - type: fill
+    q: Впиши условие, чтобы программа печатала YES для чисел от 10 до 99 включительно.
+    code: |
+      n = 42
+      if ___:
+          print("YES")
+    answer: ["10 <= n <= 99", "n >= 10 and n <= 99", "n >= 10 and n < 100", "10 <= n < 100"]
+    expect: "YES"
+    explain: Цепочка сравнений 10 <= n <= 99 читается как в математике.
+    section: bool
+  - type: choice
+    q: Почему условие if answer == "да" or "yes" всегда истинно?
+    options: ["Строки нельзя сравнивать", "\"yes\" само по себе — непустая строка, а она считается истиной", "or работает как and", "Не хватает скобок вокруг answer"]
+    answer: 1
+    explain: Python читает его как (answer == "да") or ("yes"). Непустая строка истинна, поэтому всё условие истинно. Нужно answer == "да" or answer == "yes".
+    section: logic
+
+express:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      score = 80
+      if score >= 50:
+          print("зачёт")
+      elif score >= 75:
+          print("хорошо")
+      else:
+          print("незачёт")
+    answer: "зачёт"
+    explain: Первое условие уже истинно, поэтому до проверки score >= 75 дело не доходит. Порядок elif важен.
+    section: elif
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      x, y = -2, 5
+      if x > 0:
+          if y > 0:
+              print(1)
+      else:
+          if y > 0:
+              print(2)
+          else:
+              print(3)
+    answer: "2"
+    explain: x не больше 0, попадаем во внешний else, там y > 0 — выводится 2.
+    section: nested
+  - type: choice
+    q: Какой год НЕ високосный?
+    options: ["2000", "2024", "1900", "1996"]
+    answer: 2
+    explain: 1900 делится на 100, но не на 400. Правило — (делится на 4 и не делится на 100) или делится на 400.
+    section: logic
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      print(3 < 5 < 4)
+      print("b" > "abc")
+    answer: "False\nTrue"
+    explain: 3 < 5 < 4 — это 3 < 5 и 5 < 4, второе ложно. Строки сравниваются посимвольно — «b» больше «a».
+    section: bool
+  - type: fill
+    q: Впиши пропуск так, чтобы программа вывела ok и не упала с делением на ноль.
+    code: |
+      d = 0
+      if d == 0 ___ 10 / d > 1:
+          print("ok")
+    answer: ["or"]
+    expect: "ok"
+    explain: При d == 0 первая часть истинна, и or не вычисляет вторую — деления на ноль не происходит.
+    section: logic
+  - type: choice
+    q: "Что произойдёт при запуске кода if x = 5: print(x)?"
+    options: ["Выведет 5", "Ничего не выведет", "SyntaxError", "Присвоит 5 и выведет True"]
+    answer: 2
+    explain: В условии нельзя присваивать через =. Нужно сравнение ==.
+    section: bool

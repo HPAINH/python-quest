@@ -1,0 +1,7 @@
+code: P1
+title: Series и DataFrame
+intro: Таблицы pandas на данных магазина ShopData — колонки, новые признаки, чтение CSV и первый осмотр данных.
+minutes: 30
+expected_tasks: 12
+packages: [numpy, pandas]
+data: true

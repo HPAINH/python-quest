@@ -1,0 +1,27 @@
+id: C4-07-fix-sort
+type: fix_bug
+base: stdio
+title: Исправь медиану
+difficulty: 2
+lesson_section: list-methods
+statement: |
+  Программа должна выводить медиану списка с нечётным числом элементов — средний элемент после сортировки. Сейчас она падает. Исправь её.
+starter: |
+  nums = list(map(int, input().split()))
+  nums = nums.sort()
+  print(nums[len(nums) // 2])
+reference: |
+  nums = list(map(int, input().split()))
+  nums.sort()
+  print(nums[len(nums) // 2])
+tests:
+  visible: ["5 1 3", "7"]
+  hidden: ["9 8 7 6 5", "-1 -3 -2", "2 2 2 1 1"]
+random: {count: 20, gen: "' '.join(str(random.randint(-50, 50)) for _ in range(random.choice([1, 3, 5, 7, 9])))"}
+star3: [first_try]
+hints:
+  - "Прочитай ошибку и раздел «Методы списков»: что возвращает sort?"
+  - "sort сортирует список на месте и ничего не возвращает. Присваивание nums = nums.sort() заменяет список на None."
+  - "Оставь nums.sort() отдельной строкой без присваивания или используй sorted."
+  - "nums = list(map(int, input().split()))\nnums.___()\nprint(nums[len(nums) // 2])"
+  - "После nums = nums.sort() в nums лежит None, и len(None) падает с TypeError. Достаточно вызвать nums.sort() без присваивания — или написать nums = sorted(nums): sorted как раз возвращает новый список."

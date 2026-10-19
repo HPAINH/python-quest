@@ -1,0 +1,74 @@
+id: C6-14-boss-cart
+type: function
+title: "Босс: калькулятор корзины"
+difficulty: 3
+boss: true
+lesson_section: return
+statement: |
+  Собери калькулятор корзины ShopData из трёх функций. Каждая проверяется отдельным шагом.
+
+  **Шаг 1.** `parse_price(text)` — превращает цену из выгрузки в число. Текст может содержать пробелы между разрядами, запятую вместо точки и знак `₽`: `"1 290,50 ₽"` → `1290.5`, `"990"` → `990.0`.
+
+  **Шаг 2.** `apply_discount(price, percent=0)` — возвращает цену со скидкой, округлённую до 2 знаков. Если `percent` меньше 0 или больше 100, функция возвращает цену без изменений.
+
+  **Шаг 3.** `cart_total(items, promo=None)` — `items` — список пар `(текст_цены, количество)`. Функция возвращает итог корзины, округлённый до 2 знаков:
+  - сумма `parse_price(текст) × количество` по всем позициям;
+  - промокод `"SALE10"` даёт скидку 10% на итог, `"WELCOME"` — 15%, но только если итог от 1000 ₽;
+  - любой другой промокод или `None` — без скидки.
+
+  Используй функции из шагов 1 и 2 внутри шага 3.
+starter: |
+  def parse_price(text):
+      pass
+
+  def apply_discount(price, percent=0):
+      pass
+
+  def cart_total(items, promo=None):
+      pass
+reference: |
+  def parse_price(text):
+      clean = text.replace("₽", "").replace(" ", "").replace(",", ".")
+      return float(clean)
+
+  def apply_discount(price, percent=0):
+      if percent < 0 or percent > 100:
+          return price
+      return round(price * (100 - percent) / 100, 2)
+
+  def cart_total(items, promo=None):
+      total = sum(parse_price(p) * q for p, q in items)
+      if promo == "SALE10":
+          total = apply_discount(total, 10)
+      elif promo == "WELCOME" and total >= 1000:
+          total = apply_discount(total, 15)
+      return round(total, 2)
+steps:
+  - title: Разобрать цену из текста
+    function: parse_price
+    tests:
+      visible: ["parse_price('1 290,50 ₽')", "parse_price('990')"]
+      hidden: ["parse_price('0,99')", "parse_price('12 345 678,1 ₽')", "parse_price('  55 ₽ ')"]
+    random: {count: 10, gen: "'parse_price(' + repr(f'{random.randint(0, 99999):,}'.replace(',', ' ') + ',' + str(random.randint(0, 99)) + random.choice(['', ' ₽'])) + ')'"}
+  - title: Применить скидку
+    function: apply_discount
+    tests:
+      visible: ["apply_discount(1000, 15)", "apply_discount(500)"]
+      hidden: ["apply_discount(99.99, 33)", "apply_discount(1000, 150)", "apply_discount(1000, -5)", "apply_discount(1000, 100)"]
+    random: {count: 10, gen: "f'apply_discount({random.randint(0, 99999) / 100}, {random.randint(-10, 110)})'"}
+  - title: Итог корзины с промокодом
+    function: cart_total
+    tests:
+      visible: ["cart_total([('1 290,50 ₽', 2), ('99', 3)], 'SALE10')", "cart_total([('450', 1)], 'WELCOME')"]
+      hidden: ["cart_total([])", "cart_total([('1 000', 1)], 'WELCOME')", "cart_total([('999,99', 1)], 'WELCOME')", "cart_total([('100', 5)], 'sale10')", "cart_total([('333,33 ₽', 3)], 'SALE10')"]
+    random: {count: 15, gen: "f'cart_total({[(str(random.randint(1, 3000)) + random.choice([\",50\", \"\", \",99 ₽\"]), random.randint(1, 4)) for _ in range(random.randint(0, 4))]}, {random.choice([None, \"SALE10\", \"WELCOME\", \"OTHER\"])!r})'"}
+star3: [first_try]
+buggy_variants:
+  - code: "def parse_price(text):\n    return float(text.replace(',', '.').replace('₽', ''))\n\ndef apply_discount(price, percent=0):\n    return round(price * (100 - percent) / 100, 2)\n\ndef cart_total(items, promo=None):\n    total = sum(parse_price(p) * q for p, q in items)\n    if promo == 'SALE10':\n        total = apply_discount(total, 10)\n    elif promo == 'WELCOME':\n        total = apply_discount(total, 15)\n    return round(total, 2)"
+  - code: "def parse_price(text):\n    clean = text.replace('₽', '').replace(' ', '').replace(',', '.')\n    return float(clean)\n\ndef apply_discount(price, percent=0):\n    if percent < 0 or percent > 100:\n        return price\n    return round(price * (100 - percent) / 100, 2)\n\ndef cart_total(items, promo=None):\n    total = sum(parse_price(p) * q for p, q in items)\n    if promo == 'SALE10':\n        total = apply_discount(total, 10)\n    elif promo == 'WELCOME':\n        total = apply_discount(total, 15)\n    return round(total, 2)"
+hints:
+  - "Это три небольшие функции: разбор строки (методы строк из C3), функция со значением по умолчанию (раздел «Параметры и аргументы») и функция, которая вызывает две первые."
+  - "parse_price: убери знак валюты и пробелы, замени запятую на точку, переведи в float. apply_discount: сначала проверь некорректный процент и верни цену как есть, иначе посчитай и округли. cart_total: сложи цену × количество по позициям, затем примени скидку по промокоду с проверкой порога для WELCOME."
+  - "str.replace, float, round(x, 2), sum(... for p, q in items), if / elif по промокоду, вызовы parse_price и apply_discount."
+  - "def parse_price(text):\n    clean = text.replace(\"₽\", \"\").replace(___, \"\").replace(\",\", ___)\n    return float(clean)\n\ndef apply_discount(price, percent=0):\n    if percent < 0 or percent > ___:\n        return price\n    return round(price * (100 - percent) / 100, ___)\n\ndef cart_total(items, promo=None):\n    total = sum(parse_price(p) * q for p, q in ___)\n    if promo == \"SALE10\":\n        total = apply_discount(total, 10)\n    elif promo == \"WELCOME\" and total >= ___:\n        total = apply_discount(total, 15)\n    return round(total, 2)"
+  - "«1 290,50 ₽» → убираем ₽ и пробелы → «1290,50» → запятую на точку → 1290.5. Для корзины из примера: 1290.5 × 2 + 99 × 3 = 2878, скидка 10% → 2590.2. WELCOME при итоге 450 не работает — порог 1000. Промокоды сравниваются точно, поэтому «sale10» не даёт скидки. Шаги проверяются по отдельности, и при ошибке видно, какая функция сломана."

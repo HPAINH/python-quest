@@ -1,0 +1,22 @@
+id: P1-04-mean
+type: value
+title: Средний чек
+difficulty: 1
+lesson_section: series
+statement: |
+  Посчитай средний чек — среднее значение колонки `amount` таблицы `orders`. Запиши в `result`, округлив до 2 знаков через `round`.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+reference: |
+  result = round(orders["amount"].mean(), 2)
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = round(orders['amount'].median(), 2)"
+  - code: "result = orders['amount'].mean"
+hints:
+  - "Агрегаты Series — раздел «Series»."
+  - "Выбери колонку суммы и вызови у неё метод среднего, затем округли."
+  - "orders[\"amount\"].mean(), round(..., 2)."
+  - "result = round(orders[\"___\"].___(), 2)"
+  - "mean без скобок вернул бы сам метод, а не число. Медиана — другая метрика, она устойчива к крупным заказам, но средний чек считают через среднее."

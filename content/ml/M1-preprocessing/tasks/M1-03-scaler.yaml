@@ -1,0 +1,51 @@
+id: M1-03-scaler
+type: stat
+title: Масштабирование без подглядывания
+difficulty: 2
+lesson_section: scaling
+statement: 'Возьми числовые колонки `days_since_last`, `orders_90d`, `support_tickets`. Раздели `X` как в первой задаче (25%, `stratify=y`, `random_state=42`), обучи `StandardScaler` на train и преобразуй test. Запиши в `test_means` средние трёх преобразованных колонок теста — список из трёх чисел (допуск ±0.0001).
+
+  '
+setup: "import numpy as np\nimport pandas as pd\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import OneHotEncoder, StandardScaler\nfrom sklearn.impute import SimpleImputer\nfrom sklearn.compose import ColumnTransformer\nfrom sklearn.pipeline import make_pipeline, Pipeline\nfrom sklearn.linear_model import LogisticRegression\ndf = pd.read_csv(\"churn.csv\")\nX = df.drop(columns=[\"customer_id\", \"cancel_request\", \"churned\"])\ny = df[\"churned\"]\nif SHUFFLE:\n    y = y.sample(frac=1, random_state=1).reset_index(drop=True)\n"
+outputs:
+- var: test_means
+  tol: 0.0001
+reference: 'cols = ["days_since_last", "orders_90d", "support_tickets"]
+
+  X_train, X_test, y_train, y_test = train_test_split(X[cols], y, test_size=0.25, stratify=y, random_state=42)
+
+  sc = StandardScaler().fit(X_train)
+
+  test_means = sc.transform(X_test).mean(axis=0).tolist()
+
+  '
+star3:
+- first_try
+- max_lines:4
+buggy_variants:
+- code: 'cols = [''days_since_last'', ''orders_90d'', ''support_tickets'']
+
+    X_train, X_test, y_train, y_test = train_test_split(X[cols], y, test_size=0.25, stratify=y, random_state=42)
+
+    sc = StandardScaler().fit(X_test)
+
+    test_means = sc.transform(X_test).mean(axis=0).tolist()'
+  expect_detector: stat_value
+- code: 'cols = [''days_since_last'', ''orders_90d'', ''support_tickets'']
+
+    X_train, X_test, y_train, y_test = train_test_split(X[cols], y, test_size=0.25, stratify=y, random_state=42)
+
+    test_means = StandardScaler().fit_transform(X_test).mean(axis=0).tolist()'
+  expect_detector: stat_value
+hints:
+- fit на train, transform на test — раздел «Масштабирование».
+- Сначала разбей, потом обучи scaler на X_train и примени к X_test. Средние по колонкам — mean(axis=0).
+- StandardScaler().fit(X_train), sc.transform(X_test).mean(axis=0).tolist().
+- 'cols = ["days_since_last", "orders_90d", "support_tickets"]
+
+  X_train, X_test, y_train, y_test = train_test_split(X[cols], y, test_size=0.25, stratify=y, random_state=42)
+
+  sc = StandardScaler().fit(___)
+
+  test_means = sc.transform(___).mean(axis=0).tolist()'
+- 'Если обучить scaler на тесте, средние будут ровно нули — красиво, но это подглядывание. Честные средние теста немного отличаются от нуля: тест — другие клиенты.'

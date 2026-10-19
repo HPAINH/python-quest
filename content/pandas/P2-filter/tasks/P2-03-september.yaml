@@ -1,0 +1,22 @@
+id: P2-03-september
+type: dataframe
+title: Заказы за сентябрь
+difficulty: 1
+lesson_section: filter
+statement: |
+  Запиши в `result` заказы за сентябрь 2026 года (с 1 по 30 сентября включительно), отменённые клиентами — статус `cancelled`.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+reference: |
+  sept = orders["order_date"].between("2026-09-01", "2026-09-30")
+  result = orders[sept & (orders["status"] == "cancelled")]
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "result = orders[(orders['order_date'] > '2026-09-01') & (orders['order_date'] < '2026-09-30') & (orders['status'] == 'cancelled')]"
+hints:
+  - "Диапазон дат удобно задавать через between — раздел «Фильтры»."
+  - "Даты хранятся строками в формате ГГГГ-ММ-ДД и правильно сравниваются как строки. Объедини маску периода с маской статуса."
+  - "orders[\"order_date\"].between(\"2026-09-01\", \"2026-09-30\") & (orders[\"status\"] == \"cancelled\")."
+  - "sept = orders[\"order_date\"].between(\"___\", \"___\")\nresult = orders[sept & (orders[\"status\"] == ___)]"
+  - "between включает обе границы. Строгие > и < выбросили бы заказы 1 и 30 сентября. В уровне P3 даты станут настоящими датами, и тот же фильтр будет работать для любых форматов."

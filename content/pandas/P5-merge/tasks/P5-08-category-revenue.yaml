@@ -1,0 +1,28 @@
+id: P5-08-category-revenue
+type: dataframe
+title: Выручка по категориям
+difficulty: 3
+lesson_section: merge
+statement: |
+  Посчитай выручку по названиям категорий по всем позициям заказов: выручка позиции — `quantity * unit_price * (1 - discount)`. Запиши в `result` колонки `category` и `revenue` (округлить до 2 знаков), по убыванию `revenue`.
+setup: |
+  import pandas as pd
+  items = pd.read_csv("order_items.csv")
+  products = pd.read_csv("products.csv")
+  categories = pd.read_csv("categories.csv")
+reference: |
+  items["revenue"] = items["quantity"] * items["unit_price"] * (1 - items["discount"])
+  cats = categories.rename(columns={"name": "category"})
+  t = items.merge(products[["product_id", "category_id"]], on="product_id").merge(cats, on="category_id")
+  result = t.groupby("category")["revenue"].sum().round(2).reset_index().sort_values("revenue", ascending=False)
+ordered: true
+star3: [first_try, "max_lines:4"]
+buggy_variants:
+  - code: "items['revenue'] = items['quantity'] * items['unit_price'] * (1 - items['discount'])\nt = items.merge(products, on='product_id')\nresult = t.groupby('category_id')['revenue'].sum().round(2).reset_index().sort_values('revenue', ascending=False)"
+    expect_detector: columns_mismatch
+hints:
+  - "Цепочка из двух merge — раздел «merge»; группировка — уровень P4."
+  - "Позиции знают товар, товар знает категорию, категория — своё название. Соедини три таблицы по очереди, затем сгруппируй по названию."
+  - "items.merge(products[[\"product_id\", \"category_id\"]], on=\"product_id\").merge(cats, on=\"category_id\")."
+  - "items[\"revenue\"] = items[\"quantity\"] * items[\"unit_price\"] * (1 - items[\"discount\"])\ncats = categories.rename(columns={\"name\": ___})\nt = items.merge(products[[\"product_id\", ___]], on=\"product_id\").merge(cats, on=___)\nresult = t.groupby(\"category\")[\"revenue\"].sum().round(2).reset_index().sort_values(\"revenue\", ascending=False)"
+  - "Из products берём только ключи — тогда name товара не столкнётся с name категории. merge возвращает таблицу, поэтому вызовы можно ставить цепочкой, как несколько JOIN подряд."

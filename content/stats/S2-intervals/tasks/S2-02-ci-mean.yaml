@@ -1,0 +1,33 @@
+id: S2-02-ci-mean
+type: stat
+title: Интервал для среднего чека
+difficulty: 2
+lesson_section: ci-mean
+statement: |
+  Построй 95% доверительный интервал для среднего `amount` **доставленных** заказов по распределению Стьюдента. Запиши в `ci` пару `(нижняя, верхняя)`, допуск ±0.01.
+setup: |
+  import numpy as np
+  import pandas as pd
+  from scipy import stats
+  orders = pd.read_csv("orders.csv")
+outputs:
+  - var: ci
+    title: (нижняя, верхняя)
+    tol: 0.01
+reference: |
+  a = orders.loc[orders["status"] == "delivered", "amount"]
+  ci = stats.t.interval(0.95, df=len(a) - 1, loc=a.mean(), scale=stats.sem(a))
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "a = orders.loc[orders['status'] == 'delivered', 'amount']\nci = (a.mean() - 1.96 * a.std(), a.mean() + 1.96 * a.std())"
+    expect_detector: stat_value
+  - code: "a = orders.loc[orders['status'] == 'delivered', 'amount']\nci = (a.mean() - stats.sem(a), a.mean() + stats.sem(a))"
+    expect_detector: stat_value
+  - code: "a = orders.loc[orders['status'] == 'delivered', 'amount']\nci = a.mean()"
+    expect_detector: stat_count
+hints:
+  - "Интервал для среднего — раздел «Интервал для среднего»."
+  - "Нужны среднее, стандартная ошибка и квантиль t с n − 1 степенями свободы. Готовая функция — stats.t.interval."
+  - "stats.t.interval(0.95, df=len(a) - 1, loc=a.mean(), scale=stats.sem(a))."
+  - "a = orders.loc[orders[\"status\"] == \"delivered\", \"amount\"]\nci = stats.t.interval(___, df=len(a) - 1, loc=a.___(), scale=stats.___(a))"
+  - "Без множителя t интервал соответствует примерно 68%, а с std вместо SE он в √n раз шире. На выборке из тысяч заказов t ≈ 1,96, поэтому mean ± 1,96·SE тоже уложится в допуск."

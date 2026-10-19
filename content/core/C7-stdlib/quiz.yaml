@@ -1,0 +1,104 @@
+quiz:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      for t in ["5", "x", "0"]:
+          try:
+              print(10 // int(t))
+          except ValueError:
+              print("не число")
+          except ZeroDivisionError:
+              print("ноль")
+    answer: "2\nне число\nноль"
+    explain: Для каждого значения срабатывает свой except. Программа не падает и продолжает цикл.
+    section: exceptions
+  - type: choice
+    q: Почему голый except без типа считается плохой практикой?
+    options: ["Он медленнее", "Он ловит вообще все ошибки, включая опечатки, и прячет их", "Python не разрешает так писать", "Он не работает с ValueError"]
+    answer: 1
+    explain: Перехватывай только те ошибки, которые ожидаешь и умеешь обработать.
+    section: mistakes
+  - type: fill
+    q: Впиши пропуск, чтобы программа вывела 3 — число вхождений слова «кофе».
+    code: |
+      from collections import Counter
+      c = ___("кофе чай кофе кофе".split())
+      print(c["кофе"])
+    answer: ["Counter"]
+    expect: "3"
+    explain: Counter считает, сколько раз встретился каждый элемент.
+    section: collections
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      from datetime import date
+      d1 = date(2026, 10, 1)
+      d2 = date(2026, 10, 17)
+      print((d2 - d1).days)
+    answer: "16"
+    explain: Разность дат — timedelta, в .days лежит число дней.
+    section: datetime
+  - type: choice
+    q: Чем хорош with open(...) as f?
+    options: ["Файл читается быстрее", "Файл закроется сам, даже если внутри случится ошибка", "Можно открыть файл без имени", "Файл сразу становится списком"]
+    answer: 1
+    explain: Блок with гарантирует закрытие файла при выходе из блока.
+    section: files
+
+express:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      def f(x):
+          try:
+              return 10 / x
+          except ZeroDivisionError:
+              return "ноль"
+          finally:
+              print("готово")
+      print(f(0))
+    answer: "готово\nноль"
+    explain: finally выполняется перед тем, как функция вернёт значение, поэтому «готово» печатается первым.
+    section: exceptions
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      from collections import defaultdict
+      d = defaultdict(int)
+      for w in "a b a c a".split():
+          d[w] += 1
+      print(d["a"], d["z"], len(d))
+    answer: "3 0 4"
+    explain: defaultdict(int) создаёт 0 для нового ключа. Обращение d["z"] тоже создаёт ключ, поэтому ключей становится 4.
+    section: collections
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      from itertools import combinations
+      print(len(list(combinations([1, 2, 3, 4], 2))))
+    answer: "6"
+    explain: Пар из 4 элементов без повторов и без учёта порядка — 4 · 3 / 2 = 6.
+    section: itertools-math
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      from datetime import datetime
+      d = datetime.strptime("2026-10-17", "%Y-%m-%d")
+      print(d.strftime("%d.%m.%y"), d.weekday())
+    answer: "17.10.26 5"
+    explain: "%y — год двумя цифрами. 17 октября 2026 года — суббота, weekday() возвращает 5."
+    section: datetime
+  - type: choice
+    q: Какой тип ошибки выбросить, если функции передали возраст -5?
+    options: ["TypeError", "ValueError", "KeyError", "IndexError"]
+    answer: 1
+    explain: Тип правильный (число), но значение недопустимое — это ValueError.
+    section: raise
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import math
+      print(0.1 + 0.2 == 0.3, math.isclose(0.1 + 0.2, 0.3))
+    answer: "False True"
+    explain: Дробные числа хранятся с погрешностью, поэтому == ошибается, а isclose сравнивает с допуском.
+    section: itertools-math

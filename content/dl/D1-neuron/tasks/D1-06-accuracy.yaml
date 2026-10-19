@@ -1,0 +1,72 @@
+id: D1-06-accuracy
+type: stat
+title: Точность сети
+difficulty: 1
+lesson_section: forward
+data: false
+variants_count: 3
+statement: 'В `setup` есть случайные веса сети и объекты `X` с метками `y`. Посчитай вероятности прямым проходом (ReLU, затем softmax), предсказанный класс — индекс наибольшей вероятности в строке, и запиши `acc` — долю верных предсказаний (допуск ±1e-9), и `mean_conf` — среднюю наибольшую вероятность по объектам (допуск ±1e-6).
+
+  '
+setup: "import numpy as np\n\ndef rnd(*shape, seed=0):\n    return np.random.default_rng(seed).normal(size=shape).round(3)\nrng = np.random.default_rng(SEED)\nX = rng.normal(size=(200, 4))\ny = rng.integers(0, 3, 200)\nW1, b1 = rng.normal(size=(4, 16)), np.zeros(16)\nW2, b2 = rng.normal(size=(16, 3)), np.zeros(3)\n"
+outputs:
+- var: acc
+  tol: 1.0e-09
+- var: mean_conf
+  tol: 1.0e-06
+reference: 'H = np.maximum(0, X @ W1 + b1)
+
+  Z = H @ W2 + b2
+
+  e = np.exp(Z - Z.max(axis=1, keepdims=True))
+
+  P = e / e.sum(axis=1, keepdims=True)
+
+  acc = (P.argmax(axis=1) == y).mean()
+
+  mean_conf = P.max(axis=1).mean()
+
+  '
+star3:
+- first_try
+- max_lines:6
+buggy_variants:
+- code: 'H = np.maximum(0, X @ W1 + b1)
+
+    Z = H @ W2 + b2
+
+    e = np.exp(Z - Z.max(axis=1, keepdims=True))
+
+    P = e / e.sum(axis=1, keepdims=True)
+
+    acc = (P.argmax(axis=0) == y).mean()
+
+    mean_conf = P.max(axis=1).mean()'
+- code: 'H = np.maximum(0, X @ W1 + b1)
+
+    Z = H @ W2 + b2
+
+    e = np.exp(Z - Z.max(axis=1, keepdims=True))
+
+    P = e / e.sum(axis=1, keepdims=True)
+
+    acc = (P.argmax(axis=1) == y).mean()
+
+    mean_conf = P.max()'
+  expect_detector: stat_value
+hints:
+- Прямой проход и argmax — раздел «Прямой проход».
+- Посчитай P как в задаче «Двухслойная сеть», класс — argmax по строкам. Доля верных — среднее булевой маски, уверенность — максимум строки.
+- P.argmax(axis=1), (pred == y).mean(), P.max(axis=1).mean().
+- 'H = np.maximum(0, X @ W1 + b1)
+
+  Z = H @ W2 + b2
+
+  e = np.exp(Z - Z.max(axis=1, keepdims=True))
+
+  P = e / e.sum(axis=1, keepdims=True)
+
+  acc = (P.argmax(axis=___) == y).mean()
+
+  mean_conf = P.max(axis=___).mean()'
+- Необученная сеть угадывает примерно треть — как случайный выбор из трёх классов, но может быть при этом очень «уверена». Уверенность и точность — разные вещи.

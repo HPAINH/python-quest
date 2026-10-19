@@ -1,0 +1,27 @@
+id: N2-04-share
+type: value
+title: Доля средних чеков
+difficulty: 1
+lesson_section: masks
+statement: |
+  Посчитай долю заказов из `amounts`, сумма которых строго больше `lo` и не больше `hi`. Запиши число в `result`, округлив до 3 знаков через `round`.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  amounts = rng.integers(50, 5000, size=int(rng.integers(30, 80)))
+  lo = int(rng.integers(300, 1000))
+  hi = lo + int(rng.integers(500, 2000))
+reference: |
+  result = round(float(((amounts > lo) & (amounts <= hi)).mean()), 3)
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = round(float(((amounts > lo) and (amounts <= hi)).mean()), 3)"
+    expect_detector: series_and_or
+  - code: "result = round(float((amounts > lo & amounts <= hi).mean()), 3)"
+    expect_detector: mask_parentheses
+hints:
+  - "Объединение условий через & и доля через mean — раздел «Булевы маски»."
+  - "Построй маску из двух условий, соединённых «и». Среднее маски — это доля True."
+  - "((amounts > lo) & (amounts <= hi)).mean(), round(..., 3)."
+  - "result = round(float(((amounts > lo) ___ (amounts <= hi)).mean()), ___)"
+  - "True считается за 1, False — за 0, поэтому среднее маски равно доле подходящих элементов. and вместо & вызывает ошибку «truth value is ambiguous», а без скобок & выполнится раньше сравнений."

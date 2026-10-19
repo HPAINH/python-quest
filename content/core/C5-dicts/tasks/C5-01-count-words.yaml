@@ -1,0 +1,31 @@
+id: C5-01-count-words
+type: function
+function: count_words
+title: Частота слов
+difficulty: 1
+lesson_section: counting
+statement: |
+  Напиши функцию `count_words(text)`, которая возвращает словарь `{слово: сколько раз встретилось}`. Слова разделены пробелами, регистр не важен: `Кофе` и `кофе` — одно слово, в словаре оно хранится строчными буквами.
+starter: |
+  def count_words(text):
+      pass
+reference: |
+  def count_words(text):
+      freq = {}
+      for w in text.lower().split():
+          freq[w] = freq.get(w, 0) + 1
+      return freq
+tests:
+  visible: ["count_words('кофе чай Кофе')", "count_words('one')"]
+  hidden: ["count_words('')", "count_words('a A a b')", "count_words('  много   пробелов  много ')"]
+random: {count: 20, gen: "'count_words(' + repr(' '.join(random.choice(['a', 'B', 'b', 'cc', 'A']) for _ in range(random.randint(0, 12)))) + ')'"}
+star3: [first_try]
+buggy_variants:
+  - code: "def count_words(text):\n    freq = {}\n    for w in text.lower().split():\n        freq[w] += 1\n    return freq"
+    expect_detector: key_error
+hints:
+  - "Это счётчик на словаре — раздел «Подсчёт частот»."
+  - "Приведи текст к нижнему регистру, раздели на слова и для каждого слова увеличь его значение в словаре."
+  - "freq = {}, text.lower().split(), freq[w] = freq.get(w, 0) + 1, return freq."
+  - "def count_words(text):\n    freq = ___\n    for w in text.___().split():\n        freq[w] = freq.get(w, ___) + 1\n    return freq"
+  - "get(w, 0) даёт 0 для слова, которого ещё нет, поэтому первое появление записывает 1. Запись freq[w] += 1 упадёт с KeyError на первом же новом слове. Пустая строка даёт пустой словарь."

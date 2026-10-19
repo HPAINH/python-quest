@@ -1,0 +1,25 @@
+id: P6-06-row-number
+type: dataframe
+title: Самый крупный заказ клиента
+difficulty: 2
+lesson_section: rank
+sql_quest_ref: ROW_NUMBER() OVER
+statement: |
+  Пронумеруй заказы каждого клиента по убыванию `amount`: самый крупный — 1. При равных суммах меньший номер получает заказ с меньшим `order_id`. Запиши в `result` только заказы с номером 1 и 2: колонки `customer_id`, `order_id`, `amount`, `rn` (целое число).
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv", parse_dates=["order_date"])
+reference: |
+  t = orders.sort_values(["customer_id", "amount", "order_id"], ascending=[True, False, True])
+  t["rn"] = t.groupby("customer_id").cumcount() + 1
+  result = t.loc[t["rn"] <= 2, ["customer_id", "order_id", "amount", "rn"]]
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "t = orders.sort_values(['customer_id', 'amount', 'order_id'], ascending=[True, True, True])\nt['rn'] = t.groupby('customer_id').cumcount() + 1\nresult = t.loc[t['rn'] <= 2, ['customer_id', 'order_id', 'amount', 'rn']]"
+    expect_detector: column_values
+hints:
+  - "Нумерация внутри группы — раздел «rank и cumsum»."
+  - "Отсортируй так, чтобы внутри клиента заказы шли от крупного к мелкому, а при равенстве — по order_id. Тогда номер — это cumcount + 1."
+  - "sort_values([\"customer_id\", \"amount\", \"order_id\"], ascending=[True, False, True]), groupby(\"customer_id\").cumcount() + 1."
+  - "t = orders.sort_values([\"customer_id\", \"amount\", \"order_id\"], ascending=[True, ___, True])\nt[\"rn\"] = t.groupby(\"customer_id\").___() + 1\nresult = t.loc[t[\"rn\"] <= 2, [\"customer_id\", \"order_id\", \"amount\", \"rn\"]]"
+  - "Это ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY amount DESC, order_id). rank(method=\"min\") — это RANK(): при равных суммах оба заказа получат 1, и номера перестанут быть уникальными. rank(method=\"first\") тоже подойдёт, если строки заранее отсортированы по order_id."

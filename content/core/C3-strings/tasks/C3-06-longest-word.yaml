@@ -1,0 +1,26 @@
+id: C3-06-longest-word
+type: stdio
+title: Самое длинное слово
+difficulty: 2
+lesson_section: split-join
+statement: |
+  Дано предложение из слов, разделённых пробелами (знаков препинания нет). Выведи самое длинное слово. Если таких несколько — первое из них.
+reference: |
+  best = ""
+  for w in input().split():
+      if len(w) > len(best):
+          best = w
+  print(best)
+tests:
+  visible: ["аналитик данных пишет код", "a bb cc d"]
+  hidden: ["one", "xx yy zz", "  много   пробелов   тут  ", "a b c dddd eeee"]
+random: {count: 20, gen: "' '.join(''.join(random.choice('abcde') for _ in range(random.randint(1, 8))) for _ in range(random.randint(1, 10)))"}
+star3: [first_try]
+buggy_variants:
+  - code: "best = ''\nfor w in input().split():\n    if len(w) >= len(best):\n        best = w\nprint(best)"
+hints:
+  - "Слова получаются через split — раздел «split и join», а поиск лучшего — как поиск максимума в C2."
+  - "Пройди по словам и запоминай слово, если оно строго длиннее запомненного."
+  - "for w in s.split(), len(w) > len(best)."
+  - "best = ___\nfor w in input().split():\n    if len(w) ___ len(best):\n        best = w\nprint(best)"
+  - "Строгое > оставляет первое из самых длинных слов: следующее слово такой же длины его не заменит. С >= победило бы последнее. Начальное значение — пустая строка: любое слово длиннее неё."

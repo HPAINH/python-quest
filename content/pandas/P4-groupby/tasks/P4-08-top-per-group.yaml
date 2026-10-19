@@ -1,0 +1,28 @@
+id: P4-08-top-per-group
+type: dataframe
+title: Самый дорогой товар категории
+difficulty: 2
+lesson_section: transform
+sql_quest_ref: ROW_NUMBER() OVER
+statement: |
+  Для каждой категории найди самый дорогой товар. При равной цене выбери товар с меньшим `product_id`. Запиши в `result` колонки `category_id`, `product_id`, `name`, `price`, по возрастанию `category_id`.
+setup: |
+  import pandas as pd
+  products = pd.read_csv("products.csv")
+reference: |
+  t = products.sort_values(["price", "product_id"], ascending=[False, True])
+  t = t.groupby("category_id").head(1).sort_values("category_id")
+  result = t[["category_id", "product_id", "name", "price"]]
+ordered: true
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "result = products.groupby('category_id')['price'].max()"
+    expect_detector: columns_mismatch
+  - code: "t = products.sort_values('price').groupby('category_id').head(1).sort_values('category_id')\nresult = t[['category_id', 'product_id', 'name', 'price']]"
+    expect_detector: column_values
+hints:
+  - "Первая строка группы после сортировки — раздел «transform», последний абзац."
+  - "Отсортируй товары по цене по убыванию (и по id по возрастанию), возьми первую строку каждой категории, затем упорядочь по категории."
+  - "sort_values([\"price\", \"product_id\"], ascending=[False, True]), groupby(\"category_id\").head(1)."
+  - "t = products.sort_values([\"price\", \"product_id\"], ascending=[___, True])\nt = t.groupby(\"category_id\").___(1).sort_values(\"category_id\")\nresult = t[[\"category_id\", \"product_id\", \"name\", \"price\"]]"
+  - "max() даёт только цену, а не сам товар. Сортировка + head(1) по группе — аналог ROW_NUMBER() OVER (PARTITION BY ... ORDER BY price DESC) = 1. По возрастанию цены head(1) взял бы самый дешёвый."

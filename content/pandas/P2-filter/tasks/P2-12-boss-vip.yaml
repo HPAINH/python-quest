@@ -1,0 +1,43 @@
+id: P2-12-boss-vip
+type: dataframe
+title: "Босс: VIP-клиенты"
+difficulty: 3
+boss: true
+lesson_section: filter
+statement: |
+  Отдел лояльности готовит рассылку для VIP-клиентов. VIP — клиенты уровня `gold` из Москвы или Санкт-Петербурга.
+
+  Создай три переменные:
+  1. `vip` — VIP-клиенты: колонки `customer_id`, `name`, `city`, отсортированные по `customer_id`;
+  2. `vip_orders` — **доставленные** заказы VIP-клиентов на сумму от 2000 ₽ включительно: колонки `order_id`, `customer_id`, `amount`, по убыванию суммы, при равенстве — по возрастанию `order_id`;
+  3. `vip_share` — доля этих заказов среди всех доставленных заказов магазина, округлённая до 4 знаков через `round`.
+setup: |
+  import pandas as pd
+  customers = pd.read_csv("customers.csv")
+  orders = pd.read_csv("orders.csv")
+outputs:
+  - var: vip
+    title: VIP-клиенты
+    ordered: true
+  - var: vip_orders
+    title: крупные заказы VIP
+    ordered: true
+  - var: vip_share
+    title: доля среди доставленных
+reference: |
+  is_vip = (customers["loyalty"] == "gold") & customers["city"].isin(["Москва", "Санкт-Петербург"])
+  vip = customers.loc[is_vip, ["customer_id", "name", "city"]].sort_values("customer_id")
+  delivered = orders[orders["status"] == "delivered"]
+  big = delivered[delivered["customer_id"].isin(vip["customer_id"]) & (delivered["amount"] >= 2000)]
+  vip_orders = big.sort_values(["amount", "order_id"], ascending=[False, True])[["order_id", "customer_id", "amount"]]
+  vip_share = round(len(vip_orders) / len(delivered), 4)
+star3: [first_try]
+buggy_variants:
+  - code: "is_vip = (customers['loyalty'] == 'gold') & customers['city'].isin(['Москва', 'Санкт-Петербург'])\nvip = customers.loc[is_vip, ['customer_id', 'name', 'city']].sort_values('customer_id')\nbig = orders[orders['customer_id'].isin(vip['customer_id']) & (orders['amount'] >= 2000)]\nvip_orders = big.sort_values(['amount', 'order_id'], ascending=[False, True])[['order_id', 'customer_id', 'amount']]\nvip_share = round(len(vip_orders) / len(orders), 4)"
+  - code: "is_vip = (customers['loyalty'] == 'gold') | customers['city'].isin(['Москва', 'Санкт-Петербург'])\nvip = customers.loc[is_vip, ['customer_id', 'name', 'city']].sort_values('customer_id')\ndelivered = orders[orders['status'] == 'delivered']\nbig = delivered[delivered['customer_id'].isin(vip['customer_id']) & (delivered['amount'] >= 2000)]\nvip_orders = big.sort_values(['amount', 'order_id'], ascending=[False, True])[['order_id', 'customer_id', 'amount']]\nvip_share = round(len(vip_orders) / len(delivered), 4)"
+hints:
+  - "Всё из уровня: маски с & и isin, loc, сортировка по двум колонкам. Чтобы связать заказы с VIP без merge, используй isin по списку id."
+  - "Сначала маска VIP: уровень gold и город из двух. Потом из доставленных заказов оставь те, чей customer_id входит в id VIP-клиентов и сумма не меньше 2000. Долю считай от числа всех доставленных, а не всех заказов."
+  - "customers[\"city\"].isin([...]), delivered[\"customer_id\"].isin(vip[\"customer_id\"]), sort_values([\"amount\", \"order_id\"], ascending=[False, True]), len(...) / len(...)."
+  - "is_vip = (customers[\"loyalty\"] == \"gold\") & customers[\"city\"].isin([\"Москва\", ___])\nvip = customers.loc[is_vip, [\"customer_id\", \"name\", \"city\"]].sort_values(___)\ndelivered = orders[orders[\"status\"] == ___]\nbig = delivered[delivered[\"customer_id\"].isin(vip[___]) & (delivered[\"amount\"] >= 2000)]\nvip_orders = big.sort_values([\"amount\", \"order_id\"], ascending=[False, True])[[\"order_id\", \"customer_id\", \"amount\"]]\nvip_share = round(len(vip_orders) / len(___), 4)"
+  - "isin с колонкой другой таблицы — простой способ отфильтровать по связанной таблице без merge, как WHERE customer_id IN (SELECT ...) в SQL. Знаменатель доли — доставленные заказы. Если взять все заказы, доля получится меньше, а | вместо & превратил бы VIP в «всех gold и всех москвичей»."

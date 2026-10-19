@@ -1,0 +1,24 @@
+id: P3-10-status
+type: value
+title: Доля доставленных
+difficulty: 2
+lesson_section: str
+statement: |
+  Статусы в `orders_raw` записаны как `delivered`, `DELIVERED`, `Delivered` и ` delivered `. Удали полные повторы строк, приведи статусы к одному виду и запиши в `result` долю доставленных заказов, округлённую до 4 знаков через `round`.
+setup: |
+  import pandas as pd
+  raw = pd.read_csv("orders_raw.csv")
+reference: |
+  clean = raw.drop_duplicates()
+  status = clean["status"].str.strip().str.lower()
+  result = round((status == "delivered").mean(), 4)
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "clean = raw.drop_duplicates()\nstatus = clean['status'].str.lower()\nresult = round((status == 'delivered').mean(), 4)"
+  - code: "status = raw['status'].str.strip().str.lower()\nresult = round((status == 'delivered').mean(), 4)"
+hints:
+  - "Дубликаты и методы строк — разделы «Дубликаты» и «Строки: .str»."
+  - "Порядок: drop_duplicates, потом strip и lower для статуса. Доля True в маске — её среднее."
+  - "raw.drop_duplicates(), clean[\"status\"].str.strip().str.lower(), (status == \"delivered\").mean()."
+  - "clean = raw.___()\nstatus = clean[\"status\"].str.strip().str.___()\nresult = round((status == ___).mean(), 4)"
+  - "Среднее маски True/False — доля True, как AVG(CASE WHEN ...) в SQL. Без strip статус « delivered » не совпадает с «delivered», без удаления повторов задвоенные заказы искажают долю."

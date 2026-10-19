@@ -1,0 +1,28 @@
+id: C2-04-factorial
+type: stdio
+title: Факториал
+difficulty: 1
+lesson_section: accumulators
+statement: |
+  Дано целое `n` от 0 до 20. Выведи `n!` — произведение всех чисел от 1 до `n`. По определению `0! = 1`.
+
+  Не импортируй модули.
+reference: |
+  n = int(input())
+  p = 1
+  for i in range(2, n + 1):
+      p *= i
+  print(p)
+requires: [no_import]
+tests:
+  visible: ["5", "0"]
+  hidden: ["1", "2", "10", "20"]
+star3: [first_try]
+buggy_variants:
+  - code: "n = int(input())\np = 0\nfor i in range(1, n + 1):\n    p *= i\nprint(p)"
+hints:
+  - "Это произведение — раздел «Накопители и счётчики»."
+  - "Начни с произведения, равного 1, и умножай его на каждое число от 1 до n."
+  - "p = 1, цикл for по range, p *= i."
+  - "n = int(input())\np = ___\nfor i in range(1, n + ___):\n    p *= ___\nprint(p)"
+  - "Начальное значение 1 — нейтральное для умножения. Для n = 0 цикл не выполнится ни разу, и выведется 1, как и положено для 0!. Если начать с 0, ответ всегда будет 0."

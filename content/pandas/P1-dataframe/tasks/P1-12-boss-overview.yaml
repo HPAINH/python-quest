@@ -1,0 +1,43 @@
+id: P1-12-boss-overview
+type: value
+title: "Босс: паспорт данных"
+difficulty: 3
+boss: true
+lesson_section: explore
+statement: |
+  Руководитель просит краткий паспорт данных ShopData. Таблицы `orders` и `customers` уже загружены.
+
+  Создай четыре переменные:
+  1. `n_orders` — число заказов;
+  2. `period` — кортеж из самой ранней и самой поздней даты заказа (строки, как в файле);
+  3. `channel_share` — доля каждого канала продаж среди заказов, округлённая до 3 знаков: Series с индексом-каналом;
+  4. `top_city` — город, где живёт больше всего клиентов (пропуски не учитываются).
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+  customers = pd.read_csv("customers.csv")
+outputs:
+  - var: n_orders
+    title: число заказов
+  - var: period
+    title: первая и последняя дата
+  - var: channel_share
+    title: доли каналов
+  - var: top_city
+    title: самый частый город клиентов
+reference: |
+  n_orders = len(orders)
+  period = (orders["order_date"].min(), orders["order_date"].max())
+  channel_share = orders["channel"].value_counts(normalize=True).round(3)
+  top_city = customers["city"].value_counts().index[0]
+star3: [first_try, "max_lines:4"]
+same_ok: true
+buggy_variants:
+  - code: "n_orders = len(orders)\nperiod = (orders['order_date'].min(), orders['order_date'].max())\nchannel_share = orders['channel'].value_counts().round(3)\ntop_city = customers['city'].value_counts().index[0]"
+  - code: "n_orders = orders['customer_id'].nunique()\nperiod = (orders['order_date'].min(), orders['order_date'].max())\nchannel_share = orders['channel'].value_counts(normalize=True).round(3)\ntop_city = customers['city'].value_counts().index[0]"
+hints:
+  - "Всё из уровня: len или shape, min и max по колонке, value_counts с normalize и обращение к индексу Series."
+  - "Число заказов — число строк. Даты в формате ГГГГ-ММ-ДД сравниваются как строки правильно, поэтому min и max работают сразу. Доли даёт value_counts(normalize=True). Самый частый город — первый в value_counts, его название лежит в индексе."
+  - "len(orders), orders[\"order_date\"].min(), value_counts(normalize=True).round(3), value_counts().index[0]."
+  - "n_orders = len(___)\nperiod = (orders[\"order_date\"].___(), orders[\"order_date\"].max())\nchannel_share = orders[\"channel\"].value_counts(normalize=___).round(3)\ntop_city = customers[\"city\"].value_counts().___[0]"
+  - "value_counts сортирует по убыванию частоты, поэтому первый элемент индекса — самый частый город. Без normalize=True получились бы количества, а не доли. Даты в формате ISO можно сравнивать строками: «2025-01-01» < «2026-09-30» и по алфавиту, и по времени."

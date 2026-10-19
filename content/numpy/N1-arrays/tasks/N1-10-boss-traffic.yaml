@@ -1,0 +1,41 @@
+id: N1-10-boss-traffic
+type: array
+title: "Босс: сетка посещаемости"
+difficulty: 3
+boss: true
+lesson_section: reshape
+statement: |
+  В `visits` — посещения сайта ShopData по часам за одну неделю: 168 чисел, начиная с понедельника 00:00.
+
+  Создай три переменные:
+  1. `grid` — таблица «день × час», форма `(7, 24)`;
+  2. `share` — доля каждого часа в посещениях за всю неделю: `grid`, делённая на сумму всех посещений, округлённая до 4 знаков через `np.round`;
+  3. `index` — «индекс нагрузки»: `grid`, умноженная на 100 и целочисленно делённая на максимум `grid`. Должны получиться целые числа от 0 до 100.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  hours = np.tile(np.arange(24), 7)
+  base = 40 + 60 * np.exp(-((hours - 20) ** 2) / 18)
+  visits = rng.poisson(base).astype(int)
+outputs:
+  - var: grid
+    title: таблица день × час
+  - var: share
+    title: доля каждого часа
+  - var: index
+    title: индекс нагрузки 0–100
+reference: |
+  grid = visits.reshape(7, 24)
+  share = np.round(grid / grid.sum(), 4)
+  index = grid * 100 // grid.max()
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "grid = visits.reshape(24, 7)\nshare = np.round(grid / grid.sum(), 4)\nindex = grid * 100 // grid.max()"
+    expect_detector: axis_confusion
+  - code: "grid = visits.reshape(7, 24)\nshare = grid / grid.sum()\nindex = grid * 100 / grid.max()"
+hints:
+  - "Нужны reshape (раздел «Форма и reshape») и поэлементная арифметика с числом (раздел «Массив»)."
+  - "Разложи 168 чисел в 7 строк по 24 часа. Долю получи делением всей таблицы на общую сумму и округли. Индекс — та же таблица, умноженная на 100 и целочисленно делённая на максимум."
+  - "visits.reshape(7, 24), grid.sum(), np.round(..., 4), grid.max(), оператор //."
+  - "grid = visits.reshape(___, 24)\nshare = np.round(grid / grid.___(), 4)\nindex = grid * 100 ___ grid.max()"
+  - "grid / grid.sum() делит каждый элемент на одно число — общую сумму, сумма всех долей равна 1. // между целыми даёт целые, поэтому самый нагруженный час получает ровно 100. Обычное деление / дало бы дробные значения, а форма (24, 7) разложила бы часы неправильно."

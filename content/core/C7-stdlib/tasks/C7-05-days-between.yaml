@@ -1,0 +1,34 @@
+id: C7-05-days-between
+type: function
+function: days_between
+title: Дней между датами
+difficulty: 1
+lesson_section: datetime
+statement: |
+  Напиши функцию `days_between(a, b)`, которая получает две даты строками в формате `ГГГГ-ММ-ДД` и возвращает число дней между ними — всегда неотрицательное.
+starter: |
+  from datetime import datetime
+
+  def days_between(a, b):
+      pass
+reference: |
+  from datetime import datetime
+
+  def days_between(a, b):
+      fmt = "%Y-%m-%d"
+      d1 = datetime.strptime(a, fmt)
+      d2 = datetime.strptime(b, fmt)
+      return abs((d2 - d1).days)
+tests:
+  visible: ["days_between('2026-10-01', '2026-10-17')", "days_between('2026-01-01', '2025-01-01')"]
+  hidden: ["days_between('2024-02-28', '2024-03-01')", "days_between('2026-05-05', '2026-05-05')", "days_between('2025-12-31', '2026-01-01')"]
+random: {count: 20, gen: "f'days_between(\"20{random.randint(20, 29)}-{random.randint(1, 12):02d}-{random.randint(1, 28):02d}\", \"20{random.randint(20, 29)}-{random.randint(1, 12):02d}-{random.randint(1, 28):02d}\")'"}
+star3: [first_try]
+buggy_variants:
+  - code: "def days_between(a, b):\n    return abs(int(b[8:]) - int(a[8:]))"
+hints:
+  - "Даты разбирает strptime — раздел «datetime»."
+  - "Преврати обе строки в даты по формату год-месяц-день, вычти одну из другой и возьми модуль числа дней."
+  - "datetime.strptime(a, \"%Y-%m-%d\"), (d2 - d1).days, abs."
+  - "from datetime import datetime\n\ndef days_between(a, b):\n    fmt = \"%Y-%m-___\"\n    d1 = datetime.strptime(a, fmt)\n    d2 = datetime.___(b, fmt)\n    return abs((d2 - d1).___)"
+  - "Вычитание дат учитывает разную длину месяцев и високосные годы: между 28 февраля и 1 марта 2024 года — 2 дня. Если вычитать номера дней из строки, ответ будет неверным уже при смене месяца."

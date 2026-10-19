@@ -1,0 +1,46 @@
+id: M4-02-folds
+type: stat
+title: Доля ушедших в фолдах
+difficulty: 1
+lesson_section: kfold
+statement: 'Пройди по фолдам `StratifiedKFold(5, shuffle=True, random_state=0)` на `X`, `y` и запиши в `rates` список долей ушедших клиентов в **тестовой** части каждого фолда (допуск ±0.0001), а в `sizes` — список размеров тестовых частей.
+
+  '
+setup: "import numpy as np\nimport pandas as pd\nfrom sklearn import metrics\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import OneHotEncoder, StandardScaler\nfrom sklearn.impute import SimpleImputer\nfrom sklearn.compose import ColumnTransformer\nfrom sklearn.pipeline import make_pipeline, Pipeline\nfrom sklearn.linear_model import LogisticRegression, LinearRegression\nfrom sklearn.model_selection import cross_val_score, KFold, StratifiedKFold, GridSearchCV, TimeSeriesSplit\nfrom sklearn.ensemble import HistGradientBoostingClassifier, HistGradientBoostingRegressor\ndf = pd.read_csv(\"churn.csv\")\nX = df.drop(columns=[\"customer_id\", \"cancel_request\", \"churned\"])\ny = df[\"churned\"]\nif SHUFFLE:\n    y = y.sample(frac=1, random_state=1).reset_index(drop=True)\ncat = [\"city\", \"loyalty\"]\nnum = [c for c in X.columns if c not in cat]\npre = ColumnTransformer([\n    (\"num\", make_pipeline(SimpleImputer(strategy=\"median\"), StandardScaler()), num),\n    (\"cat\", OneHotEncoder(handle_unknown=\"ignore\"), cat),\n])\npipe = make_pipeline(pre, LogisticRegression(max_iter=1000))\n"
+outputs:
+- var: rates
+  tol: 0.0001
+- var: sizes
+reference: 'cv = StratifiedKFold(5, shuffle=True, random_state=0)
+
+  rates = [y.iloc[te].mean() for _, te in cv.split(X, y)]
+
+  sizes = [len(te) for _, te in cv.split(X, y)]
+
+  '
+star3:
+- first_try
+- max_lines:3
+buggy_variants:
+- code: 'cv = KFold(5)
+
+    rates = [y.iloc[te].mean() for _, te in cv.split(X, y)]
+
+    sizes = [len(te) for _, te in cv.split(X, y)]'
+  expect_detector: stat_value
+- code: 'cv = StratifiedKFold(5, shuffle=True, random_state=0)
+
+    rates = [y.iloc[tr].mean() for tr, _ in cv.split(X, y)]
+
+    sizes = [len(te) for _, te in cv.split(X, y)]'
+  expect_detector: stat_value
+hints:
+- Фолды — раздел «Фолды».
+- 'cv.split(X, y) выдаёт пары массивов индексов: train и test. Доля ушедших — среднее y по индексам теста через iloc.'
+- '[y.iloc[te].mean() for _, te in cv.split(X, y)], [len(te) for _, te in cv.split(X, y)].'
+- 'cv = StratifiedKFold(5, shuffle=True, random_state=0)
+
+  rates = [y.iloc[___].mean() for _, te in cv.split(X, y)]
+
+  sizes = [len(te) for _, te in cv.split(X, ___)]'
+- Индексы из split — позиции, поэтому iloc, а не loc. Без стратификации доли в фолдах гуляют сильнее.

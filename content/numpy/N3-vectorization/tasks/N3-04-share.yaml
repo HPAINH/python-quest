@@ -1,0 +1,23 @@
+id: N3-04-share
+type: array
+title: Доли внутри дня
+difficulty: 2
+lesson_section: broadcasting
+statement: |
+  `visits` — визиты по каналам: строки — дни, столбцы — каналы (app, web, offline). Запиши в `result` долю каждого канала **внутри своего дня** — каждую строку, делённую на сумму этой строки. Округли до 3 знаков через `np.round`.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  visits = rng.integers(100, 2000, size=(int(rng.integers(5, 15)), 3))
+reference: |
+  result = np.round(visits / visits.sum(axis=1, keepdims=True), 3)
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = np.round(visits / visits.sum(axis=0), 3)"
+  - code: "result = np.round(visits / visits.sum(), 3)"
+hints:
+  - "Деление матрицы на суммы строк — разделы «Broadcasting» и «Оси»."
+  - "Посчитай суммы по строкам так, чтобы получился столбец формы (дни, 1). Тогда каждая строка поделится на свою сумму."
+  - "visits.sum(axis=1, keepdims=True)."
+  - "result = np.round(visits / visits.sum(axis=___, keepdims=___), 3)"
+  - "Без keepdims сумма строк имеет форму (дни,) и совмещается со столбцами, а не со строками: деление либо упадёт, либо при трёх днях молча посчитает не то. keepdims=True даёт форму (дни, 1), и broadcasting делит каждую строку на её сумму. Сумма долей в каждой строке — 1."

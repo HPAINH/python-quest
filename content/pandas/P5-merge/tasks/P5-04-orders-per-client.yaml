@@ -1,0 +1,26 @@
+id: P5-04-orders-per-client
+type: dataframe
+title: Заказы на каждого клиента
+difficulty: 2
+lesson_section: how
+statement: |
+  Запиши в `result` для **каждого** клиента число его заказов: колонки `customer_id` и `n_orders`. Клиенты без заказов тоже должны быть — с нулём.
+setup: |
+  import pandas as pd
+  customers = pd.read_csv("customers.csv")
+  orders = pd.read_csv("orders.csv")
+reference: |
+  t = customers.merge(orders, on="customer_id", how="left")
+  result = t.groupby("customer_id")["order_id"].count().reset_index(name="n_orders")
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "t = customers.merge(orders, on='customer_id')\nresult = t.groupby('customer_id')['order_id'].count().reset_index(name='n_orders')"
+    expect_detector: merge_inner
+  - code: "t = customers.merge(orders, on='customer_id', how='left')\nresult = t.groupby('customer_id').size().reset_index(name='n_orders')"
+    expect_detector: column_values
+hints:
+  - "Сохранить всех клиентов — how=\"left\", раздел «Виды соединений»."
+  - "Соедини клиентов с заказами так, чтобы клиенты без заказов остались. Потом посчитай непустые order_id по клиенту."
+  - "customers.merge(orders, on=\"customer_id\", how=\"left\"), groupby(\"customer_id\")[\"order_id\"].count()."
+  - "t = customers.merge(orders, on=\"customer_id\", how=___)\nresult = t.groupby(\"customer_id\")[___].count().reset_index(name=\"n_orders\")"
+  - "Inner теряет клиентов без заказов. size() считает строки, а у клиента без заказов после left-соединения одна строка с NaN — получилась бы единица вместо нуля. count по order_id пропуск не считает."

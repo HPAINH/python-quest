@@ -1,0 +1,33 @@
+id: C7-04-group-sum
+type: function
+function: revenue_by_city
+title: Выручка по городам
+difficulty: 1
+lesson_section: collections
+statement: |
+  Напиши функцию `revenue_by_city(orders)`. Она получает список пар `(город, сумма)` и возвращает словарь «город → суммарная выручка», округлённая до 2 знаков. Используй `defaultdict`.
+starter: |
+  from collections import defaultdict
+
+  def revenue_by_city(orders):
+      pass
+reference: |
+  from collections import defaultdict
+
+  def revenue_by_city(orders):
+      totals = defaultdict(float)
+      for city, amount in orders:
+          totals[city] += amount
+      return {c: round(v, 2) for c, v in totals.items()}
+requires: ["uses:defaultdict"]
+tests:
+  visible: ["revenue_by_city([('Казань', 990), ('Москва', 450.5), ('Казань', 120)])", "revenue_by_city([])"]
+  hidden: ["revenue_by_city([('A', 0.1), ('A', 0.2)])", "revenue_by_city([('Пермь', 1)])", "revenue_by_city([('x', -5), ('y', 5), ('x', 5)])"]
+random: {count: 15, gen: "f'revenue_by_city({[(random.choice([\"Москва\", \"Казань\", \"Самара\"]), random.randint(1, 50000) / 100) for _ in range(random.randint(0, 8))]})'"}
+star3: [first_try]
+hints:
+  - "defaultdict сам создаёт значение для нового ключа — раздел «collections»."
+  - "Заведи defaultdict с нулём по умолчанию, прибавь каждую сумму к своему городу и округли значения перед возвратом."
+  - "defaultdict(float), totals[city] += amount, генератор словаря с round."
+  - "from collections import defaultdict\n\ndef revenue_by_city(orders):\n    totals = defaultdict(___)\n    for city, amount in orders:\n        totals[city] ___ amount\n    return {c: round(v, ___) for c, v in totals.items()}"
+  - "defaultdict(float) возвращает 0.0 для нового города, поэтому += работает сразу, без get. Округление в конце убирает хвосты вроде 0.30000000000000004. Это тот же groupby, что в pandas, только вручную."

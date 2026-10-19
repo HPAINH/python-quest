@@ -1,0 +1,7 @@
+code: P3
+title: Очистка данных
+intro: Приводим грязные выгрузки в порядок — пропуски, типы, дубликаты, строки и даты в разных форматах.
+minutes: 35
+expected_tasks: 12
+packages: [numpy, pandas]
+data: true

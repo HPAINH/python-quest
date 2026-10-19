@@ -1,0 +1,36 @@
+id: D3-02-minibatches
+type: function
+function: minibatches
+title: Мини-батчи
+difficulty: 1
+lesson_section: minibatch
+tol: 0
+statement: 'Напиши функцию `minibatches(n, batch_size, seed)`: перемешай индексы `0 … n−1` через `np.random.default_rng(seed).permutation(n)` и верни список массивов индексов по `batch_size` подряд; последний может быть короче.
+
+  '
+setup: "import numpy as np\n\ndef rnd(*shape, seed=0):\n    return np.random.default_rng(seed).normal(size=shape).round(3)\n\ndef labels(n, k, seed=0):\n    return np.random.default_rng(seed).integers(0, k, n)\n"
+starter: "def minibatches(n, batch_size, seed):\n    pass\n"
+reference: "def minibatches(n, batch_size, seed):\n    idx = np.random.default_rng(seed).permutation(n)\n    return [idx[i:i + batch_size] for i in range(0, n, batch_size)]\n"
+tests:
+  visible:
+  - minibatches(10, 4, 0)
+  - minibatches(6, 3, 1)
+  hidden:
+  - minibatches(1, 5, 2)
+  - minibatches(7, 7, 3)
+  - minibatches(9, 2, 4)
+random:
+  count: 15
+  gen: f'minibatches({random.randint(1, 30)}, {random.randint(1, 8)}, {random.randint(0, 999)})'
+star3:
+- first_try
+- max_lines:3
+buggy_variants:
+- code: "def minibatches(n, batch_size, seed):\n    idx = np.arange(n)\n    return [idx[i:i + batch_size] for i in range(0, n, batch_size)]"
+- code: "def minibatches(n, batch_size, seed):\n    idx = np.random.default_rng(seed).permutation(n)\n    return [idx[i:i + batch_size] for i in range(0, n - batch_size + 1, batch_size)]"
+hints:
+- Мини-батчи — раздел «Мини-батчи».
+- Получи перемешанные индексы и нарежь их срезами длиной batch_size с шагом batch_size.
+- idx = np.random.default_rng(seed).permutation(n); [idx[i:i + batch_size] for i in range(0, n, batch_size)].
+- "def minibatches(n, batch_size, seed):\n    idx = np.random.default_rng(seed).___(n)\n    return [idx[i:i + batch_size] for i in range(0, ___, batch_size)]"
+- Если отбросить короткий хвост, часть объектов не попадёт в обучение на этой эпохе. Генератор с seed делает перемешивание воспроизводимым — в обучении seed меняют от эпохи к эпохе или берут один генератор на весь цикл.

@@ -1,0 +1,31 @@
+id: S1-06-poisson
+type: stat
+title: Загруженный день
+difficulty: 2
+lesson_section: distributions
+statement: |
+  Будем считать, что число заказов в день распределено по Пуассону. Оцени параметр `lam` как среднее число заказов в день за сентябрь 2026 года (все дни месяца, все заказы) и найди вероятность дня, в котором **больше** `lam + 10` заказов. Запиши `lam` (допуск ±0.01) и `prob` (допуск ±0.0001).
+setup: |
+  import pandas as pd
+  from scipy import stats
+  orders = pd.read_csv("orders.csv", parse_dates=["order_date"])
+outputs:
+  - var: lam
+    tol: 0.01
+  - var: prob
+    tol: 0.0001
+reference: |
+  daily = orders.resample("D", on="order_date").size().loc["2026-09"]
+  lam = daily.mean()
+  prob = stats.poisson.sf(lam + 10, mu=lam)
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "daily = orders.groupby('order_date').size()\nlam = daily.mean()\nprob = stats.poisson.sf(lam + 10, mu=lam)"
+    expect_detector: stat_value
+  - code: "daily = orders.resample('D', on='order_date').size().loc['2026-09']\nlam = daily.mean()\nprob = stats.poisson.pmf(lam + 10, mu=lam)"
+hints:
+  - "Распределение Пуассона — раздел «Распределения»; дневной ряд — уровень P6."
+  - "Сверни заказы по дням, возьми сентябрь и среднее — это lam. «Больше x» — это sf(x)."
+  - "orders.resample(\"D\", on=\"order_date\").size().loc[\"2026-09\"].mean(), stats.poisson.sf(lam + 10, mu=lam)."
+  - "daily = orders.resample(\"D\", on=\"order_date\").size().loc[___]\nlam = daily.___()\nprob = stats.poisson.___(lam + 10, mu=lam)"
+  - "sf у дискретного распределения при дробном x считает P(X > x), то есть отбрасывает дробную часть границы. pmf от дробного числа — ноль: целое число заказов не бывает равно 31,4."

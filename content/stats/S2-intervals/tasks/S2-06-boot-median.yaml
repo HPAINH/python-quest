@@ -1,0 +1,31 @@
+id: S2-06-boot-median
+type: stat
+title: Bootstrap для медианы
+difficulty: 2
+lesson_section: bootstrap
+statement: |
+  Построй 95% bootstrap-интервал для медианы `amount` доставленных заказов: 1000 выборок с возвращением того же размера, генератор `rng` уже создан. Границы — перцентили 2,5 и 97,5. Запиши в `ci`, допуск ±2%.
+setup: |
+  import numpy as np
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+  rng = np.random.default_rng(SEED)
+outputs:
+  - var: ci
+    rtol: 0.02
+reference: |
+  a = orders.loc[orders["status"] == "delivered", "amount"].to_numpy()
+  boot = [np.median(rng.choice(a, size=len(a), replace=True)) for _ in range(1000)]
+  ci = tuple(np.percentile(boot, [2.5, 97.5]))
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "a = orders.loc[orders['status'] == 'delivered', 'amount'].to_numpy()\nboot = [np.mean(rng.choice(a, size=len(a), replace=True)) for _ in range(1000)]\nci = tuple(np.percentile(boot, [2.5, 97.5]))"
+    expect_detector: stat_value
+  - code: "a = orders.loc[orders['status'] == 'delivered', 'amount'].to_numpy()\nboot = [np.median(rng.choice(a, size=len(a), replace=True)) for _ in range(1000)]\nci = tuple(np.percentile(a, [2.5, 97.5]))"
+    expect_detector: stat_value
+hints:
+  - "Bootstrap — раздел «Bootstrap»."
+  - "В цикле на 1000 повторов бери rng.choice(a, size=len(a), replace=True) и считай медиану. Границы — перцентили списка медиан."
+  - "[np.median(rng.choice(a, size=len(a), replace=True)) for _ in range(1000)], np.percentile(boot, [2.5, 97.5])."
+  - "a = orders.loc[orders[\"status\"] == \"delivered\", \"amount\"].to_numpy()\nboot = [np.___(rng.choice(a, size=len(a), replace=___)) for _ in range(1000)]\nci = tuple(np.percentile(___, [2.5, 97.5]))"
+  - "Перцентили исходных данных дают диапазон 95% заказов, а не интервал для медианы — он в десятки раз шире. Интервал для медианы строится по распределению медиан bootstrap-выборок."

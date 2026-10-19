@@ -1,0 +1,29 @@
+id: P6-04-growth
+type: dataframe
+title: Рост месяц к месяцу
+difficulty: 2
+lesson_section: shift
+sql_quest_ref: LAG
+statement: |
+  Запиши в `result` таблицу по месяцам 2026 года (индекс — первые дни месяцев) с колонками `revenue` — выручка доставленных заказов, округлённая до 2 знаков, и `growth` — рост к предыдущему месяцу долей (0.05 — это +5%), округлённый до 4 знаков. Для января 2026 рост считай к декабрю 2025.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv", parse_dates=["order_date"])
+reference: |
+  delivered = orders[orders["status"] == "delivered"]
+  m = delivered.resample("MS", on="order_date")["amount"].sum()
+  t = pd.DataFrame({"revenue": m.round(2), "growth": m.pct_change().round(4)})
+  result = t.loc["2026"]
+ordered: true
+star3: [first_try, "max_lines:4"]
+buggy_variants:
+  - code: "delivered = orders[orders['status'] == 'delivered']\nm = delivered.resample('MS', on='order_date')['amount'].sum().loc['2026']\nresult = pd.DataFrame({'revenue': m.round(2), 'growth': m.pct_change().round(4)})"
+    expect_detector: column_values
+  - code: "delivered = orders[orders['status'] == 'delivered']\nm = delivered.resample('MS', on='order_date')['amount'].sum()\nt = pd.DataFrame({'revenue': m.round(2), 'growth': (m.diff() / m).round(4)})\nresult = t.loc['2026']"
+    expect_detector: column_values
+hints:
+  - "Сравнение с прошлым периодом — раздел «shift, diff, pct_change»."
+  - "Посчитай месячную выручку за весь период, рост — pct_change, а срез 2026 года делай в самом конце."
+  - "delivered.resample(\"MS\", on=\"order_date\")[\"amount\"].sum(), m.pct_change(), t.loc[\"2026\"]."
+  - "delivered = orders[orders[\"status\"] == \"delivered\"]\nm = delivered.resample(\"MS\", on=\"order_date\")[\"amount\"].sum()\nt = pd.DataFrame({\"revenue\": m.round(2), \"growth\": m.___().round(4)})\nresult = t.loc[___]"
+  - "pct_change = (текущее − прошлое) / прошлое. Делить разницу на текущее значение — другая метрика. Если обрезать ряд до pct_change, у января не будет предыдущего месяца и получится NaN."

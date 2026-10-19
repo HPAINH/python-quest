@@ -1,0 +1,26 @@
+id: P5-06-dupes
+type: dataframe
+title: Справочник с повторами
+difficulty: 2
+lesson_section: keys
+statement: |
+  Справочник `clients` выгружен из CRM с повторами строк. Запиши в `result` доставленные заказы с городом клиента: колонки `order_id`, `city`, `amount`. Каждый заказ должен встречаться один раз.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+  customers = pd.read_csv("customers.csv")
+  clients = pd.concat([customers, customers.sample(frac=0.1, random_state=SEED)])[["customer_id", "city"]]
+reference: |
+  delivered = orders[orders["status"] == "delivered"]
+  t = delivered.merge(clients.drop_duplicates("customer_id"), on="customer_id", validate="many_to_one")
+  result = t[["order_id", "city", "amount"]]
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "delivered = orders[orders['status'] == 'delivered']\nt = delivered.merge(clients, on='customer_id')\nresult = t[['order_id', 'city', 'amount']]"
+    expect_detector: merge_dupes
+hints:
+  - "Размножение строк из-за повторов ключа — раздел «Ключи»."
+  - "Перед соединением убери повторы customer_id в справочнике. validate=\"many_to_one\" проверит, что ключ справа уникален."
+  - "clients.drop_duplicates(\"customer_id\"), merge(..., validate=\"many_to_one\")."
+  - "delivered = orders[orders[\"status\"] == \"delivered\"]\nt = delivered.merge(clients.___(\"customer_id\"), on=\"customer_id\", validate=___)\nresult = t[[\"order_id\", \"city\", \"amount\"]]"
+  - "Каждый повтор клиента в справочнике даёт копию его заказов — выручка по городам выросла бы. Ошибки нет, поэтому такую проблему легко пропустить: сравнивай число строк до и после merge."

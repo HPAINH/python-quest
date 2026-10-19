@@ -1,0 +1,25 @@
+id: P2-01-big-delivered
+type: dataframe
+title: Крупные доставленные заказы
+difficulty: 1
+lesson_section: filter
+sql_quest_ref: WHERE с AND
+statement: |
+  Запиши в `result` все доставленные заказы (`status` равен `delivered`) с суммой больше 5000 ₽. Все колонки, исходный порядок строк.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+reference: |
+  result = orders[(orders["status"] == "delivered") & (orders["amount"] > 5000)]
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = orders[orders['status'] == 'delivered' & orders['amount'] > 5000]"
+    expect_detector: mask_parentheses
+  - code: "result = orders[(orders['status'] == 'delivered') | (orders['amount'] > 5000)]"
+    expect_detector: shape_rows
+hints:
+  - "Фильтр с двумя условиями — раздел «Фильтры»."
+  - "Построй две маски — по статусу и по сумме — и объедини их «и». Каждое сравнение возьми в скобки."
+  - "(orders[\"status\"] == \"delivered\") & (orders[\"amount\"] > 5000)."
+  - "result = orders[(orders[\"status\"] == ___) ___ (orders[\"amount\"] > 5000)]"
+  - "& выполняется раньше сравнений, поэтому без скобок pandas пытается посчитать «'delivered' & orders['amount']» и падает. | дал бы заказы, где выполнено хотя бы одно условие, — их намного больше."

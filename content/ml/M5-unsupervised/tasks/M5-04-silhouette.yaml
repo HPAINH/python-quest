@@ -1,0 +1,47 @@
+id: M5-04-silhouette
+type: value
+title: Сколько кластеров на самом деле
+difficulty: 2
+lesson_section: choose-k
+data: false
+variants_count: 4
+statement: 'Для точек `X` из `setup` найди k от 2 до 6 с наибольшим силуэтом (`KMeans(k, n_init=10, random_state=0)`, `silhouette_score`). Запиши его в `result`.
+
+  '
+setup: 'import numpy as np
+
+  import pandas as pd
+
+  from sklearn.cluster import KMeans
+
+  from sklearn.decomposition import PCA
+
+  from sklearn.preprocessing import StandardScaler
+
+  from sklearn.metrics import silhouette_score
+
+  from sklearn.datasets import make_blobs
+
+  X, _ = make_blobs(n_samples=300, centers=2 + SEED % 4, cluster_std=0.7, random_state=SEED % 1000)
+
+  '
+reference: 'scores = {k: silhouette_score(X, KMeans(k, n_init=10, random_state=0).fit_predict(X)) for k in range(2, 7)}
+
+  result = max(scores, key=scores.get)
+
+  '
+star3:
+- first_try
+- max_lines:2
+buggy_variants:
+- code: 'inert = {k: KMeans(k, n_init=10, random_state=0).fit(X).inertia_ for k in range(2, 7)}
+
+    result = min(inert, key=inert.get)'
+hints:
+- Силуэт — раздел «Выбор числа кластеров».
+- Для каждого k посчитай силуэт по меткам KMeans и выбери k с максимальным значением.
+- silhouette_score(X, KMeans(k, n_init=10, random_state=0).fit_predict(X)), max(scores, key=scores.get).
+- 'scores = {k: ___(X, KMeans(k, n_init=10, random_state=0).fit_predict(X)) for k in range(2, 7)}
+
+  result = ___(scores, key=scores.get)'
+- Минимальная инерция всегда у самого большого k, поэтому по ней выбирать нельзя. Силуэт наказывает и за слишком мало, и за слишком много кластеров.

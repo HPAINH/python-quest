@@ -1,0 +1,22 @@
+id: P1-02-shape
+type: value
+title: Размер каталога
+difficulty: 1
+lesson_section: read-csv
+statement: |
+  В `products` загружен каталог товаров. Запиши в `result` кортеж из числа строк и числа колонок таблицы.
+setup: |
+  import pandas as pd
+  products = pd.read_csv("products.csv")
+reference: |
+  result = products.shape
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = len(products)"
+    expect_detector: type_mismatch
+hints:
+  - "Размер таблицы хранит атрибут shape — раздел «Чтение CSV»."
+  - "shape — это уже нужный кортеж (строки, колонки)."
+  - "products.shape — без скобок, это атрибут."
+  - "result = products.___"
+  - "shape — атрибут, а не метод, поэтому скобки не нужны. len(products) даёт только число строк."

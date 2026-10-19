@@ -1,0 +1,65 @@
+id: M2-02-reg-metrics
+type: stat
+title: Три метрики регрессии
+difficulty: 2
+lesson_section: reg-metrics
+statement: 'Раздели `Xd`, `yd`: 25% в тест, `random_state=42`. Обучи `make_pipeline(pre_d, LinearRegression())` на train и посчитай на test `mae`, `rmse` и `r2` (допуск ±0.001).
+
+  '
+setup: "import numpy as np\nimport pandas as pd\nfrom sklearn import metrics\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import OneHotEncoder, StandardScaler\nfrom sklearn.impute import SimpleImputer\nfrom sklearn.compose import ColumnTransformer\nfrom sklearn.pipeline import make_pipeline, Pipeline\nfrom sklearn.linear_model import LogisticRegression, LinearRegression\ndd = pd.read_csv(\"demand.csv\", parse_dates=[\"date\"])\ndd[\"month\"] = dd[\"date\"].dt.month\nXd = dd.drop(columns=[\"date\", \"product_id\", \"units\"])\nyd = dd[\"units\"]\nif SHUFFLE:\n    yd = yd.sample(frac=1, random_state=1).reset_index(drop=True)\npre_d = ColumnTransformer([(\"cat\", OneHotEncoder(handle_unknown=\"ignore\"), [\"category\"])], remainder=\"passthrough\")\n"
+outputs:
+- var: mae
+  tol: 0.001
+- var: rmse
+  tol: 0.001
+- var: r2
+  tol: 0.001
+reference: 'a, b, ya, yb = train_test_split(Xd, yd, test_size=0.25, random_state=42)
+
+  pred = make_pipeline(pre_d, LinearRegression()).fit(a, ya).predict(b)
+
+  mae = metrics.mean_absolute_error(yb, pred)
+
+  rmse = np.sqrt(metrics.mean_squared_error(yb, pred))
+
+  r2 = metrics.r2_score(yb, pred)
+
+  '
+star3:
+- first_try
+- max_lines:5
+buggy_variants:
+- code: 'a, b, ya, yb = train_test_split(Xd, yd, test_size=0.25, random_state=42)
+
+    pred = make_pipeline(pre_d, LinearRegression()).fit(a, ya).predict(b)
+
+    mae = metrics.mean_absolute_error(yb, pred)
+
+    rmse = metrics.mean_squared_error(yb, pred)
+
+    r2 = metrics.r2_score(yb, pred)'
+  expect_detector: stat_value
+- code: 'm = make_pipeline(pre_d, LinearRegression()).fit(Xd, yd)
+
+    pred = m.predict(Xd)
+
+    mae = metrics.mean_absolute_error(yd, pred)
+
+    rmse = np.sqrt(metrics.mean_squared_error(yd, pred))
+
+    r2 = metrics.r2_score(yd, pred)'
+  expect_detector: stat_value
+hints:
+- Метрики — раздел «Метрики регрессии».
+- Раздели данные, обучи pipeline на train и сделай прогноз для test. MAE и R² есть в metrics готовыми, RMSE — корень из mean_squared_error.
+- metrics.mean_absolute_error(yb, pred), np.sqrt(metrics.mean_squared_error(yb, pred)), metrics.r2_score(yb, pred).
+- 'a, b, ya, yb = train_test_split(Xd, yd, test_size=0.25, random_state=42)
+
+  pred = make_pipeline(pre_d, LinearRegression()).fit(a, ya).predict(___)
+
+  mae = metrics.mean_absolute_error(yb, pred)
+
+  rmse = np.___(metrics.mean_squared_error(yb, pred))
+
+  r2 = metrics.r2_score(yb, pred)'
+- Без корня получится MSE — в квадратных штуках, его трудно интерпретировать. Метрики на обучающих данных всегда оптимистичнее, чем на новых.

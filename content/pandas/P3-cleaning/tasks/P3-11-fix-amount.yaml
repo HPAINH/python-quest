@@ -1,0 +1,27 @@
+id: P3-11-fix-amount
+type: fix_bug
+base: value
+title: Исправь выручку из кассы
+difficulty: 2
+lesson_section: types
+statement: |
+  Нужна сумма всех заказов из `orders_raw` (без удаления повторов и выбросов), округлённая до 2 знаков. Суммы записаны текстом: `1290.50`, `1 290,50`, `1290.50 ₽`. Код падает — исправь его.
+setup: |
+  import pandas as pd
+  raw = pd.read_csv("orders_raw.csv")
+starter: |
+  amount = raw["amount"].astype(float)
+  result = round(amount.sum(), 2)
+reference: |
+  text = raw["amount"].str.replace("₽", "").str.replace(" ", "").str.replace(",", ".")
+  amount = pd.to_numeric(text)
+  result = round(amount.sum(), 2)
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "text = raw['amount'].str.replace('₽', '').str.replace(',', '.')\namount = pd.to_numeric(text, errors='coerce')\nresult = round(amount.sum(), 2)"
+hints:
+  - "Перевод текста в число — раздел «Типы», замена символов — раздел «Строки: .str»."
+  - "Перед переводом убери знак ₽ и пробелы и замени запятую на точку. Каждую замену делает str.replace."
+  - "raw[\"amount\"].str.replace(\"₽\", \"\").str.replace(\" \", \"\").str.replace(\",\", \".\")."
+  - "text = raw[\"amount\"].str.replace(\"₽\", ___).str.replace(___, \"\").str.replace(\",\", ___)\namount = pd.to_numeric(text)\nresult = round(amount.sum(), 2)"
+  - "float понимает только «1290.50» — пробел между разрядами, запятая и ₽ его ломают. errors=\"coerce\" скрывает проблему: суммы с пробелом молча станут NaN и выпадут из суммы."

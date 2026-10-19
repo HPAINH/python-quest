@@ -1,0 +1,85 @@
+quiz:
+  - type: choice
+    q: Что такое p-value?
+    options: ["Вероятность, что H0 верна", "Вероятность получить такую или большую разницу, если H0 верна", "Размер эффекта", "Вероятность ошибки II рода"]
+    answer: 1
+    explain: p-value считается в предположении, что эффекта нет.
+    section: h0
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      alpha = 0.05
+      for p in [0.003, 0.05, 0.2]:
+          print(p < alpha, end=" ")
+    answer: "True False False"
+    explain: При p = alpha ровно H0 не отвергают — строгое неравенство.
+    section: h0
+  - type: choice
+    q: Почему в A/B-тестах берут t-тест Уэлча (equal_var=False)?
+    options: ["Он всегда даёт меньший p-value", "Он не требует равенства дисперсий групп", "Он для долей", "Так короче"]
+    answer: 1
+    explain: Дисперсии групп часто различаются, особенно если эффект есть.
+    section: ttest
+  - type: fill
+    q: Впиши аргумент, чтобы отключить поправку Йейтса.
+    code: |
+      from scipy import stats
+      chi2, p, dof, exp = stats.chi2_contingency([[90, 910], [120, 880]], ___=False)
+      print(dof)
+    answer: ["correction"]
+    expect: "1"
+    explain: Без поправки результат совпадает с z-тестом для долей.
+    section: chi2
+  - type: choice
+    q: Что такое ошибка II рода?
+    options: ["Найти эффект, которого нет", "Не заметить настоящий эффект", "Перепутать группы", "Взять не тот тест"]
+    answer: 1
+    explain: Её вероятность β, мощность — 1 − β.
+    section: errors
+
+express:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      from scipy import stats
+      print(round(2 * stats.norm.sf(1.96), 3), round(stats.norm.sf(1.96), 3))
+    answer: "0.05 0.025"
+    explain: Двусторонний p-value вдвое больше одностороннего.
+    section: ztest
+  - type: choice
+    q: "Выручка на пользователя: у 90% — ноль, у остальных — сильно разная. Какой тест устойчивее к такому распределению?"
+    options: ["Хи-квадрат", "Манна-Уитни", "z-тест для долей", "Никакой"]
+    answer: 1
+    explain: Ранговые тесты не чувствительны к выбросам.
+    section: mannwhitney
+  - type: choice
+    q: p-value = 0,0001 на выборке в миллион пользователей. Что можно сказать?
+    options: ["Эффект большой", "Разница статистически значима, но о её размере p-value ничего не говорит", "H0 верна", "Тест ошибся"]
+    answer: 1
+    explain: Размер эффекта смотрят по разнице и её интервалу.
+    section: h0
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      xa, na, xb, nb = 100, 1000, 130, 1000
+      p = (xa + xb) / (na + nb)
+      z = (xb / nb - xa / na) / np.sqrt(p * (1 - p) * (1 / na + 1 / nb))
+      print(round(p, 3), round(z, 2))
+    answer: "0.115 2.1"
+    explain: Общая доля 230 / 2000, разница 0,03.
+    section: ztest
+  - type: choice
+    q: Когда выбирают направление односторонней гипотезы?
+    options: ["После взгляда на данные", "До эксперимента", "Когда p-value больше 0,05", "Никогда"]
+    answer: 1
+    explain: Выбор после данных удваивает шанс ложного открытия.
+    section: ttest
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      alpha, power = 0.05, 0.8
+      print(1 - power, alpha)
+    answer: "0.19999999999999996 0.05"
+    explain: β = 1 − мощность; ошибка в последних знаках — особенность float.
+    section: errors

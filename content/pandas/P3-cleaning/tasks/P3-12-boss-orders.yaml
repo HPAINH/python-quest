@@ -1,0 +1,48 @@
+id: P3-12-boss-orders
+type: dataframe
+title: "Босс: чистая выгрузка кассы"
+difficulty: 3
+boss: true
+lesson_section: why
+statement: |
+  Финансовый отдел просит превратить `orders_raw` в таблицу, по которой можно считать выручку. Создай две переменные.
+
+  1. `clean` — очищенная таблица с колонками `order_id`, `customer_id`, `order_date`, `amount`, `status`, отсортированная по `order_id`:
+     - полные повторы строк удалены;
+     - `order_date` — дата (`datetime`), форматы смешаны, день идёт первым;
+     - `amount` — число; строки с суммой ≤ 0 или ровно 999999 — сбои кассы, их удали;
+     - `status` — без пробелов по краям, в нижнем регистре.
+  2. `report` — словарь с ключами `raw` (строк в выгрузке), `duplicates` (удалено повторов), `bad_amount` (удалено строк со сбоем суммы) и `clean` (строк осталось). Все значения — `int`.
+setup: |
+  import pandas as pd
+  raw = pd.read_csv("orders_raw.csv")
+outputs:
+  - var: clean
+    title: очищенная таблица
+    ordered: true
+  - var: report
+    title: отчёт об очистке
+reference: |
+  df = raw.drop_duplicates().copy()
+  df["order_date"] = pd.to_datetime(df["order_date"], format="mixed", dayfirst=True)
+  text = df["amount"].str.replace("₽", "").str.replace(" ", "").str.replace(",", ".")
+  df["amount"] = pd.to_numeric(text)
+  df["status"] = df["status"].str.strip().str.lower()
+  bad = (df["amount"] <= 0) | (df["amount"] == 999999)
+  clean = df[~bad].sort_values("order_id")
+  report = {
+      "raw": len(raw),
+      "duplicates": len(raw) - len(df),
+      "bad_amount": int(bad.sum()),
+      "clean": len(clean),
+  }
+star3: [first_try]
+buggy_variants:
+  - code: "df = raw.drop_duplicates().copy()\ndf['order_date'] = pd.to_datetime(df['order_date'], format='mixed', dayfirst=True)\ntext = df['amount'].str.replace('₽', '').str.replace(' ', '').str.replace(',', '.')\ndf['amount'] = pd.to_numeric(text)\ndf['status'] = df['status'].str.strip().str.lower()\nbad = df['amount'] <= 0\nclean = df[~bad].sort_values('order_id')\nreport = {'raw': len(raw), 'duplicates': len(raw) - len(df), 'bad_amount': int(bad.sum()), 'clean': len(clean)}"
+  - code: "df = raw.copy()\ndf['order_date'] = pd.to_datetime(df['order_date'], format='mixed', dayfirst=True)\ntext = df['amount'].str.replace('₽', '').str.replace(' ', '').str.replace(',', '.')\ndf['amount'] = pd.to_numeric(text)\ndf['status'] = df['status'].str.strip().str.lower()\nbad = (df['amount'] <= 0) | (df['amount'] == 999999)\nclean = df[~bad].sort_values('order_id')\nreport = {'raw': len(raw), 'duplicates': 0, 'bad_amount': int(bad.sum()), 'clean': len(clean)}"
+hints:
+  - "Всё из уровня: drop_duplicates, to_datetime с format=\"mixed\", очистка текста перед to_numeric, strip и lower, маска сбоев."
+  - "Удобный порядок: убрать повторы, привести типы и статусы, построить маску сбоев суммы, оставить строки без сбоя и отсортировать. Числа для отчёта — разности длин таблиц и сумма маски."
+  - "raw.drop_duplicates(), pd.to_datetime(..., format=\"mixed\", dayfirst=True), pd.to_numeric(text), (df[\"amount\"] <= 0) | (df[\"amount\"] == 999999), df[~bad]."
+  - "df = raw.drop_duplicates().copy()\ndf[\"order_date\"] = pd.to_datetime(df[\"order_date\"], format=___, dayfirst=True)\ntext = df[\"amount\"].str.replace(\"₽\", \"\").str.replace(\" \", \"\").str.replace(___, \".\")\ndf[\"amount\"] = pd.to_numeric(text)\ndf[\"status\"] = df[\"status\"].str.strip().str.___()\nbad = (df[\"amount\"] <= 0) | (df[\"amount\"] == ___)\nclean = df[~bad].sort_values(\"order_id\")\nreport = {\"raw\": len(raw), \"duplicates\": len(raw) - len(df), \"bad_amount\": int(bad.sum()), \"clean\": len(clean)}"
+  - "Повторы удаляют до остальных шагов, иначе каждое преобразование делается дважды, а отчёт считает сбои с задвоением. ~ инвертирует маску: df[~bad] — строки без сбоя. Выброс 999999 — типичная «заглушка» кассы, его не видно без проверки максимума."

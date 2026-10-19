@@ -1,0 +1,84 @@
+quiz:
+  - type: choice
+    q: Почему веса нельзя инициализировать нулями?
+    options: ["Это медленно", "Все нейроны слоя получают одинаковые градиенты и остаются одинаковыми", "Нули не поддерживает NumPy", "Можно"]
+    answer: 1
+    explain: Случайный старт нарушает симметрию.
+    section: init
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      print(round(float(np.sqrt(2 / 8)), 3))
+    answer: "0.5"
+    explain: Стандартное отклонение He для 8 входов.
+    section: init
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      W = np.array([2.0, -1.0])
+      lam = 0.5
+      print(lam / 2 * (W ** 2).sum(), (lam * W).tolist())
+    answer: "1.25 [1.0, -0.5]"
+    explain: Штраф 0.25 · 5, градиент штрафа — λ·W.
+    section: regularization
+  - type: choice
+    q: Зачем в inverted dropout делить на 1 − p?
+    options: ["Чтобы выключить больше нейронов", "Чтобы среднее активаций на обучении совпадало с прогнозом без dropout", "Для скорости", "Чтобы получить вероятности"]
+    answer: 1
+    explain: Тогда на прогнозе dropout просто отключают.
+    section: dropout
+  - type: choice
+    q: Что Adam хранит для каждого веса?
+    options: ["Только градиент", "Скользящие средние градиента и его квадрата", "Историю всех весов", "Число шагов"]
+    answer: 1
+    explain: m и v, плюс общий счётчик шагов t.
+    section: adam
+
+express:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      g, b1, b2 = np.array([4.0]), 0.9, 0.999
+      m = (1 - b1) * g
+      v = (1 - b2) * g ** 2
+      print((m / (1 - b1)).tolist(), (v / (1 - b2)).round(6).tolist())
+    answer: "[4.0] [16.0]"
+    explain: Поправка смещения на первом шаге восстанавливает сам градиент и его квадрат.
+    section: adam
+  - type: choice
+    q: Сеть отлично учится на train, а на валидации качество падает с каждой эпохой. Что поможет?
+    options: ["Больше эпох", "L2, dropout, ранняя остановка", "Убрать масштабирование", "Увеличить lr"]
+    answer: 1
+    explain: Это переобучение.
+    section: regularization
+  - type: choice
+    q: Какой параметр MLPClassifier отвечает за L2-регуляризацию?
+    options: ["hidden_layer_sizes", "alpha", "max_iter", "early_stopping"]
+    answer: 1
+    explain: Чем больше alpha, тем сильнее штраф.
+    section: sklearn
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      A = np.array([2.0, 4.0, 6.0, 8.0])
+      mask = np.array([True, False, True, False])
+      print((A * mask / 0.5).tolist())
+    answer: "[4.0, 0.0, 12.0, 0.0]"
+    explain: Выключенные нейроны — ноль, оставшиеся удваиваются при p = 0.5.
+    section: dropout
+  - type: choice
+    q: Почему нейросети особенно нужно масштабирование признаков?
+    options: ["Без него нельзя one-hot", "Признаки с большим разбросом доминируют в градиентах, обучение идёт плохо", "Так требует softmax", "Не нужно"]
+    answer: 1
+    explain: Деревьям масштаб безразличен, сетям — нет.
+    section: sklearn
+  - type: choice
+    q: Какой lr обычно ставят Adam?
+    options: ["10", "1.0", "0.001–0.01", "0"]
+    answer: 2
+    explain: Шаг Adam по модулю близок к lr независимо от величины градиента.
+    section: adam

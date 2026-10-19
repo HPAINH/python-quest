@@ -1,0 +1,26 @@
+id: S3-01-groups
+type: dataframe
+title: Конверсия по группам
+difficulty: 1
+lesson_section: h0
+statement: |
+  Для эксперимента `exp_checkout` запиши в `result` таблицу с колонками `group`, `users` (число участников) и `conv` (доля `converted`, округлённая до 4 знаков).
+setup: |
+  import pandas as pd
+  from scipy import stats
+  m = pd.read_csv("ab_metrics.csv")
+  a = pd.read_csv("ab_assignments.csv")
+reference: |
+  t = m.merge(a, on=["user_id", "experiment"])
+  c = t[t["experiment"] == "exp_checkout"]
+  result = c.groupby("group").agg(users=("user_id", "count"), conv=("converted", "mean")).round(4).reset_index()
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "t = m.merge(a, on=['user_id', 'experiment'])\nresult = t.groupby('group').agg(users=('user_id', 'count'), conv=('converted', 'mean')).round(4).reset_index()"
+    expect_detector: column_values
+hints:
+  - "Первый шаг анализа теста — раздел «H0, alpha и p-value»."
+  - "Соедини метрики с распределением по двум ключам, оставь нужный эксперимент и посчитай по группе число участников и среднее converted."
+  - "m.merge(a, on=[\"user_id\", \"experiment\"]), agg(users=(\"user_id\", \"count\"), conv=(\"converted\", \"mean\"))."
+  - "t = m.merge(a, on=[\"user_id\", ___])\nc = t[t[\"experiment\"] == ___]\nresult = c.groupby(\"group\").agg(users=(\"user_id\", \"count\"), conv=(\"converted\", ___)).round(4).reset_index()"
+  - "Без фильтра по эксперименту смешаются два разных теста. Соединять нужно по паре ключей: в теории один пользователь может участвовать в нескольких экспериментах."

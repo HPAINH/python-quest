@@ -1,0 +1,35 @@
+id: D2-04-dense-back
+type: function
+function: dense_backward
+title: Градиенты слоя
+difficulty: 2
+lesson_section: layer-grads
+tol: 1.0e-09
+statement: 'Напиши функцию `dense_backward(X, W, dZ)` для слоя `Z = X @ W + b`: по входу `X`, весам `W` и градиенту `dZ = dL/dZ` верни кортеж `(dW, db, dX)`.
+
+  '
+setup: "import numpy as np\n\ndef rnd(*shape, seed=0):\n    return np.random.default_rng(seed).normal(size=shape).round(3)\n\ndef labels(n, k, seed=0):\n    return np.random.default_rng(seed).integers(0, k, n)\n"
+starter: "def dense_backward(X, W, dZ):\n    pass\n"
+reference: "def dense_backward(X, W, dZ):\n    return X.T @ dZ, dZ.sum(axis=0), dZ @ W.T\n"
+tests:
+  visible:
+  - dense_backward(np.array([[1.0, 2.0]]), np.array([[1.0, 0.0, -1.0], [0.0, 1.0, 2.0]]), np.array([[0.5, -1.0, 2.0]]))
+  hidden:
+  - dense_backward(rnd(4, 3, seed=1), rnd(3, 2, seed=2), rnd(4, 2, seed=3))
+  - dense_backward(rnd(6, 1, seed=4), rnd(1, 5, seed=5), rnd(6, 5, seed=6))
+  - dense_backward(np.eye(3), rnd(3, 3, seed=7), np.ones((3, 3)))
+random:
+  count: 12
+  gen: '(lambda n, i, o, s: f''dense_backward(rnd({n}, {i}, seed={s}), rnd({i}, {o}, seed={s + 1}), rnd({n}, {o}, seed={s + 2}))'')(random.randint(1, 6), random.randint(1, 5), random.randint(1, 5), random.randint(0, 999))'
+star3:
+- first_try
+- max_lines:2
+buggy_variants:
+- code: "def dense_backward(X, W, dZ):\n    return X.T @ dZ, dZ, dZ @ W.T"
+- code: "def dense_backward(X, W, dZ):\n    return dZ.T @ X, dZ.sum(axis=0), dZ @ W.T"
+hints:
+- Градиенты слоя — раздел «Градиенты слоя».
+- 'Каждый градиент имеет форму своего массива: dW — как W, db — как b, dX — как X. Подбери транспонирование так, чтобы формы сошлись.'
+- X.T @ dZ, dZ.sum(axis=0), dZ @ W.T.
+- "def dense_backward(X, W, dZ):\n    return X.___ @ dZ, dZ.sum(axis=___), dZ @ W.___"
+- dZ.T @ X даёт транспонированный dW — форма (нейроны, входы) вместо (входы, нейроны). Сдвиг влияет на каждый объект, поэтому его градиент суммирует строки dZ.

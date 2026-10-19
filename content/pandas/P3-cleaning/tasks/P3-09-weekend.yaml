@@ -1,0 +1,25 @@
+id: P3-09-weekend
+type: dataframe
+title: Заказы выходного дня
+difficulty: 2
+lesson_section: dates
+statement: |
+  Переведи `order_date` в `orders` в дату и запиши в `result` заказы, оформленные в субботу или воскресенье: колонки `order_id`, `order_date` (дата) и `amount`. Исходный порядок.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+reference: |
+  orders["order_date"] = pd.to_datetime(orders["order_date"])
+  result = orders.loc[orders["order_date"].dt.dayofweek >= 5, ["order_id", "order_date", "amount"]]
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "orders['order_date'] = pd.to_datetime(orders['order_date'])\nresult = orders.loc[orders['order_date'].dt.dayofweek > 5, ['order_id', 'order_date', 'amount']]"
+    expect_detector: shape_rows
+  - code: "result = orders.loc[pd.to_datetime(orders['order_date']).dt.dayofweek >= 5, ['order_id', 'order_date', 'amount']]"
+    expect_detector: column_dtype
+hints:
+  - "Части даты — .dt, раздел «Даты»."
+  - "dayofweek нумерует дни с нуля: понедельник — 0, воскресенье — 6. Выходные — 5 и 6."
+  - "pd.to_datetime(orders[\"order_date\"]), orders[\"order_date\"].dt.dayofweek >= 5."
+  - "orders[\"order_date\"] = pd.to_datetime(orders[\"order_date\"])\nresult = orders.loc[orders[\"order_date\"].dt.___ >= ___, [\"order_id\", \"order_date\", \"amount\"]]"
+  - "> 5 оставил бы только воскресенья. Если перевести дату только внутри маски, в результате колонка order_date останется текстом — поэтому дату сначала записывают обратно в таблицу."

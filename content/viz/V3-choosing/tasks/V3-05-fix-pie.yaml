@@ -1,0 +1,33 @@
+id: V3-05-fix-pie
+type: fix_bug
+base: value
+title: Замени круговую диаграмму
+difficulty: 1
+lesson_section: parts
+statement: |
+  Нужно сравнить доли сессий по источникам (`source` в `sessions.csv`). Коллега построил круговую диаграмму — переделай её в столбцы долей по убыванию, оставив заголовок.
+setup: |
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  import seaborn as sns
+  sessions = pd.read_csv("sessions.csv")
+plot:
+  labels: true
+  ordered: true
+starter: |
+  share = sessions["source"].value_counts(normalize=True)
+  fig, ax = plt.subplots()
+  ax.pie(share.values, labels=share.index)
+  ax.set_title("Источники сессий")
+reference: |
+  share = sessions["source"].value_counts(normalize=True)
+  fig, ax = plt.subplots()
+  ax.bar(share.index, share.values)
+  ax.set_title("Источники сессий")
+star3: [first_try]
+hints:
+  - "Почему не круговая — раздел «Части целого»."
+  - "Данные уже готовы: value_counts(normalize=True) даёт доли по убыванию. Поменяй только способ рисования."
+  - "ax.bar(share.index, share.values)."
+  - "share = sessions[\"source\"].value_counts(normalize=True)\nfig, ax = plt.subplots()\nax.___(share.index, share.values)\nax.set_title(\"Источники сессий\")"
+  - "Столбцы, отсортированные по убыванию, сразу показывают порядок и разницу между источниками, а близкие сектора круга глаз не различает. Проверка не находит в круговой ни линий, ни столбцов — поэтому и ругается на тип."

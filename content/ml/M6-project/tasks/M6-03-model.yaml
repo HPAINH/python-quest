@@ -1,0 +1,37 @@
+id: M6-03-model
+type: model
+title: Модель с признаками
+difficulty: 2
+lesson_section: model
+statement: 'Собери модель на сырой таблице `raw`: `FunctionTransformer(add_features)` → подготовка колонок (без `customer_id` и `cancel_request`, с новыми `inactive` и `new_discount`) → `LogisticRegression(max_iter=1000)`. Функцию `add_features` из прошлой задачи определи в коде. Обучи на всех данных и запиши в `model`. Порог — ROC-AUC не ниже 0.83 на скрытой выборке; без новых признаков логистическая регрессия даёт около 0.82.
+
+  '
+setup: "import numpy as np\nimport pandas as pd\nfrom sklearn import metrics\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import OneHotEncoder, StandardScaler\nfrom sklearn.impute import SimpleImputer\nfrom sklearn.compose import ColumnTransformer\nfrom sklearn.pipeline import make_pipeline, Pipeline\nfrom sklearn.linear_model import LogisticRegression, LinearRegression\nfrom sklearn.preprocessing import FunctionTransformer\nfrom sklearn.ensemble import HistGradientBoostingClassifier\ndf = pd.read_csv(\"churn.csv\")\nX = df.drop(columns=[\"customer_id\", \"cancel_request\", \"churned\"])\ny = df[\"churned\"]\nif SHUFFLE:\n    y = y.sample(frac=1, random_state=1).reset_index(drop=True)\nraw = df.drop(columns=[\"churned\"])\n"
+model:
+  metric: roc_auc
+  threshold: 0.83
+  data: churn
+  target: churned
+  drop: []
+  baseline: 'from sklearn.dummy import DummyClassifier
+
+    model = DummyClassifier().fit(raw, y)'
+  leak_check: true
+reference: "def add_features(d):\n    d = d.copy()\n    d[\"orders_per_month\"] = d[\"orders_90d\"] / 3\n    d[\"inactive\"] = (d[\"days_since_last\"] > 60).astype(int)\n    d[\"new_discount\"] = d[\"discount_share\"] * (d[\"tenure_months\"] < 6)\n    return d\ncat = [\"city\", \"loyalty\"]\nnum = [c for c in raw.columns if c not in cat + [\"customer_id\", \"cancel_request\"]] + [\"inactive\", \"new_discount\"]\npre = ColumnTransformer([\n    (\"num\", make_pipeline(SimpleImputer(strategy=\"median\"), StandardScaler()), num),\n    (\"cat\", OneHotEncoder(handle_unknown=\"ignore\"), cat),\n])\nmodel = make_pipeline(FunctionTransformer(add_features), pre, LogisticRegression(max_iter=1000))\nmodel.fit(raw, y)\n"
+star3:
+- first_try
+buggy_variants:
+- code: 'cat = [''city'', ''loyalty'']
+
+    num = [c for c in raw.columns if c not in cat + [''customer_id'', ''cancel_request'']]
+
+    pre = ColumnTransformer([(''num'', make_pipeline(SimpleImputer(strategy=''median''), StandardScaler()), num), (''cat'', OneHotEncoder(handle_unknown=''ignore''), cat)])
+
+    model = make_pipeline(pre, LogisticRegression(max_iter=1000)).fit(raw, y)'
+  expect_detector: model_metric
+hints:
+- Pipeline проекта — раздел «Модель».
+- Первым шагом поставь FunctionTransformer с твоей функцией — он добавит колонки. Во втором шаге перечисли числовые колонки вместе с новыми.
+- make_pipeline(FunctionTransformer(add_features), pre, LogisticRegression(max_iter=1000)).fit(raw, y).
+- "def add_features(d):\n    d = d.copy()\n    d[\"orders_per_month\"] = d[\"orders_90d\"] / 3\n    d[\"inactive\"] = (d[\"days_since_last\"] > 60).astype(int)\n    d[\"new_discount\"] = d[\"discount_share\"] * (d[\"tenure_months\"] < 6)\n    return d\ncat = [\"city\", \"loyalty\"]\nnum = [c for c in raw.columns if c not in cat + [\"customer_id\", \"cancel_request\"]] + [___, ___]\npre = ColumnTransformer([...])\nmodel = make_pipeline(___(add_features), pre, LogisticRegression(max_iter=1000))\nmodel.fit(raw, y)"
+- Признак-порог и признак-взаимодействие дают линейной модели то, что дерево нашло бы само. В итоге простая модель с хорошими признаками догоняет бустинг.

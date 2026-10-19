@@ -1,0 +1,91 @@
+quiz:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      y = np.array([1, 0])
+      p = np.array([0.5, 0.5])
+      print(round(-np.mean(y * np.log(p) + (1 - y) * np.log(1 - p)), 4))
+    answer: "0.6931"
+    explain: Неуверенный прогноз 0.5 даёт потерю ln 2.
+    section: losses
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      w, lr = 0.0, 0.5
+      for _ in range(3):
+          w -= lr * 2 * (w - 4)
+      print(w)
+    answer: "4.0"
+    explain: При lr = 0.5 для (w − 4)² минимум достигается за один шаг.
+    section: sgd
+  - type: choice
+    q: Потеря растёт с каждой эпохой и уходит в бесконечность. Что вероятнее всего?
+    options: ["Мало эпох", "Слишком большая скорость обучения", "Мало нейронов", "Слишком маленький батч"]
+    answer: 1
+    explain: Шаги перепрыгивают минимум всё дальше.
+    section: sgd
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      idx = np.arange(7)
+      print([idx[i:i + 3].tolist() for i in range(0, 7, 3)])
+    answer: "[[0, 1, 2], [3, 4, 5], [6]]"
+    explain: Последний пакет короче.
+    section: minibatch
+  - type: choice
+    q: Почему круг внутри квадрата не разделить логистической регрессией?
+    options: ["Мало данных", "Граница классов не прямая, а линейная модель проводит только прямую", "Нужна другая потеря", "Можно разделить"]
+    answer: 1
+    explain: Скрытый слой с нелинейностью позволяет строить кривые границы.
+    section: loop
+
+express:
+  - type: choice
+    q: Зачем обрезать вероятности перед логарифмом в BCE?
+    options: ["Для скорости", "log(0) — минус бесконечность, потеря станет inf или nan", "Чтобы сумма была 1", "Так требует NumPy"]
+    answer: 1
+    explain: np.clip(p, eps, 1 − eps).
+    section: losses
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      print(np.eye(3, dtype=int)[np.array([1, 1, 0])].tolist())
+    answer: "[[0, 1, 0], [0, 1, 0], [1, 0, 0]]"
+    explain: One-hot кодирование через строки единичной матрицы.
+    section: losses
+  - type: choice
+    q: Зачем перемешивать данные на каждой эпохе?
+    options: ["Чтобы пакеты каждый раз были разными и градиент не повторял один и тот же порядок", "Чтобы данных стало больше", "Для воспроизводимости", "Не нужно"]
+    answer: 0
+    explain: Фиксированный порядок вносит систематический сдвиг.
+    section: minibatch
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      w = 0.0
+      for _ in range(2):
+          w -= 1.5 * 2 * (w - 1)
+      print(w)
+    answer: "-3.0"
+    explain: "Слишком большой шаг: 0 → 3 → −3, спуск расходится."
+    section: sgd
+  - type: choice
+    q: Что делать, если потеря на обучении падает, а точность на новых данных не растёт?
+    options: ["Увеличить lr", "Это переобучение — регуляризация, меньше эпох, больше данных", "Убрать скрытый слой", "Ничего"]
+    answer: 1
+    explain: Регуляризация — тема уровня D4.
+    section: loop
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      X = np.array([[1.0], [2.0]])
+      y = np.array([0, 1])
+      p = np.array([0.5, 0.5])
+      print((X.T @ (p - y) / 2).tolist(), (p - y).mean())
+    answer: "[-0.25] 0.0"
+    explain: Градиенты логистической регрессии по w и b.
+    section: loop

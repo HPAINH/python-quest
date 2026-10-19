@@ -1,0 +1,43 @@
+id: S1-10-boss-profile
+type: dataframe
+title: "Босс: профиль каналов"
+difficulty: 3
+boss: true
+lesson_section: why
+statement: |
+  Подготовь описательную статистику суммы **доставленных** заказов по каналам. Создай две переменные:
+
+  1. `profile` — таблица с индексом `channel` и колонками `n`, `mean`, `median`, `std` (выборочное), `iqr`, `skew` (pandas), все числа округлены до 2 знаков;
+  2. `most_skewed` — название канала с наибольшей асимметрией.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+outputs:
+  - var: profile
+    title: профиль каналов
+  - var: most_skewed
+    title: самый скошенный канал
+reference: |
+  d = orders[orders["status"] == "delivered"]
+  g = d.groupby("channel")["amount"]
+  profile = pd.DataFrame({
+      "n": g.size(),
+      "mean": g.mean(),
+      "median": g.median(),
+      "std": g.std(),
+      "iqr": g.quantile(0.75) - g.quantile(0.25),
+      "skew": g.skew(),
+  }).round(2)
+  most_skewed = profile["skew"].idxmax()
+star3: [first_try]
+buggy_variants:
+  - code: "d = orders[orders['status'] == 'delivered']\ng = d.groupby('channel')['amount']\nprofile = pd.DataFrame({'n': g.size(), 'mean': g.mean(), 'median': g.median(), 'std': g.std(ddof=0), 'iqr': g.quantile(0.75) - g.quantile(0.25), 'skew': g.skew()}).round(2)\nmost_skewed = profile['skew'].idxmax()"
+    expect_detector: column_values
+  - code: "d = orders\ng = d.groupby('channel')['amount']\nprofile = pd.DataFrame({'n': g.size(), 'mean': g.mean(), 'median': g.median(), 'std': g.std(), 'iqr': g.quantile(0.75) - g.quantile(0.25), 'skew': g.skew()}).round(2)\nmost_skewed = profile['skew'].idxmax()"
+    expect_detector: column_values
+hints:
+  - "Всё из уровня: центр, разброс, квантили и асимметрия, только по группам."
+  - "Сгруппируй доставленные заказы по каналу и собери таблицу из Series-агрегатов: у groupby есть size, mean, median, std, quantile и skew. Канал с наибольшей асимметрией — idxmax."
+  - "g = d.groupby(\"channel\")[\"amount\"], pd.DataFrame({\"n\": g.size(), ...}), g.quantile(0.75) - g.quantile(0.25), profile[\"skew\"].idxmax()."
+  - "d = orders[orders[\"status\"] == \"delivered\"]\ng = d.groupby(\"channel\")[\"amount\"]\nprofile = pd.DataFrame({\n    \"n\": g.size(),\n    \"mean\": g.___(),\n    \"median\": g.median(),\n    \"std\": g.std(),\n    \"iqr\": g.quantile(___) - g.quantile(0.25),\n    \"skew\": g.___(),\n}).round(2)\nmost_skewed = profile[\"skew\"].___()"
+  - "Словарь Series с общим индексом каналов собирается в таблицу автоматически. idxmax возвращает подпись строки с максимумом, а не само значение."

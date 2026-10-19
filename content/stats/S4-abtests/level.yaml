@@ -1,0 +1,7 @@
+code: S4
+title: A/B-тесты
+intro: Дизайн теста, мощность и размер выборки, SRM, z-тест и интервал для разницы, поправки на множественные сравнения и вред подглядывания.
+minutes: 35
+expected_tasks: 10
+packages: [numpy, pandas, scipy, statsmodels]
+data: [ab]

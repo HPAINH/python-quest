@@ -1,0 +1,39 @@
+id: C8-07-fix-self
+type: fix_bug
+base: function
+function: Basket
+title: Исправь корзину
+difficulty: 1
+lesson_section: mistakes
+statement: |
+  Класс `Basket` должен копить цены товаров и считать сумму. Сейчас вызов `total()` падает. Найди и исправь ошибку.
+starter: |
+  class Basket:
+      def __init__(self):
+          self.prices = []
+
+      def add(self, price):
+          self.prices.append(price)
+
+      def total():
+          return sum(self.prices)
+reference: |
+  class Basket:
+      def __init__(self):
+          self.prices = []
+
+      def add(self, price):
+          self.prices.append(price)
+
+      def total(self):
+          return sum(self.prices)
+tests:
+  visible: ["b = Basket()\nb.add(450)\nb.add(990)\nb.total()", "Basket().total()"]
+  hidden: ["b = Basket()\nb.add(1)\nb.total()", "a, b = Basket(), Basket()\na.add(5)\n(a.total(), b.total())", "b = Basket()\nfor p in [0.5, 0.25]:\n    b.add(p)\nb.total()"]
+star3: [first_try]
+hints:
+  - "Прочитай ошибку: сколько аргументов ждёт total и сколько получает? Раздел «Методы»."
+  - "Python передаёт объект в метод первым аргументом автоматически. Если метод его не принимает, вызов падает."
+  - "В def total не хватает одного параметра."
+  - "    def total(___):\n        return sum(self.prices)"
+  - "b.total() превращается в Basket.total(b). Метод без параметров не может принять b — TypeError «takes 0 positional arguments but 1 was given». Добавь self."

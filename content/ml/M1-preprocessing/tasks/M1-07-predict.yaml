@@ -1,0 +1,39 @@
+id: M1-07-predict
+type: predict
+title: Разбиение и кодирование
+difficulty: 2
+lesson_section: encoding
+statement: 'Впиши, что выведет программа.
+
+  '
+code: 'import numpy as np
+
+  import pandas as pd
+
+  from sklearn.model_selection import train_test_split
+
+  from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
+  X = pd.DataFrame({"c": ["a", "b", "a", "c"], "v": [1.0, 2.0, 3.0, 6.0]})
+
+  enc = OneHotEncoder(handle_unknown="ignore").fit(X[["c"]])
+
+  print(enc.get_feature_names_out().tolist())
+
+  print(enc.transform(pd.DataFrame({"c": ["c", "d"]})).toarray().tolist())
+
+  sc = StandardScaler().fit(X[["v"]])
+
+  print(sc.mean_[0], round(float(sc.transform([[3.0]])[0, 0]), 3))
+
+  a, b = train_test_split(X, test_size=0.5, random_state=0)
+
+  print(len(a), len(b))
+
+  '
+hints:
+- Повтори разделы «Кодирование категорий», «Масштабирование» и «train_test_split».
+- Имена колонок кодировщика — имя признака и значение через подчёркивание, в алфавитном порядке значений.
+- 'Среднее v — 3. Стандартное отклонение StandardScaler считает с делением на n: √((4 + 1 + 0 + 9) / 4) ≈ 1.871.'
+- 'Четыре строки: список имён, список из двух строк кодов, два числа, два числа.'
+- 'Ответ: «[''c_a'', ''c_b'', ''c_c'']», «[[0.0, 0.0, 1.0], [0.0, 0.0, 0.0]]», «3.0 0.0», «2 2».'

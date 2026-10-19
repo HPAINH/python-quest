@@ -1,0 +1,28 @@
+id: P7-04-sources
+type: dataframe
+title: Какие источники приводят покупателей
+difficulty: 2
+lesson_section: conversion
+statement: |
+  Для каждого источника привлечения (`source` из `users.csv`) посчитай долю пользователей, которые сделали хотя бы одну покупку. Запиши в `result` колонки `source`, `users`, `buyers`, `conv` (доля, 4 знака) по убыванию `conv`.
+setup: |
+  import pandas as pd
+  users = pd.read_csv("users.csv")
+  events = pd.read_csv("events.csv")
+reference: |
+  buyers = events.loc[events["event"] == "purchase", "user_id"].unique()
+  users["buyer"] = users["user_id"].isin(buyers)
+  t = users.groupby("source").agg(users=("user_id", "count"), buyers=("buyer", "sum")).reset_index()
+  t["conv"] = (t["buyers"] / t["users"]).round(4)
+  result = t.sort_values("conv", ascending=False)
+ordered: true
+star3: [first_try, "max_lines:5"]
+buggy_variants:
+  - code: "e = events[events['event'] == 'purchase'].merge(users, on='user_id')\nt = e.groupby('source').agg(buyers=('user_id', 'nunique')).reset_index()\nt['users'] = t['source'].map(users.groupby('source').size())\nt['conv'] = (t['buyers'] / t['users']).round(4)\nresult = t.sort_values('conv')"
+    expect_detector: row_order
+hints:
+  - "Доля пользователей с покупкой — раздел «Конверсия», агрегаты — уровень P4."
+  - "Отметь покупателей булевой колонкой в users. Затем по источнику посчитай всех пользователей и сумму булевой колонки — это число покупателей."
+  - "users[\"user_id\"].isin(buyers), agg(users=(\"user_id\", \"count\"), buyers=(\"buyer\", \"sum\")), sort_values(\"conv\", ascending=False)."
+  - "buyers = events.loc[events[\"event\"] == \"purchase\", \"user_id\"].unique()\nusers[\"buyer\"] = users[\"user_id\"].isin(___)\nt = users.groupby(\"source\").agg(users=(\"user_id\", \"count\"), buyers=(\"buyer\", ___)).reset_index()\nt[\"conv\"] = (t[\"buyers\"] / t[\"users\"]).round(4)\nresult = t.sort_values(\"conv\", ascending=___)"
+  - "Сумма булевой колонки — число True. Источник считается по пользователю (откуда он пришёл в первый раз), а не по сессии, поэтому берём source из users."

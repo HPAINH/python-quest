@@ -1,0 +1,27 @@
+id: S2-05-n-share
+type: value
+title: Сколько опросить
+difficulty: 1
+lesson_section: sample-size
+data: false
+variants_count: 4
+statement: |
+  Доля довольных клиентов ожидается около `p` (задана в переменной). Сколько клиентов нужно опросить, чтобы 95% интервал для доли был не шире ±`e` (тоже задана)? Запиши в `result` целое число, округлённое вверх.
+setup: |
+  import math
+  from scipy import stats
+  p = round(0.1 + (SEED % 6) * 0.1, 1)
+  e = [0.02, 0.03, 0.05][SEED % 3]
+reference: |
+  z = stats.norm.ppf(0.975)
+  result = math.ceil(z ** 2 * p * (1 - p) / e ** 2)
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "z = stats.norm.ppf(0.975)\nresult = math.ceil(z ** 2 * p * (1 - p) / e)"
+  - code: "z = 1.96\nresult = round(z ** 2 * p * (1 - p) / e ** 2)"
+hints:
+  - "Формула для доли — раздел «Размер выборки»."
+  - "n = z² · p(1 − p) / e², округление вверх."
+  - "math.ceil(stats.norm.ppf(0.975) ** 2 * p * (1 - p) / e ** 2)."
+  - "z = stats.norm.ppf(0.975)\nresult = math.ceil(z ** ___ * p * (1 - p) / e ** ___)"
+  - "Погрешность входит в знаменатель в квадрате: вдвое точнее — вчетверо больше людей. round может округлить вниз, а этого допускать нельзя."

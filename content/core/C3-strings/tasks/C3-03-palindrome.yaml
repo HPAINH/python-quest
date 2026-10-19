@@ -1,0 +1,22 @@
+id: C3-03-palindrome
+type: stdio
+title: Палиндром
+difficulty: 2
+lesson_section: slices
+statement: |
+  Дана фраза. Выведи `YES`, если она читается одинаково в обе стороны без учёта регистра и пробелов, иначе `NO`.
+reference: |
+  s = input().lower().replace(" ", "")
+  print("YES" if s == s[::-1] else "NO")
+tests:
+  visible: ["А роза упала на лапу Азора", "Python"]
+  hidden: ["a", "Аргентина манит негра", "ab", "Was it a car or a cat I saw", "  "]
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "s = input()\nprint('YES' if s == s[::-1] else 'NO')"
+hints:
+  - "Палиндром проверяется сравнением со срезом [::-1] — раздел «Срезы», чистка — раздел «Методы строк»."
+  - "Сначала приведи строку к одному регистру и убери пробелы, потом сравни её с перевёрнутой."
+  - "lower(), replace(\" \", \"\"), s == s[::-1]."
+  - "s = input().___().replace(___, \"\")\nif s == s[___]:\n    print(\"YES\")\nelse:\n    print(\"NO\")"
+  - "«А роза упала на лапу Азора» без пробелов и в нижнем регистре — «арозаупаланалапуазора», и задом наперёд то же самое. Методы можно вызывать цепочкой: input().lower().replace(\" \", \"\")."

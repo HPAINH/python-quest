@@ -1,0 +1,108 @@
+quiz:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      def f(a, b=2):
+          return a * b
+      print(f(3), f(3, 4), f(b=1, a=5))
+    answer: "6 12 5"
+    explain: Если b не передан, берётся значение по умолчанию 2. По имени аргументы можно передавать в любом порядке.
+    section: params
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      def g(x):
+          if x > 0:
+              return "плюс"
+      print(g(5), g(-5))
+    answer: "плюс None"
+    explain: Для отрицательного x функция доходит до конца без return и возвращает None.
+    section: return
+  - type: choice
+    q: Чем опасен параметр def add(x, items=[])?
+    options: ["Ничем", "Список создаётся один раз и копит значения между вызовами", "Так нельзя писать — SyntaxError", "items всегда будет пустым"]
+    answer: 1
+    explain: Значение по умолчанию вычисляется один раз при создании функции. Пиши items=None и создавай список внутри.
+    section: mistakes
+  - type: fill
+    q: Впиши пропуск, чтобы функция вернула сумму любого числа аргументов.
+    code: |
+      def total(___):
+          return sum(nums)
+      print(total(1, 2, 3))
+    answer: ["*nums"]
+    expect: "6"
+    explain: "*nums собирает все позиционные аргументы в кортеж."
+    section: args-kwargs
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      def fact(n):
+          if n <= 1:
+              return 1
+          return n * fact(n - 1)
+      print(fact(4))
+    answer: "24"
+    explain: 4 * 3 * 2 * 1 = 24. Базовый случай n <= 1 останавливает рекурсию.
+    section: recursion
+
+express:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      x = 10
+      def f():
+          x = 5
+          return x
+      print(f(), x)
+    answer: "5 10"
+    explain: Присваивание внутри функции создаёт локальную x, глобальная x не меняется.
+    section: scope
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      def f(*args, **kwargs):
+          return len(args), sorted(kwargs)
+      print(f(1, 2, a=3, b=4))
+    answer: "(2, ['a', 'b'])"
+    explain: Позиционные аргументы попадают в кортеж args, именованные — в словарь kwargs.
+    section: args-kwargs
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      pairs = [("b", 2), ("a", 3), ("c", 1)]
+      print(sorted(pairs, key=lambda p: p[1])[0][0])
+    answer: "c"
+    explain: Сортировка по второму элементу ставит первой пару ("c", 1).
+    section: lambda
+  - type: choice
+    q: "Что произойдёт при вызове def fmt(x, *, digits=2) так: fmt(3.14159, 3)?"
+    options: ["Вернёт число с 3 знаками", "TypeError — digits можно передать только по имени", "digits станет 2, а 3 потеряется", "SyntaxError"]
+    answer: 1
+    explain: Параметры после * принимаются только по имени — fmt(3.14159, digits=3).
+    section: params
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      def outer():
+          n = 0
+          def inc():
+              nonlocal n
+              n += 1
+              return n
+          inc()
+          return inc()
+      print(outer())
+    answer: "2"
+    explain: nonlocal позволяет менять n из внешней функции — два вызова inc дают 2.
+    section: scope
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      def mm(xs):
+          return min(xs), max(xs)
+      a, b = mm([5, 1, 9])
+      print(b - a)
+    answer: "8"
+    explain: Функция вернула кортеж (1, 9), он распакован в a и b.
+    section: return

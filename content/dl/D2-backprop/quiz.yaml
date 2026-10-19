@@ -1,0 +1,91 @@
+quiz:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      x = 3.0
+      dL_dg = 2 * (x ** 2)
+      dg_dx = 2 * x
+      print(dL_dg * dg_dx)
+    answer: "108.0"
+    explain: "L = g², g = x²: dL/dx = 2g · 2x = 4x³."
+    section: chain
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      z = np.array([-1.0, 0.0, 2.0])
+      print((z > 0).astype(float).tolist())
+    answer: "[0.0, 0.0, 1.0]"
+    explain: Производная ReLU — 1 только при положительном входе.
+    section: activation-grads
+  - type: choice
+    q: Какая форма у dW для слоя с X (32, 10) и W (10, 5)?
+    options: ["(32, 5)", "(10, 5)", "(5, 10)", "(32, 10)"]
+    answer: 1
+    explain: Градиент по массиву имеет форму самого массива.
+    section: layer-grads
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      print(np.eye(3)[np.array([2, 0])].tolist())
+    answer: "[[0.0, 0.0, 1.0], [1.0, 0.0, 0.0]]"
+    explain: Строки единичной матрицы — one-hot векторы.
+    section: loss-grads
+  - type: choice
+    q: Зачем нужен численный градиент, если есть аналитический?
+    options: ["Он быстрее", "Чтобы проверить, что аналитическая формула выведена и запрограммирована верно", "Для обучения больших сетей", "Он точнее"]
+    answer: 1
+    explain: Им проверяют, а обучают аналитическим.
+    section: numeric
+
+express:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      s = 1 / (1 + np.exp(-0.0))
+      print(s * (1 - s))
+    answer: "0.25"
+    explain: Максимум производной сигмоиды — в нуле.
+    section: activation-grads
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      dZ = np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]])
+      print(dZ.sum(axis=0).tolist())
+    answer: "[9.0, 12.0]"
+    explain: Градиент сдвига суммирует вклады всех объектов.
+    section: layer-grads
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      P = np.array([[0.7, 0.2, 0.1]])
+      Y = np.array([[1.0, 0.0, 0.0]])
+      print((P - Y).round(2).tolist())
+    answer: "[[-0.3, 0.2, 0.1]]"
+    explain: Для softmax с кросс-энтропией градиент по логитам — P − Y (делённое на n).
+    section: loss-grads
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      f = lambda x: x ** 3
+      x, eps = 2.0, 1e-4
+      print(round((f(x + eps) - f(x - eps)) / (2 * eps), 4))
+    answer: "12.0"
+    explain: Производная x³ — 3x² = 12.
+    section: numeric
+  - type: choice
+    q: Откуда берётся dX = dZ @ W.T?
+    options: ["Это градиент по весам", "Это градиент, который передаётся в предыдущий слой", "Это градиент сдвига", "Это ошибка"]
+    answer: 1
+    explain: Он становится dA для слоя ниже.
+    section: layer-grads
+  - type: choice
+    q: Численный и аналитический градиенты расходятся на 0.3. Что это значит?
+    options: ["Всё в порядке", "В аналитической формуле или коде ошибка", "eps слишком маленький", "Нужно больше эпох"]
+    answer: 1
+    explain: Допустимое расхождение — порядка 1e−5 и меньше.
+    section: numeric

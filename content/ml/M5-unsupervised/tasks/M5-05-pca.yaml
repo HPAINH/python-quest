@@ -1,0 +1,63 @@
+id: M5-05-pca
+type: stat
+title: Сколько информации в компонентах
+difficulty: 2
+lesson_section: pca
+statement: 'Стандартизируй колонки `cols` из `setup` (пропуски — медианой) и обучи `PCA()`. Запиши `ratios` — доли объяснённой дисперсии всех компонент (допуск ±0.0001) и `first_two` — сумму первых двух.
+
+  '
+setup: 'import numpy as np
+
+  import pandas as pd
+
+  from sklearn.cluster import KMeans
+
+  from sklearn.decomposition import PCA
+
+  from sklearn.preprocessing import StandardScaler
+
+  from sklearn.metrics import silhouette_score
+
+  from sklearn.datasets import make_blobs
+
+  df = pd.read_csv("churn.csv")
+
+  cols = ["tenure_months", "orders_90d", "avg_check", "days_since_last", "support_tickets", "discount_share", "returns_share", "app_user", "email_opens_30d"]
+
+  '
+outputs:
+- var: ratios
+  tol: 0.0001
+- var: first_two
+  tol: 0.0001
+reference: 'Z = StandardScaler().fit_transform(df[cols].fillna(df[cols].median()))
+
+  p = PCA().fit(Z)
+
+  ratios = p.explained_variance_ratio_.tolist()
+
+  first_two = sum(ratios[:2])
+
+  '
+star3:
+- first_try
+- max_lines:4
+buggy_variants:
+- code: 'p = PCA().fit(df[cols].fillna(df[cols].median()))
+
+    ratios = p.explained_variance_ratio_.tolist()
+
+    first_two = sum(ratios[:2])'
+  expect_detector: stat_value
+hints:
+- PCA — раздел «PCA».
+- Стандартизируй, обучи PCA без ограничения числа компонент и возьми explained_variance_ratio_.
+- PCA().fit(Z).explained_variance_ratio_.tolist().
+- 'Z = StandardScaler().fit_transform(df[cols].fillna(df[cols].median()))
+
+  p = PCA().fit(___)
+
+  ratios = p.___.tolist()
+
+  first_two = sum(ratios[:2])'
+- 'Без стандартизации первая компонента — это почти целиком чек в рублях, и её доля близка к 1. После стандартизации доли почти равные: признаки слабо связаны.'

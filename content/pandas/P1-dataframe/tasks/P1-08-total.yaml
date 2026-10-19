@@ -1,0 +1,25 @@
+id: P1-08-total
+type: dataframe
+title: Стоимость позиций
+difficulty: 2
+lesson_section: dataframe
+statement: |
+  В `items` — позиции заказов. Добавь колонку `total` — стоимость позиции с учётом скидки: `unit_price × quantity × (1 − discount)`, округлённая до 2 знаков. Запиши всю таблицу с новой колонкой в `result`.
+setup: |
+  import pandas as pd
+  items = pd.read_csv("order_items.csv")
+reference: |
+  items["total"] = (items["unit_price"] * items["quantity"] * (1 - items["discount"])).round(2)
+  result = items
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "items['total'] = (items['unit_price'] * items['quantity'] * items['discount']).round(2)\nresult = items"
+    expect_detector: column_values
+  - code: "result = (items['unit_price'] * items['quantity'] * (1 - items['discount'])).round(2)"
+    expect_detector: columns_mismatch
+hints:
+  - "Новая колонка создаётся присваиванием — раздел «DataFrame»."
+  - "Посчитай формулу по колонкам целиком, без цикла, округли и запиши в новую колонку. Потом положи таблицу в result."
+  - "items[\"total\"] = (...).round(2), result = items."
+  - "items[\"total\"] = (items[\"unit_price\"] * items[\"___\"] * (1 - items[\"___\"])).round(2)\nresult = ___"
+  - "Арифметика над колонками идёт построчно, как в NumPy. Скидка хранится долей: 0.1 — это 10%, поэтому множитель (1 − discount). Если записать в result только Series, проверка увидит не ту структуру: нужна вся таблица."

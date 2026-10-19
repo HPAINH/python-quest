@@ -1,0 +1,24 @@
+id: N4-03-trend
+type: array
+title: Тренд выручки
+difficulty: 2
+lesson_section: linalg
+statement: |
+  `revenue` — выручка по месяцам, номер месяца — индекс (0, 1, 2…). Подбери прямую `revenue ≈ a · месяц + b` методом наименьших квадратов и запиши в `result` массив `[a, b]`, округлённый до 2 знаков через `np.round`.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  m = int(rng.integers(8, 25))
+  revenue = np.round(rng.uniform(1e5, 3e5) + rng.uniform(-5e3, 2e4) * np.arange(m) + rng.normal(0, 8e3, size=m), 2)
+reference: |
+  result = np.round(np.polyfit(np.arange(len(revenue)), revenue, 1), 2)
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "result = np.round(np.polyfit(np.arange(1, len(revenue) + 1), revenue, 1), 2)"
+  - code: "result = np.round(np.polyfit(revenue, np.arange(len(revenue)), 1), 2)"
+hints:
+  - "Прямую по точкам подбирает np.polyfit — раздел «Матрицы»."
+  - "Аргумент x — номера месяцев от 0, y — выручка, степень многочлена — 1."
+  - "np.polyfit(np.arange(len(revenue)), revenue, 1)."
+  - "x = np.arange(len(___))\nresult = np.round(np.polyfit(x, revenue, ___), 2)"
+  - "polyfit возвращает коэффициенты от старшей степени: сначала наклон a — на сколько в среднем растёт выручка за месяц, потом сдвиг b. Если нумеровать месяцы с 1, наклон тот же, а сдвиг другой. Перепутанные x и y дают совсем другую прямую."

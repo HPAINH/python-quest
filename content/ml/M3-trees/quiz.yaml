@@ -1,0 +1,78 @@
+quiz:
+  - type: choice
+    q: "Дерево без ограничений: ROC-AUC на train 1.0, на test 0.63. Что это?"
+    options: ["Отличная модель", "Переобучение — дерево запомнило обучающие данные", "Утечка", "Ошибка в метрике"]
+    answer: 1
+    explain: Ограничь max_depth или min_samples_leaf.
+    section: tree
+  - type: choice
+    q: Почему деревьям не нужно масштабирование?
+    options: ["Они не работают с числами", "Разбиения зависят только от порядка значений, а не от масштаба", "Масштабирование делается внутри автоматически", "Нужно всегда"]
+    answer: 1
+    explain: Порог «≤ 60 дней» и «≤ 0.33 после масштабирования» делят данные одинаково.
+    section: tree
+  - type: choice
+    q: Чем бустинг отличается от случайного леса?
+    options: ["Ничем", "Лес усредняет независимые деревья, бустинг строит деревья по очереди, исправляя ошибки предыдущих", "Бустинг — одно дерево", "Лес работает только с регрессией"]
+    answer: 1
+    explain: Поэтому у бустинга важен learning_rate.
+    section: boosting
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      from sklearn.tree import DecisionTreeClassifier
+      t = DecisionTreeClassifier(max_depth=1).fit([[1], [2], [8], [9]], [0, 0, 1, 1])
+      print(t.predict([[0], [5.5], [10]]).tolist(), t.get_depth())
+    answer: "[0, 1, 1] 1"
+    explain: Порог посередине между 2 и 8 — 5, значение 5.5 справа от него.
+    section: tree
+  - type: choice
+    q: Что показывает permutation importance?
+    options: ["Корреляцию признака с целью", "Насколько падает метрика, если перемешать значения признака", "Число разбиений по признаку", "Причину оттока"]
+    answer: 1
+    explain: Сильное падение — модель на признак опирается.
+    section: importance
+
+express:
+  - type: choice
+    q: Какой параметр леса уменьшает переобучение отдельных деревьев?
+    options: ["n_estimators", "min_samples_leaf", "random_state", "n_jobs"]
+    answer: 1
+    explain: Чем больше лист, тем грубее и устойчивее дерево.
+    section: forest
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      from sklearn.ensemble import RandomForestClassifier
+      rf = RandomForestClassifier(n_estimators=7, random_state=0).fit([[0], [1], [2], [3]], [0, 0, 1, 1])
+      print(len(rf.estimators_))
+    answer: "7"
+    explain: n_estimators — число деревьев в лесу.
+    section: forest
+  - type: choice
+    q: Как обычно делают бустинг аккуратнее?
+    options: ["Увеличивают learning_rate", "Уменьшают learning_rate и увеличивают число итераций, ограничивают глубину", "Убирают признаки", "Ставят max_iter=1"]
+    answer: 1
+    explain: Мелкие шаги с большим числом деревьев переобучаются меньше.
+    section: boosting
+  - type: choice
+    q: "feature_importances_ у days_since_last — 0.4. Что можно сказать?"
+    options: ["Клиенты уходят из-за долгого отсутствия", "Модель сильнее всего опирается на этот признак", "Признак объясняет 40% оттока", "Признак — утечка"]
+    answer: 1
+    explain: Важность описывает модель, а не причины в реальности.
+    section: importance
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      from sklearn.tree import DecisionTreeRegressor
+      t = DecisionTreeRegressor(max_depth=1).fit([[1], [2], [3], [4]], [10, 10, 30, 30])
+      print(t.predict([[1.5], [3.5]]).tolist())
+    answer: "[10.0, 30.0]"
+    explain: Лист регрессионного дерева предсказывает среднее своих объектов.
+    section: tree
+  - type: choice
+    q: Нужен ли OneHotEncoder перед случайным лесом в sklearn?
+    options: ["Нет, лес понимает текст", "Да, модели sklearn принимают только числа", "Только для регрессии", "Только при пропусках"]
+    answer: 1
+    explain: Масштабировать не нужно, а кодировать — нужно.
+    section: mistakes

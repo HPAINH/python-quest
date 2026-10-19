@@ -1,0 +1,6 @@
+code: N2
+title: Индексация и маски
+intro: Выбираем части массива — индексы, срезы, двумерные выборки, булевы маски, where и argsort.
+minutes: 25
+expected_tasks: 10
+packages: [numpy]

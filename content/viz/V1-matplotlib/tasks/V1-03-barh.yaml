@@ -1,0 +1,34 @@
+id: V1-03-barh
+type: plot
+title: Топ-10 товаров
+difficulty: 2
+lesson_section: bar
+statement: |
+  Построй горизонтальную столбчатую диаграмму 10 товаров с наибольшей выручкой по позициям `order_items` (выручка позиции — `quantity * unit_price * (1 - discount)`). Подписи столбцов — названия товаров из `products`, самый прибыльный товар — сверху. Нужен заголовок; подписи осей — по желанию.
+setup: |
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  items = pd.read_csv("order_items.csv")
+  products = pd.read_csv("products.csv")
+plot:
+  labels: true
+  ordered: true
+reference: |
+  items["revenue"] = items["quantity"] * items["unit_price"] * (1 - items["discount"])
+  t = items.merge(products[["product_id", "name"]], on="product_id")
+  top = t.groupby("name")["revenue"].sum().nlargest(10).sort_values()
+  fig, ax = plt.subplots(figsize=(8, 5))
+  ax.barh(top.index, top.values)
+  ax.set_title("Топ-10 товаров по выручке")
+star3: [first_try]
+buggy_variants:
+  - code: "items['revenue'] = items['quantity'] * items['unit_price'] * (1 - items['discount'])\nt = items.merge(products[['product_id', 'name']], on='product_id')\ntop = t.groupby('name')['revenue'].sum().nlargest(10)\nfig, ax = plt.subplots()\nax.barh(top.index, top.values)\nax.set_title('Топ-10')"
+    expect_detector: plot_order
+  - code: "items['revenue'] = items['quantity'] * items['unit_price'] * (1 - items['discount'])\nt = items.merge(products[['product_id', 'name']], on='product_id')\ntop = t.groupby('name')['revenue'].sum().nlargest(10).sort_values()\nfig, ax = plt.subplots()\nax.bar(top.index, top.values)\nax.set_title('Топ-10')"
+    expect_detector: plot_kind
+hints:
+  - "Горизонтальные столбцы и их порядок — раздел «Столбцы»."
+  - "Посчитай выручку позиций, присоедини названия товаров, сложи по названию и возьми 10 самых больших. Перед barh отсортируй по возрастанию — тогда лидер окажется сверху."
+  - "groupby(\"name\")[\"revenue\"].sum().nlargest(10).sort_values(), ax.barh(top.index, top.values)."
+  - "items[\"revenue\"] = items[\"quantity\"] * items[\"unit_price\"] * (1 - items[\"discount\"])\nt = items.merge(products[[\"product_id\", \"name\"]], on=___)\ntop = t.groupby(\"name\")[\"revenue\"].sum().___(10).sort_values()\nfig, ax = plt.subplots(figsize=(8, 5))\nax.___(top.index, top.values)\nax.set_title(\"...\")"
+  - "nlargest отдаёт значения по убыванию, а barh рисует первую строку внизу — без sort_values лидер окажется в самом низу. Длинные названия товаров не поместились бы под вертикальными столбцами, поэтому barh."

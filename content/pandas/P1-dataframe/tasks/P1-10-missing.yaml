@@ -1,0 +1,23 @@
+id: P1-10-missing
+type: dataframe
+title: Пропуски по колонкам
+difficulty: 1
+lesson_section: explore
+statement: |
+  Посчитай, сколько пропусков в каждой колонке таблицы `customers`. Запиши в `result` Series: индекс — название колонки, значение — число пропусков.
+setup: |
+  import pandas as pd
+  customers = pd.read_csv("customers.csv")
+reference: |
+  result = customers.isna().sum()
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = customers.count()"
+  - code: "result = customers.isna().sum().sum()"
+    expect_detector: result_type
+hints:
+  - "Пропуски находит isna — раздел «Первый осмотр таблицы»."
+  - "isna возвращает таблицу True/False той же формы. Сумма по колонкам считает True."
+  - "customers.isna().sum()."
+  - "result = customers.___().___()"
+  - "count() считает заполненные значения — обратную величину. Двойной sum() дал бы одно число на всю таблицу, а нужно по колонкам. В таблице клиентов пропуски бывают в городе и годе рождения."

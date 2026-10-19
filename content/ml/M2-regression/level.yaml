@@ -1,0 +1,7 @@
+code: M2
+title: Регрессии и метрики
+intro: Линейная и логистическая регрессия, MAE, RMSE, R², матрица ошибок, precision, recall, F1, ROC-AUC и выбор порога.
+minutes: 35
+expected_tasks: 10
+packages: [numpy, pandas, scipy, scikit-learn]
+data: [churn, demand]

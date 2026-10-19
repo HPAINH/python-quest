@@ -1,0 +1,45 @@
+id: C8-05-dataclass
+type: function
+function: Product
+title: Товар через dataclass
+difficulty: 1
+lesson_section: dataclass
+statement: |
+  Объяви `Product` через `@dataclass` с полями `name` (str), `price` (float) и `stock` (int, по умолчанию 0). Добавь методы:
+  - `value()` — стоимость остатка `price × stock`, округлённая до 2 знаков;
+  - `restock(n)` — увеличивает `stock` на `n` и возвращает новый остаток; при `n <= 0` выбрасывает `ValueError`.
+starter: |
+  from dataclasses import dataclass
+
+  @dataclass
+  class Product:
+      pass
+reference: |
+  from dataclasses import dataclass
+
+  @dataclass
+  class Product:
+      name: str
+      price: float
+      stock: int = 0
+
+      def value(self):
+          return round(self.price * self.stock, 2)
+
+      def restock(self, n):
+          if n <= 0:
+              raise ValueError("n должно быть больше нуля")
+          self.stock += n
+          return self.stock
+tests:
+  visible: ["Product('Чай', 450.0, 3).value()", "p = Product('Кофе', 990.0)\np.restock(5)\np"]
+  hidden: ["Product('a', 1.0)", "Product('x', 0.1, 3).value()", "raises(lambda: Product('b', 1.0).restock(0))", "Product('a', 2.0, 1) == Product('a', 2.0, 1)", "p = Product('z', 9.99, 1)\n[p.restock(1), p.restock(2), p.value()]"]
+star3: [first_try]
+buggy_variants:
+  - code: "from dataclasses import dataclass\n\n@dataclass\nclass Product:\n    name: str\n    price: float\n    stock: int = 0\n    def value(self):\n        return self.price * self.stock\n    def restock(self, n):\n        self.stock += n\n        return self.stock"
+hints:
+  - "Поля объявляются с аннотацией типа — раздел «dataclass»."
+  - "Перечисли три поля, у stock задай значение 0. Добавь два обычных метода: value считает и округляет стоимость, restock проверяет n, увеличивает остаток и возвращает его."
+  - "name: str, price: float, stock: int = 0, round(..., 2), raise ValueError."
+  - "@dataclass\nclass Product:\n    name: ___\n    price: float\n    stock: int = ___\n\n    def value(self):\n        return round(self.price * self.stock, ___)\n\n    def restock(self, n):\n        if n <= 0:\n            raise ValueError(\"n > 0\")\n        self.stock ___ n\n        return self.stock"
+  - "dataclass сам пишет __init__, __repr__ и __eq__, поэтому p выводится как Product(name='Кофе', price=990.0, stock=5), а два одинаковых товара равны. 0.1 × 3 без округления дало бы 0.30000000000000004."

@@ -1,0 +1,36 @@
+id: V1-06-fill-status
+type: fill_gaps
+base: value
+title: Заказы по статусам
+difficulty: 1
+lesson_section: bar
+statement: |
+  Заполни пропуски `___`, чтобы получилась столбчатая диаграмма числа заказов по статусам, по убыванию, с заголовком и подписями осей.
+setup: |
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  orders = pd.read_csv("orders.csv")
+plot:
+  labels: true
+  ordered: true
+template: |
+  s = orders["status"].___()
+  fig, ax = plt.subplots()
+  ax.___(s.index, s.values)
+  ax.set_title("Заказы по статусам")
+  ax.set_xlabel("Статус")
+  ax.___("Заказов")
+reference: |
+  s = orders["status"].value_counts()
+  fig, ax = plt.subplots()
+  ax.bar(s.index, s.values)
+  ax.set_title("Заказы по статусам")
+  ax.set_xlabel("Статус")
+  ax.set_ylabel("Заказов")
+star3: [first_try]
+hints:
+  - "Подсчёт значений — value_counts, столбцы — раздел «Столбцы»."
+  - "value_counts уже сортирует по убыванию. Столбцы рисует bar, подпись оси Y задаёт set_ylabel."
+  - "orders[\"status\"].value_counts(), ax.bar, ax.set_ylabel."
+  - "Три пропуска: метод подсчёта, метод столбцов, метод подписи оси Y."
+  - "Ответ: value_counts, bar, set_ylabel. value_counts — короткий путь к «число строк по значению, по убыванию»."

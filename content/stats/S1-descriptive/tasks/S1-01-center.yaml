@@ -1,0 +1,34 @@
+id: S1-01-center
+type: stat
+title: Типичный чек
+difficulty: 1
+lesson_section: center
+statement: |
+  Для **доставленных** заказов посчитай среднее и медиану `amount`. Запиши их в `mean_amount` и `median_amount` (допуск ±0.01), а в `skewed` — `True`, если среднее больше медианы.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+outputs:
+  - var: mean_amount
+    title: среднее
+    tol: 0.01
+  - var: median_amount
+    title: медиана
+    tol: 0.01
+  - var: skewed
+    title: среднее больше медианы
+reference: |
+  a = orders.loc[orders["status"] == "delivered", "amount"]
+  mean_amount = a.mean()
+  median_amount = a.median()
+  skewed = bool(mean_amount > median_amount)
+star3: [first_try, "max_lines:4"]
+buggy_variants:
+  - code: "a = orders['amount']\nmean_amount = a.mean()\nmedian_amount = a.median()\nskewed = bool(mean_amount > median_amount)"
+    expect_detector: stat_value
+hints:
+  - "Меры центра — раздел «Центр»."
+  - "Выбери суммы доставленных заказов и посчитай у них mean и median."
+  - "orders.loc[orders[\"status\"] == \"delivered\", \"amount\"], a.mean(), a.median()."
+  - "a = orders.loc[orders[\"status\"] == ___, \"amount\"]\nmean_amount = a.___()\nmedian_amount = a.___()\nskewed = bool(mean_amount > median_amount)"
+  - "Среднее выше медианы — признак правого хвоста: немного крупных заказов. Округлять не нужно — проверка сравнивает с допуском."

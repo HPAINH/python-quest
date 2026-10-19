@@ -1,0 +1,28 @@
+id: N4-02-solve
+type: array
+title: Цены из чеков
+difficulty: 2
+lesson_section: linalg
+statement: |
+  Аналитик знает итоговые суммы нескольких чеков и количества товаров в них, но не знает цены. `A` — квадратная матрица количеств (строки — чеки, столбцы — товары), `b` — суммы чеков. Найди цены товаров, решив систему `A · x = b`, и запиши их в `result`, округлив до 2 знаков через `np.round`.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  n = int(rng.integers(2, 6))
+  while True:
+      A = rng.integers(0, 5, size=(n, n)).astype(float)
+      if abs(np.linalg.det(A)) > 0.5:
+          break
+  true_price = np.round(rng.uniform(50, 1500, size=n), 2)
+  b = A @ true_price
+reference: |
+  result = np.round(np.linalg.solve(A, b), 2)
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = np.round(b / A.sum(axis=1), 2)"
+hints:
+  - "Систему уравнений решает np.linalg.solve — раздел «Матрицы»."
+  - "Передай матрицу количеств и вектор сумм в solve, результат округли."
+  - "np.round(np.linalg.solve(A, b), 2)."
+  - "result = np.round(np.linalg.___(A, b), ___)"
+  - "Каждый чек — одно уравнение: сумма количеств × цены равна итогу. solve находит цены сразу для всех товаров. Деление итога на число товаров дало бы среднюю цену в чеке, а не цену каждого товара. Можно и через inv: np.linalg.inv(A) @ b, но solve точнее и быстрее."

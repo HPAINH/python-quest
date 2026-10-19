@@ -1,0 +1,35 @@
+id: V1-01-line
+type: plot
+title: Выручка по месяцам
+difficulty: 1
+lesson_section: line
+statement: |
+  Построй линейный график выручки **доставленных** заказов по месяцам (сумма `amount`, месяцы через `resample("MS")`). Добавь заголовок и подписи обеих осей — текст любой.
+setup: |
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  orders = pd.read_csv("orders.csv", parse_dates=["order_date"])
+plot:
+  labels: true
+reference: |
+  delivered = orders[orders["status"] == "delivered"]
+  m = delivered.resample("MS", on="order_date")["amount"].sum()
+  fig, ax = plt.subplots()
+  ax.plot(m.index, m.values)
+  ax.set_title("Выручка доставленных заказов")
+  ax.set_xlabel("Месяц")
+  ax.set_ylabel("₽")
+star3: [first_try]
+buggy_variants:
+  - code: "m = orders.resample('MS', on='order_date')['amount'].sum()\nfig, ax = plt.subplots()\nax.plot(m.index, m.values)\nax.set_title('Выручка')\nax.set_xlabel('Месяц')\nax.set_ylabel('₽')"
+    expect_detector: plot_data
+  - code: "delivered = orders[orders['status'] == 'delivered']\nm = delivered.resample('MS', on='order_date')['amount'].sum()\nfig, ax = plt.subplots()\nax.plot(m.index, m.values)"
+    expect_detector: plot_labels
+  - code: "delivered = orders[orders['status'] == 'delivered']\nm = delivered.resample('MS', on='order_date')['amount'].sum()\nfig, ax = plt.subplots()\nax.bar(m.index, m.values, width=20)\nax.set_title('Выручка')\nax.set_xlabel('Месяц')\nax.set_ylabel('₽')"
+    expect_detector: plot_kind
+hints:
+  - "Линейный график и подписи — разделы «Линия» и «Подписи и легенда»."
+  - "Посчитай месячную выручку доставленных заказов через resample, создай fig и ax, нарисуй линию и задай три подписи."
+  - "delivered.resample(\"MS\", on=\"order_date\")[\"amount\"].sum(), ax.plot(m.index, m.values), ax.set_title, ax.set_xlabel, ax.set_ylabel."
+  - "delivered = orders[orders[\"status\"] == \"delivered\"]\nm = delivered.resample(___, on=\"order_date\")[\"amount\"].sum()\nfig, ax = plt.subplots()\nax.___(m.index, m.values)\nax.set_title(\"...\")\nax.set_xlabel(\"...\")\nax.set_ylabel(\"...\")"
+  - "Проверка читает данные линии, а не картинку, поэтому годится и m.plot(ax=ax). Для динамики во времени нужна именно линия: столбцы по 21 месяцу читаются хуже и скрывают тренд."

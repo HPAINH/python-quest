@@ -1,0 +1,25 @@
+id: P4-09-pivot
+type: dataframe
+title: Сводная по каналам и статусам
+difficulty: 2
+lesson_section: pivot
+statement: |
+  Построй сводную таблицу числа заказов: строки — `channel`, колонки — значения `status`, в ячейках — число заказов, на месте отсутствующих сочетаний — 0. Запиши в `result` через `pivot_table`.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+reference: |
+  result = orders.pivot_table(index="channel", columns="status", values="order_id", aggfunc="count", fill_value=0)
+requires: ["uses:pivot_table"]
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = orders.pivot_table(index='status', columns='channel', values='order_id', aggfunc='count', fill_value=0)"
+    expect_detector: columns_mismatch
+  - code: "result = orders.pivot_table(index='channel', columns='status', values='amount', aggfunc='sum', fill_value=0)"
+    expect_detector: column_values
+hints:
+  - "Сводные таблицы — раздел «Сводные таблицы»."
+  - "index — что пойдёт в строки, columns — в колонки, values и aggfunc — что считать в ячейках."
+  - "orders.pivot_table(index=\"channel\", columns=\"status\", values=\"order_id\", aggfunc=\"count\", fill_value=0)."
+  - "result = orders.pivot_table(index=___, columns=___, values=\"order_id\", aggfunc=___, fill_value=0)"
+  - "Та же информация, что в задаче «Канал и статус», но развёрнутая в матрицу — так её удобнее читать. pd.crosstab(orders[\"channel\"], orders[\"status\"]) даёт то же самое короче."

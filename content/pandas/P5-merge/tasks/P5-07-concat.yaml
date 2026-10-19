@@ -1,0 +1,28 @@
+id: P5-07-concat
+type: dataframe
+title: Две выгрузки в одну
+difficulty: 1
+lesson_section: concat
+sql_quest_ref: UNION ALL
+statement: |
+  Заказы за август и сентябрь пришли двумя таблицами — `aug` и `sept`. Склей их одна под другой в `result`: сначала август, потом сентябрь, строки пронумерованы заново.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+  sept = orders[orders["order_date"].str.startswith("2026-09")].reset_index(drop=True)
+  aug = orders[orders["order_date"].str.startswith("2026-08")].reset_index(drop=True)
+reference: |
+  result = pd.concat([aug, sept], ignore_index=True)
+requires: ["uses:concat"]
+ordered: true
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = pd.concat([aug, sept], axis=1)"
+  - code: "result = pd.concat([sept, aug], ignore_index=True)"
+    expect_detector: row_order
+hints:
+  - "Склейка таблиц — concat, раздел «concat»."
+  - "Передай в pd.concat список таблиц в нужном порядке и попроси пронумеровать строки заново."
+  - "pd.concat([aug, sept], ignore_index=True)."
+  - "result = pd.concat([___, ___], ignore_index=___)"
+  - "Порядок в списке — порядок строк в результате. axis=1 поставил бы таблицы рядом, а не друг под другом."

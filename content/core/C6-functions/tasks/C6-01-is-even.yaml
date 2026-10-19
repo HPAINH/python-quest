@@ -1,0 +1,28 @@
+id: C6-01-is-even
+type: function
+function: is_even
+title: Чётное ли число
+difficulty: 1
+lesson_section: return
+statement: |
+  Напиши функцию `is_even(n)`, которая возвращает `True`, если целое число `n` чётное, и `False` иначе.
+starter: |
+  def is_even(n):
+      pass
+reference: |
+  def is_even(n):
+      return n % 2 == 0
+tests:
+  visible: ["is_even(4)", "is_even(7)"]
+  hidden: ["is_even(0)", "is_even(-3)", "is_even(-10)", "is_even(10**18 + 1)"]
+random: {count: 20, gen: "f'is_even({random.randint(-10**6, 10**6)})'"}
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "def is_even(n):\n    if n % 2 == 0:\n        print(True)\n    else:\n        print(False)"
+    expect_detector: print_instead_of_return
+hints:
+  - "Функция возвращает результат через return — раздел «return»."
+  - "Число чётное, если остаток от деления на 2 равен нулю. Результат сравнения уже True или False — его и нужно вернуть."
+  - "n % 2 == 0 и return."
+  - "def is_even(n):\n    return n % 2 ___ 0"
+  - "Сравнение n % 2 == 0 само даёт True или False, поэтому if не нужен: return n % 2 == 0. Если вместо return написать print, функция вернёт None, и проверка не пройдёт."

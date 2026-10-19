@@ -1,0 +1,23 @@
+id: P5-05-left-on
+type: dataframe
+title: Ключи с разными именами
+difficulty: 2
+lesson_section: keys
+statement: |
+  В справочнике `catalog` номер товара называется `id`. Добавь к позициям заказов `items` название товара: колонки `order_id`, `product_id`, `name`, `quantity`, все позиции.
+setup: |
+  import pandas as pd
+  items = pd.read_csv("order_items.csv")
+  catalog = pd.read_csv("products.csv").rename(columns={"product_id": "id"})
+reference: |
+  t = items.merge(catalog, left_on="product_id", right_on="id")
+  result = t[["order_id", "product_id", "name", "quantity"]]
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "t = items.merge(catalog, left_on='product_id', right_on='category_id')\nresult = t[['order_id', 'product_id', 'name', 'quantity']]"
+hints:
+  - "left_on и right_on — раздел «Ключи»."
+  - "Укажи, какая колонка — ключ в левой таблице, а какая — в правой."
+  - "items.merge(catalog, left_on=\"product_id\", right_on=\"id\")."
+  - "t = items.merge(catalog, left_on=___, right_on=___)\nresult = t[[\"order_id\", \"product_id\", \"name\", \"quantity\"]]"
+  - "Можно и переименовать id в product_id до merge и соединить через on. Соединение по случайной колонке (category_id) не упадёт, но склеит не то — merge проверяет только совпадение значений."

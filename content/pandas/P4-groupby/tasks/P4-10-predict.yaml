@@ -1,0 +1,26 @@
+id: P4-10-predict
+type: predict
+title: Группы и окна
+difficulty: 2
+lesson_section: transform
+statement: |
+  Впиши, что выведет программа.
+code: |
+  import pandas as pd
+  df = pd.DataFrame({
+      "client": ["A", "B", "A", "C", "B", "A"],
+      "amount": [100, 300, 200, 50, 300, 700],
+  })
+  g = df.groupby("client")["amount"]
+  print(g.sum().tolist(), g.size().tolist())
+  print(g.transform("max").tolist())
+  t = g.agg(["mean", "nunique"])
+  print(t.loc["B", "mean"], t.loc["B", "nunique"])
+  s = g.sum()
+  print(s[s > 200].index.tolist())
+hints:
+  - "Повтори разделы «groupby», «agg» и «transform»."
+  - "Группы: A — 100, 200, 700; B — 300, 300; C — 50. Ключи идут по алфавиту."
+  - "transform(\"max\") ставит максимум группы на место каждой исходной строки, в исходном порядке."
+  - "Четыре строки: два списка, список из шести чисел, два числа, список ключей."
+  - "Ответ: «[1000, 600, 50] [3, 2, 1]», «[700, 300, 700, 50, 300, 700]», «300.0 1», «['A', 'B']». У B две одинаковые суммы — nunique 1, среднее печатается как 300.0."

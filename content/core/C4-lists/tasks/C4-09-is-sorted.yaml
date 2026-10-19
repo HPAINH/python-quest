@@ -1,0 +1,35 @@
+id: C4-09-is-sorted
+type: function
+function: is_sorted
+title: Отсортирован ли список
+difficulty: 2
+lesson_section: def-basics
+statement: |
+  Напиши функцию `is_sorted(nums)`, которая возвращает `True`, если список отсортирован по неубыванию, и `False` иначе. Пустой список и список из одного элемента считаются отсортированными.
+
+  Не используй `sorted` и `sort`.
+starter: |
+  def is_sorted(nums):
+      pass
+reference: |
+  def is_sorted(nums):
+      for i in range(len(nums) - 1):
+          if nums[i] > nums[i + 1]:
+              return False
+      return True
+requires: ["no_call:sort", "no_call:sorted"]
+tests:
+  visible: ["is_sorted([1, 2, 2, 5])", "is_sorted([3, 1, 2])"]
+  hidden: ["is_sorted([])", "is_sorted([7])", "is_sorted([2, 1])", "is_sorted([1, 1, 1])", "is_sorted([-3, -1, 0, 4, 4])"]
+random: {count: 30, gen: "'is_sorted(' + str(random.choice([sorted, list])([random.randint(-5, 5) for _ in range(random.randint(0, 8))])) + ')'"}
+star3: [first_try]
+buggy_variants:
+  - code: "def is_sorted(nums):\n    for i in range(len(nums)):\n        if nums[i] > nums[i + 1]:\n            return False\n    return True"
+    expect_detector: index_error
+  - code: "def is_sorted(nums):\n    for i in range(len(nums) - 1):\n        if nums[i] > nums[i + 1]:\n            return False\n        else:\n            return True"
+hints:
+  - "Сравнение соседей по индексам — как в разделе «Обход строки» уровня C3, а результат возвращается через return."
+  - "Пройди по парам соседей. Как только найдёшь пару, где левый больше правого, верни False. Если такой пары нет, после цикла верни True."
+  - "for i in range(len(nums) - 1), nums[i] > nums[i + 1], return False внутри цикла, return True после."
+  - "def is_sorted(nums):\n    for i in range(len(nums) - ___):\n        if nums[i] ___ nums[i + 1]:\n            return False\n    return ___"
+  - "return False сразу завершает функцию — дальше проверять не нужно. return True стоит после цикла, потому что «отсортирован» можно утверждать только проверив все пары. Если вернуть True внутри цикла, функция ответит по одной первой паре."

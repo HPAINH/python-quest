@@ -1,0 +1,28 @@
+id: S4-03-sample-size
+type: value
+title: Сколько нужно пользователей
+difficulty: 2
+lesson_section: sample-size
+data: false
+variants_count: 4
+statement: |
+  Базовая конверсия — `p0`, команда хочет заметить рост до `p1` (обе заданы). Найди размер **каждой** группы для двустороннего теста с alpha = 0.05 и мощностью 0.8 при равных группах. Запиши в `result` целое число, округлённое вверх.
+setup: |
+  import math
+  from statsmodels.stats.power import NormalIndPower
+  from statsmodels.stats.proportion import proportion_effectsize
+  p0 = [0.05, 0.08, 0.1, 0.2][SEED % 4]
+  p1 = round(p0 * [1.1, 1.15, 1.2, 1.3][(SEED // 4) % 4], 4)
+reference: |
+  h = proportion_effectsize(p1, p0)
+  result = math.ceil(NormalIndPower().solve_power(effect_size=h, alpha=0.05, power=0.8, ratio=1))
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "h = proportion_effectsize(p1, p0)\nresult = math.ceil(NormalIndPower().solve_power(effect_size=h, alpha=0.05, power=0.8, ratio=1)) * 2"
+  - code: "h = p1 - p0\nresult = math.ceil(NormalIndPower().solve_power(effect_size=h, alpha=0.05, power=0.8, ratio=1))"
+hints:
+  - "Мощность и размер выборки — разделы «Дизайн теста» и «Размер выборки»."
+  - "Переведи пару долей в размер эффекта Коэна через proportion_effectsize и реши уравнение мощности относительно размера выборки."
+  - "proportion_effectsize(p1, p0), NormalIndPower().solve_power(effect_size=h, alpha=0.05, power=0.8, ratio=1)."
+  - "h = proportion_effectsize(___, p0)\nresult = math.ceil(NormalIndPower().solve_power(effect_size=h, alpha=___, power=___, ratio=1))"
+  - "solve_power возвращает размер одной группы — удваивать не нужно. Разность долей — не размер эффекта: эффект Коэна нормирует её на разброс, поэтому одинаковый рост на 1 п. п. при базе 5% и 50% требует разных выборок."

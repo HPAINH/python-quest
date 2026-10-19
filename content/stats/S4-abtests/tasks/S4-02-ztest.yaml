@@ -1,0 +1,31 @@
+id: S4-02-ztest
+type: stat
+title: z-тест конверсии
+difficulty: 1
+lesson_section: analysis
+statement: |
+  Посчитай z-тест для разницы конверсий B − A в `exp_checkout` через `proportions_ztest`. Запиши `z` (допуск ±0.001) и `p_value` (допуск ±0.00001).
+setup: |
+  import pandas as pd
+  from statsmodels.stats.proportion import proportions_ztest
+  t = pd.read_csv("ab_metrics.csv").merge(pd.read_csv("ab_assignments.csv"), on=["user_id", "experiment"])
+outputs:
+  - var: z
+    tol: 0.001
+  - var: p_value
+    tol: 0.00001
+reference: |
+  g = t[t["experiment"] == "exp_checkout"].groupby("group")["converted"].agg(["sum", "size"])
+  z, p_value = proportions_ztest([g.loc["B", "sum"], g.loc["A", "sum"]], [g.loc["B", "size"], g.loc["A", "size"]])
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "g = t[t['experiment'] == 'exp_checkout'].groupby('group')['converted'].agg(['sum', 'size'])\nz, p_value = proportions_ztest([g.loc['A', 'sum'], g.loc['B', 'sum']], [g.loc['A', 'size'], g.loc['B', 'size']])"
+    expect_detector: stat_sign
+  - code: "g = t[t['experiment'] == 'exp_checkout'].groupby('group')['converted'].agg(['sum', 'size'])\nz, p_value = proportions_ztest([g.loc['B', 'sum'], g.loc['A', 'sum']], [g.loc['B', 'size'], g.loc['A', 'size']], alternative='larger')"
+    expect_detector: stat_sided
+hints:
+  - "proportions_ztest — раздел «Анализ результата»."
+  - "Нужны число конверсий и число участников по группам. Передай их списками: сначала B, потом A."
+  - "agg([\"sum\", \"size\"]), proportions_ztest([xb, xa], [nb, na])."
+  - "g = t[t[\"experiment\"] == \"exp_checkout\"].groupby(\"group\")[\"converted\"].agg([\"sum\", \"size\"])\nz, p_value = proportions_ztest([g.loc[___, \"sum\"], g.loc[\"A\", \"sum\"]], [g.loc[\"B\", \"size\"], g.loc[___, \"size\"]])"
+  - "Порядок групп меняет знак z, но не двусторонний p-value. alternative=\"larger\" даёт односторонний тест — p вдвое меньше, его выбирают до теста, а не после."

@@ -1,0 +1,40 @@
+id: D4-05-mlp
+type: model
+title: MLPClassifier на оттоке
+difficulty: 2
+lesson_section: sklearn
+statement: 'В `setup` есть `X`, `y` и готовый препроцессор `pre` (медиана и масштабирование для чисел, one-hot для `city` и `loyalty`). Собери `make_pipeline(pre, MLPClassifier(...))` с одним скрытым слоем из 32 нейронов, `alpha=1e-3`, ранней остановкой и `random_state=0`, обучи на всех данных и запиши в `model`. Порог — ROC-AUC не ниже 0.80 на скрытой выборке.
+
+  '
+setup: "import numpy as np\nimport pandas as pd\nfrom sklearn import metrics\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import OneHotEncoder, StandardScaler\nfrom sklearn.impute import SimpleImputer\nfrom sklearn.compose import ColumnTransformer\nfrom sklearn.pipeline import make_pipeline, Pipeline\nfrom sklearn.linear_model import LogisticRegression, LinearRegression\nfrom sklearn.neural_network import MLPClassifier\ndf = pd.read_csv(\"churn.csv\")\nX = df.drop(columns=[\"customer_id\", \"cancel_request\", \"churned\"])\ny = df[\"churned\"]\nif SHUFFLE:\n    y = y.sample(frac=1, random_state=1).reset_index(drop=True)\ncat = [\"city\", \"loyalty\"]\nnum = [c for c in X.columns if c not in cat]\npre = ColumnTransformer([\n    (\"num\", make_pipeline(SimpleImputer(strategy=\"median\"), StandardScaler()), num),\n    (\"cat\", OneHotEncoder(handle_unknown=\"ignore\"), cat),\n], sparse_threshold=0)\n"
+model:
+  metric: roc_auc
+  threshold: 0.8
+  data: churn
+  target: churned
+  drop:
+  - customer_id
+  - cancel_request
+  baseline: 'from sklearn.dummy import DummyClassifier
+
+    model = DummyClassifier().fit(X, y)'
+reference: 'model = make_pipeline(pre, MLPClassifier(hidden_layer_sizes=(32,), alpha=1e-3, max_iter=300, early_stopping=True, random_state=0))
+
+  model.fit(X, y)
+
+  '
+star3:
+- first_try
+buggy_variants:
+- code: 'model = MLPClassifier(hidden_layer_sizes=(32,), alpha=1e-3, max_iter=300, early_stopping=True, random_state=0)
+
+    model.fit(X, y)'
+  expect_detector: encode_categorical
+hints:
+- MLPClassifier — раздел «MLPClassifier».
+- Препроцессор уже собран — поставь его первым шагом pipeline, а вторым — сеть с нужными параметрами.
+- make_pipeline(pre, MLPClassifier(hidden_layer_sizes=(32,), alpha=1e-3, early_stopping=True, random_state=0)).fit(X, y).
+- 'model = make_pipeline(___, MLPClassifier(hidden_layer_sizes=(___,), alpha=1e-3, max_iter=300, early_stopping=___, random_state=0))
+
+  model.fit(X, y)'
+- hidden_layer_sizes — кортеж, (32,) — один слой; (64, 32) — два. early_stopping откладывает 10% данных и останавливает обучение, когда качество на них перестаёт расти. Без pipeline сеть получит строки городов и упадёт.

@@ -1,0 +1,25 @@
+id: N3-08-fix-axis
+type: fix_bug
+base: value
+title: Исправь отклонение от плана
+difficulty: 1
+lesson_section: broadcasting
+statement: |
+  `sales` — таблица «магазин × месяц», `plan` — план каждого магазина (по одному числу на магазин). Нужно получить таблицу отклонений: из каждой строки вычесть план её магазина. Код падает или считает не то. Исправь его.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  stores = int(rng.integers(4, 9))
+  sales = rng.integers(500, 1500, size=(stores, 12))
+  plan = rng.integers(700, 1200, size=stores)
+starter: |
+  result = sales - plan
+reference: |
+  result = sales - plan[:, None]
+star3: [first_try]
+hints:
+  - "Правило совмещения форм — раздел «Broadcasting»."
+  - "plan имеет форму (магазины,). Чтобы вычесть его из каждой строки, его нужно превратить в столбец (магазины, 1)."
+  - "plan[:, None] или plan.reshape(-1, 1)."
+  - "result = sales - plan[:, ___]"
+  - "Формы сравниваются с конца: у sales последняя ось 12, у plan — число магазинов, они не совпадают, поэтому вычитание падает с ошибкой broadcasting. Столбец (магазины, 1) совмещается: единица растягивается на 12 месяцев."

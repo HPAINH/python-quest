@@ -1,0 +1,36 @@
+id: D3-01-bce
+type: function
+function: bce
+title: Бинарная кросс-энтропия
+difficulty: 1
+lesson_section: losses
+tol: 1.0e-09
+statement: 'Напиши функцию `bce(y, p, eps=1e-12)` — средняя бинарная кросс-энтропия для меток `y` (0 и 1) и вероятностей `p`. Перед логарифмом обрежь `p` в отрезок `[eps, 1 − eps]`.
+
+  '
+setup: "import numpy as np\n\ndef rnd(*shape, seed=0):\n    return np.random.default_rng(seed).normal(size=shape).round(3)\n\ndef labels(n, k, seed=0):\n    return np.random.default_rng(seed).integers(0, k, n)\n"
+starter: "def bce(y, p, eps=1e-12):\n    pass\n"
+reference: "def bce(y, p, eps=1e-12):\n    p = np.clip(p, eps, 1 - eps)\n    return float(-np.mean(y * np.log(p) + (1 - y) * np.log(1 - p)))\n"
+tests:
+  visible:
+  - bce(np.array([1, 0, 1]), np.array([0.9, 0.2, 0.6]))
+  - bce(np.array([1, 0]), np.array([1.0, 0.0]))
+  hidden:
+  - bce(np.array([1, 1]), np.array([0.0, 0.5]))
+  - bce(labels(10, 2, seed=1), np.random.default_rng(2).random(10))
+  - bce(np.array([0]), np.array([0.5]))
+random:
+  count: 15
+  gen: '(lambda n, s: f''bce(labels({n}, 2, seed={s}), np.random.default_rng({s + 1}).random({n}))'')(random.randint(1, 20), random.randint(0, 999))'
+star3:
+- first_try
+- max_lines:3
+buggy_variants:
+- code: "def bce(y, p, eps=1e-12):\n    return float(-np.mean(y * np.log(p) + (1 - y) * np.log(1 - p)))"
+- code: "def bce(y, p, eps=1e-12):\n    p = np.clip(p, eps, 1 - eps)\n    return float(-np.mean(y * np.log(p)))"
+hints:
+- Бинарная кросс-энтропия — раздел «Функции потерь».
+- Обрежь вероятности через np.clip, затем посчитай среднее от y·log p + (1 − y)·log(1 − p) со знаком минус.
+- p = np.clip(p, eps, 1 - eps); -np.mean(y * np.log(p) + (1 - y) * np.log(1 - p)).
+- "def bce(y, p, eps=1e-12):\n    p = np.clip(p, ___, 1 - eps)\n    return float(-np.mean(y * np.log(p) + (1 - y) * np.log(___)))"
+- Без обрезки уверенная ошибка даёт log(0) = −∞, и потеря становится inf. Второе слагаемое штрафует уверенные «единицы» для настоящих нулей — без него модель выгодно всегда говорить 1.

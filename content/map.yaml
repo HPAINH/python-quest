@@ -1,0 +1,71 @@
+tracks:
+  - id: core
+    title: Ядро Python
+  - id: numpy
+    title: NumPy
+  - id: pandas
+    title: pandas
+  - id: viz
+    title: Визуализация
+  - id: stats
+    title: Статистика
+  - id: ml
+    title: Машинное обучение
+  - id: dl
+    title: Нейросети
+
+levels:
+  - {code: C0, track: core, stage: 1, deps: [], title: "Переменные, ввод и вывод", topics: "Переменные, типы, print/input, арифметика, // и %"}
+  - {code: C1, track: core, stage: 1, deps: [C0], title: "Условия", topics: "if/elif/else, логические операторы, вложенные условия"}
+  - {code: C2, track: core, stage: 1, deps: [C1], title: "Циклы", topics: "for, while, range, break/continue, счётчики и накопители"}
+  - {code: C3, track: core, stage: 1, deps: [C2], title: "Строки", topics: "Индексы, срезы, методы строк, f-строки"}
+  - {code: C4, track: core, stage: 1, deps: [C3], title: "Списки и кортежи", topics: "Списки, кортежи, сортировка, list comprehension"}
+  - {code: C5, track: core, stage: 1, deps: [C4], title: "Словари и множества", topics: "Словари, множества, подсчёт частот, вложенные структуры"}
+  - {code: C6, track: core, stage: 2, deps: [C5], title: "Функции", topics: "Аргументы, return, области видимости, lambda, *args/**kwargs"}
+  - {code: C7, track: core, stage: 2, deps: [C6], title: "Исключения и стандартная библиотека", topics: "try/except, файлы, collections, itertools, datetime, math"}
+  - {code: C8, track: core, stage: 2, deps: [C7], title: "ООП", topics: "Классы, методы, dataclass, чтение чужого кода"}
+  - {code: N1, track: numpy, stage: 2, deps: [C6], title: "Массивы", topics: "dtype, shape, создание массивов"}
+  - {code: N2, track: numpy, stage: 2, deps: [N1], title: "Индексация и маски", topics: "Срезы, булевы маски, where"}
+  - {code: N3, track: numpy, stage: 2, deps: [N2], title: "Векторизация", topics: "Broadcasting, агрегаты по осям"}
+  - {code: N4, track: numpy, stage: 2, deps: [N3], title: "Линейная алгебра и random", topics: "Линейная алгебра, random с seed, симуляции"}
+  - {code: P1, track: pandas, stage: 2, deps: [C6], title: "Series и DataFrame", topics: "Чтение CSV, head/info/describe"}
+  - {code: P2, track: pandas, stage: 2, deps: [P1], title: "Выбор и фильтрация", topics: "loc, iloc, query, сортировка"}
+  - {code: P3, track: pandas, stage: 2, deps: [P2], title: "Очистка данных", topics: "Пропуски, типы, дубликаты, .str, .dt"}
+  - {code: P4, track: pandas, stage: 2, deps: [P3], title: "Группировки", topics: "groupby, agg, pivot_table, crosstab"}
+  - {code: P5, track: pandas, stage: 2, deps: [P4], title: "Соединения таблиц", topics: "merge, concat, типы соединений"}
+  - {code: P6, track: pandas, stage: 3, deps: [P5], title: "Временные ряды", topics: "resample, rolling, shift, ранги"}
+  - {code: P7, track: pandas, stage: 3, deps: [P6], title: "Продуктовая аналитика", topics: "Воронка, когорты, retention, ARPU"}
+  - {code: V1, track: viz, stage: 3, deps: [P2], title: "matplotlib", topics: "Фигура, оси, линии, столбцы, подписи"}
+  - {code: V2, track: viz, stage: 3, deps: [V1], title: "Распределения и связи", topics: "Гистограмма, boxplot, scatter, seaborn"}
+  - {code: V3, track: viz, stage: 3, deps: [V2], title: "Правильный график", topics: "Какой график отвечает на вопрос"}
+  - {code: S1, track: stats, stage: 3, deps: [N3, P4], title: "Описательная статистика", topics: "Распределения, scipy.stats"}
+  - {code: S2, track: stats, stage: 3, deps: [S1], title: "Доверительные интервалы", topics: "Интервалы, bootstrap"}
+  - {code: S3, track: stats, stage: 3, deps: [S2], title: "Проверка гипотез", topics: "t-тест, хи-квадрат, Манна-Уитни"}
+  - {code: S4, track: stats, stage: 3, deps: [S3], title: "A/B-тесты", topics: "Размер выборки, MDE, множественные сравнения"}
+  - {code: M1, track: ml, stage: 4, deps: [N3, P5, S3], title: "Подготовка данных", topics: "split, кодирование, масштабирование, Pipeline"}
+  - {code: M2, track: ml, stage: 4, deps: [M1], title: "Регрессии", topics: "Линейная и логистическая регрессия, метрики"}
+  - {code: M3, track: ml, stage: 4, deps: [M2], title: "Деревья и ансамбли", topics: "Случайный лес, бустинг, важность признаков"}
+  - {code: M4, track: ml, stage: 4, deps: [M3], title: "Валидация", topics: "Кросс-валидация, гиперпараметры, утечки"}
+  - {code: M5, track: ml, stage: 4, deps: [M4], title: "Без учителя", topics: "Кластеризация, PCA, сегментация"}
+  - {code: M6, track: ml, stage: 4, deps: [M5], title: "Финальный проект", topics: "Отток клиентов ShopData"}
+  - {code: D1, track: dl, stage: 4, deps: [N4, M2], title: "Нейрон и перцептрон", topics: "Линейный слой, активации, прямой проход"}
+  - {code: D2, track: dl, stage: 4, deps: [D1], title: "Обратное распространение", topics: "Цепное правило, градиенты, проверка градиента"}
+  - {code: D3, track: dl, stage: 4, deps: [D2], title: "Обучение MLP", topics: "Потери, softmax, mini-batch SGD"}
+  - {code: D4, track: dl, stage: 4, deps: [D3], title: "Практика нейросетей", topics: "Инициализация, регуляризация, dropout, Adam"}
+
+grades:
+  - {title: "Кандидат", bosses: []}
+  - {title: "Trainee", bosses: [C0, C1, C2, C3]}
+  - {title: "Junior Python", bosses: [C4, C5, C6, C7, C8]}
+  - {title: "Junior Analyst", bosses: [P1, P2, P3, P4, P5, N1, N2, N3]}
+  - {title: "Analyst", bosses: [V1, V2, V3, S1, S2, S3, S4, P6, P7]}
+  - {title: "Junior DS", bosses: [M1, M2, M3, M4]}
+  - {title: "DS-ready", bosses: [N4, M5, M6, D1, D2, D3, D4]}
+
+xp:
+  normal: 20
+  star: 40
+  boss: 100
+  hint_factor: [1, 0.9, 0.8, 0.65, 0.5, 0.25]
+
+sql_quest_url: "https://hpainh.github.io/sql-quest/"

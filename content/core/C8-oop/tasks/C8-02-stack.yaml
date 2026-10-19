@@ -1,0 +1,46 @@
+id: C8-02-stack
+type: function
+function: Stack
+title: Стек задач
+difficulty: 1
+lesson_section: methods
+statement: |
+  Напиши класс `Stack` — стопку, в которой последним пришёл, первым ушёл:
+  - `push(x)` кладёт элемент наверх;
+  - `pop()` снимает и возвращает верхний элемент, а для пустого стека выбрасывает `IndexError`;
+  - `peek()` возвращает верхний элемент, не снимая его, а для пустого стека возвращает `None`;
+  - `len(stack)` возвращает число элементов.
+starter: |
+  class Stack:
+      def __init__(self):
+          pass
+reference: |
+  class Stack:
+      def __init__(self):
+          self._items = []
+
+      def push(self, x):
+          self._items.append(x)
+
+      def pop(self):
+          if not self._items:
+              raise IndexError("стек пуст")
+          return self._items.pop()
+
+      def peek(self):
+          return self._items[-1] if self._items else None
+
+      def __len__(self):
+          return len(self._items)
+tests:
+  visible: ["s = Stack()\ns.push(1)\ns.push(2)\n[s.pop(), s.peek(), len(s)]", "raises(lambda: Stack().pop())"]
+  hidden: ["Stack().peek()", "s = Stack()\nfor i in range(5):\n    s.push(i)\n[s.pop() for _ in range(5)]", "a, b = Stack(), Stack()\na.push('x')\n(len(a), len(b))", "s = Stack()\ns.push(None)\n(len(s), s.pop(), len(s))"]
+star3: [first_try]
+buggy_variants:
+  - code: "class Stack:\n    items = []\n    def push(self, x):\n        self.items.append(x)\n    def pop(self):\n        return self.items.pop()\n    def peek(self):\n        return self.items[-1] if self.items else None\n    def __len__(self):\n        return len(self.items)"
+hints:
+  - "Методы и __len__ — разделы «Методы» и «Специальные методы»."
+  - "Храни элементы в списке, созданном в __init__. push добавляет в конец, pop снимает последний (с проверкой на пустоту), peek смотрит на последний, __len__ возвращает длину списка."
+  - "self._items = [], append, pop, [-1], raise IndexError, def __len__(self)."
+  - "class Stack:\n    def __init__(self):\n        self._items = ___\n\n    def push(self, x):\n        self._items.___(x)\n\n    def pop(self):\n        if not self._items:\n            raise ___(\"стек пуст\")\n        return self._items.pop()\n\n    def peek(self):\n        return self._items[-1] if self._items else ___\n\n    def __len__(self):\n        return len(self._items)"
+  - "Список нужно создавать в __init__: атрибут класса items = [] был бы общим для всех стеков, и тест с двумя стеками это покажет. Подчёркивание в _items — соглашение «внутреннее поле, снаружи не трогать»."

@@ -1,0 +1,24 @@
+id: C5-02-phonebook
+type: stdio
+title: Телефонная книга
+difficulty: 1
+lesson_section: dict-methods
+statement: |
+  В первой строке дано число записей `n`, дальше `n` строк `имя телефон`. Затем число запросов `q` и `q` строк с именами. Для каждого запроса выведи телефон или `нет`, если имени нет в книге. Если имя записано несколько раз, действует последняя запись.
+reference: |
+  book = {}
+  for _ in range(int(input())):
+      name, phone = input().split()
+      book[name] = phone
+  for _ in range(int(input())):
+      print(book.get(input(), "нет"))
+tests:
+  visible: ["2\nаня 123\nборис 456\n3\nаня\nвика\nборис", "1\nx 1\n1\nx"]
+  hidden: ["2\nа 1\nа 2\n1\nа", "1\nаня 5\n2\nАня\nаня", "1\nz 9\n1\ny"]
+star3: [first_try]
+hints:
+  - "Поиск по имени — это словарь с методом get, раздел «Методы словарей»."
+  - "Сохрани записи в словарь «имя → телефон». На каждый запрос выведи значение по ключу или «нет», если ключа нет."
+  - "book[name] = phone, book.get(name, \"нет\")."
+  - "book = {}\nfor _ in range(int(input())):\n    name, phone = input().split()\n    book[___] = ___\nfor _ in range(int(input())):\n    print(book.get(input(), ___))"
+  - "Повторная запись по тому же ключу заменяет телефон — так и работает «последняя запись». get с вторым аргументом не падает на отсутствующем имени. Регистр важен: «Аня» и «аня» — разные ключи."

@@ -1,0 +1,24 @@
+id: N2-03-big-orders
+type: array
+title: Крупные заказы
+difficulty: 1
+lesson_section: masks
+statement: |
+  В `amounts` — суммы заказов. Запиши в `result` только заказы от `threshold` рублей включительно, в исходном порядке.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  amounts = np.round(rng.gamma(2.0, 700.0, size=int(rng.integers(15, 40))), 2)
+  threshold = float(np.round(np.quantile(amounts, 0.7)))
+reference: |
+  result = amounts[amounts >= threshold]
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = amounts > threshold"
+    expect_detector: array_shape
+hints:
+  - "Фильтрация маской — раздел «Булевы маски»."
+  - "Построй маску сравнением с порогом и проиндексируй ею массив."
+  - "amounts[amounts >= threshold]."
+  - "result = amounts[amounts ___ threshold]"
+  - "Само сравнение amounts >= threshold — это маска из True/False, а не отфильтрованные суммы. Маска внутри квадратных скобок оставляет элементы, где стоит True."

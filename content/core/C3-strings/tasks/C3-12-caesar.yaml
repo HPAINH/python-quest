@@ -1,0 +1,32 @@
+id: C3-12-caesar
+type: stdio
+title: Шифр Цезаря
+difficulty: 3
+lesson_section: iterate
+statement: |
+  В первой строке дан сдвиг `k` (от 0 до 100), во второй — текст. Зашифруй текст шифром Цезаря: каждую строчную латинскую букву сдвинь на `k` позиций вперёд по алфавиту по кругу (после `z` идёт `a`). Остальные символы не меняются.
+reference: |
+  k = int(input())
+  text = input()
+  abc = "abcdefghijklmnopqrstuvwxyz"
+  out = ""
+  for ch in text:
+      if ch in abc:
+          out += abc[(abc.find(ch) + k) % 26]
+      else:
+          out += ch
+  print(out)
+tests:
+  visible: ["3\nhello, world!", "1\nxyz"]
+  hidden: ["0\nabc", "26\nabc", "27\nabc", "5\nABC abc 123", "100\nzz"]
+random: {count: 25, gen: "str(random.randint(0, 100)) + '\\n' + ''.join(random.choice('abcxyz XY!') for _ in range(random.randint(1, 20)))"}
+star3: [first_try]
+buggy_variants:
+  - code: "k = int(input())\ntext = input()\nabc = 'abcdefghijklmnopqrstuvwxyz'\nout = ''\nfor ch in text:\n    if ch in abc:\n        out += abc[abc.find(ch) + k]\n    else:\n        out += ch\nprint(out)"
+    expect_detector: index_error
+hints:
+  - "Обход строки с построением новой — раздел «Обход строки», остаток % из уровня C0 даёт движение по кругу."
+  - "Заведи строку алфавита. Для каждой буквы найди её номер в алфавите, прибавь k и возьми остаток от деления на 26 — это номер новой буквы. Остальные символы добавляй как есть."
+  - "abc.find(ch), (позиция + k) % 26, abc[новая позиция]."
+  - "k = int(input())\ntext = input()\nabc = \"abcdefghijklmnopqrstuvwxyz\"\nout = \"\"\nfor ch in text:\n    if ch in abc:\n        out += abc[(abc.find(ch) + k) ___ 26]\n    else:\n        out += ___\nprint(out)"
+  - "Для x и k = 1: позиция 23, (23 + 1) % 26 = 24 — это y. Для z: (25 + 1) % 26 = 0 — снова a. Без % индекс выходит за алфавит, и программа падает с IndexError."

@@ -1,0 +1,25 @@
+id: P1-11-fix-column
+type: fix_bug
+base: value
+title: Исправь максимальный заказ
+difficulty: 1
+lesson_section: mistakes
+statement: |
+  Код должен записать в `result` сумму самого крупного заказа, но падает. Исправь его.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+starter: |
+  result = orders("Amount").max()
+reference: |
+  result = orders["amount"].max()
+star3: [first_try]
+buggy_variants:
+  - code: "result = orders['Amount'].max()"
+    expect_detector: column_key
+hints:
+  - "Прочитай ошибку и раздел «Частые ошибки»."
+  - "В строке две ошибки: таблицу вызывают как функцию, а название колонки написано с заглавной буквы."
+  - "Квадратные скобки и колонка amount."
+  - "result = orders[\"___\"].max()"
+  - "orders(...) — вызов таблицы как функции, pandas отвечает TypeError. Имена колонок чувствительны к регистру: «Amount» и «amount» — разные колонки. Список колонок всегда можно посмотреть через orders.columns."

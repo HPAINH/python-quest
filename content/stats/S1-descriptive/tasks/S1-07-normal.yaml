@@ -1,0 +1,32 @@
+id: S1-07-normal
+type: stat
+title: Нормальное приближение для чека
+difficulty: 3
+lesson_section: distributions
+statement: |
+  Аналитик хочет найти порог «крупного» заказа как 95-й процентиль, считая `amount` всех заказов нормальным со средним и выборочным std по данным. Запиши этот порог в `threshold` (допуск ±0.5) и фактическую долю заказов с `amount` выше порога в `share_above` (допуск ±0.0001). Сравни долю с ожидаемыми 5%.
+setup: |
+  import pandas as pd
+  from scipy import stats
+  orders = pd.read_csv("orders.csv")
+outputs:
+  - var: threshold
+    tol: 0.5
+  - var: share_above
+    tol: 0.0001
+reference: |
+  a = orders["amount"]
+  threshold = stats.norm.ppf(0.95, loc=a.mean(), scale=a.std())
+  share_above = (a > threshold).mean()
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "a = orders['amount']\nthreshold = stats.norm.ppf(0.95) * a.std()\nshare_above = (a > threshold).mean()"
+    expect_detector: stat_value
+  - code: "a = orders['amount']\nthreshold = a.quantile(0.95)\nshare_above = (a > threshold).mean()"
+    expect_detector: stat_value
+hints:
+  - "Квантиль нормального распределения — ppf, раздел «Распределения»."
+  - "Передай в norm.ppf среднее как loc и стандартное отклонение как scale. Долю выше порога посчитай средним булевой маски."
+  - "stats.norm.ppf(0.95, loc=a.mean(), scale=a.std()), (a > threshold).mean()."
+  - "a = orders[\"amount\"]\nthreshold = stats.norm.ppf(___, loc=a.mean(), scale=a.___())\nshare_above = (a > threshold).___()"
+  - "Без loc ppf возвращает квантиль стандартного нормального — 1,645, и порог теряет сдвиг на среднее. Эмпирический квантиль a.quantile(0.95) — честный ответ без предположений; задача показывает, насколько нормальное приближение ошибается на скошенных данных."

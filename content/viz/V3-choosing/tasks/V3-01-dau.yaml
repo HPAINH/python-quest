@@ -1,0 +1,31 @@
+id: V3-01-dau
+type: plot
+title: Как менялась активность
+difficulty: 1
+lesson_section: time
+statement: |
+  Вопрос продакта: «Как менялось число активных пользователей по дням?» Активный за день — пользователь хотя бы с одним событием в `events.csv`. Выбери подходящий тип графика и построй его по всем дням. Нужен заголовок.
+setup: |
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  import seaborn as sns
+  events = pd.read_csv("events.csv", parse_dates=["event_time"])
+plot:
+  labels: true
+reference: |
+  dau = events.resample("D", on="event_time")["user_id"].nunique()
+  fig, ax = plt.subplots()
+  ax.plot(dau.index, dau.values)
+  ax.set_title("Активные пользователи по дням")
+star3: [first_try, "max_lines:4"]
+buggy_variants:
+  - code: "dau = events.resample('D', on='event_time')['user_id'].nunique()\nfig, ax = plt.subplots()\nax.bar(dau.index, dau.values)\nax.set_title('DAU')"
+    expect_detector: plot_kind
+  - code: "dau = events.resample('D', on='event_time')['user_id'].count()\nfig, ax = plt.subplots()\nax.plot(dau.index, dau.values)\nax.set_title('DAU')"
+    expect_detector: plot_data
+hints:
+  - "Какой график для времени — разделы «Вопрос → тип графика» и «Время»."
+  - "Динамика по дням — линия. Посчитай уникальных пользователей по дням через resample и nunique."
+  - "events.resample(\"D\", on=\"event_time\")[\"user_id\"].nunique(), ax.plot(dau.index, dau.values)."
+  - "dau = events.resample(\"D\", on=\"event_time\")[\"user_id\"].___()\nfig, ax = plt.subplots()\nax.___(dau.index, dau.values)\nax.set_title(\"...\")"
+  - "Двести узких столбцов сливаются в забор, а линия сразу показывает рост и недельные колебания. count посчитал бы события, а вопрос — про людей."

@@ -1,0 +1,25 @@
+id: V2-06-corr
+type: dataframe
+title: Матрица корреляций
+difficulty: 2
+lesson_section: corr
+statement: |
+  Для каждого заказа собери признаки: `amount`, `delivery_cost`, `positions` — число позиций в `order_items`, `units` — сумма `quantity`. Запиши в `result` матрицу корреляций этих четырёх колонок в таком порядке, округлённую до 3 знаков. Учитывай только заказы, у которых есть позиции.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+  items = pd.read_csv("order_items.csv")
+reference: |
+  n = items.groupby("order_id").agg(positions=("product_id", "count"), units=("quantity", "sum"))
+  t = orders.set_index("order_id").join(n, how="inner")
+  result = t[["amount", "delivery_cost", "positions", "units"]].corr().round(3)
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "n = items.groupby('order_id').agg(positions=('product_id', 'count'), units=('quantity', 'sum'))\nt = orders.set_index('order_id').join(n, how='inner')\nresult = t[['amount', 'delivery_cost', 'positions', 'units']].corr(method='spearman').round(3)"
+    expect_detector: column_values
+hints:
+  - "Корреляции — раздел «Корреляции»."
+  - "Посчитай по позициям два признака на заказ, присоедини их к заказам по order_id и возьми corr у четырёх колонок."
+  - "items.groupby(\"order_id\").agg(positions=(\"product_id\", \"count\"), units=(\"quantity\", \"sum\")), orders.set_index(\"order_id\").join(n, how=\"inner\"), t[[...]].corr()."
+  - "n = items.groupby(\"order_id\").agg(positions=(\"product_id\", ___), units=(\"quantity\", ___))\nt = orders.set_index(\"order_id\").join(n, how=\"inner\")\nresult = t[[\"amount\", \"delivery_cost\", \"positions\", \"units\"]].___().round(3)"
+  - "corr по умолчанию считает корреляцию Пирсона — линейную связь. method=\"spearman\" — ранговая корреляция, она устойчивее к выбросам, но это другое число. Отрицательная связь доставки с суммой понятна: крупные заказы доставляются бесплатно."

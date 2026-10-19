@@ -1,0 +1,33 @@
+id: S1-04-skew
+type: stat
+title: Асимметрия и логарифм
+difficulty: 2
+lesson_section: shape
+statement: |
+  Посчитай асимметрию `amount` всех заказов методом pandas `skew()` и асимметрию натурального логарифма `amount`. Запиши в `skew_raw` и `skew_log`, допуск ±0.001.
+setup: |
+  import numpy as np
+  import pandas as pd
+  from scipy import stats
+  orders = pd.read_csv("orders.csv")
+outputs:
+  - var: skew_raw
+    tol: 0.001
+  - var: skew_log
+    tol: 0.001
+reference: |
+  a = orders["amount"]
+  skew_raw = a.skew()
+  skew_log = np.log(a).skew()
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "a = orders['amount']\nskew_raw = a.skew()\nskew_log = a.skew() / np.log(a.mean())"
+    expect_detector: stat_value
+  - code: "a = orders['amount']\nskew_raw = a.kurt()\nskew_log = np.log(a).kurt()"
+    expect_detector: stat_value
+hints:
+  - "Асимметрия — раздел «Форма»."
+  - "У Series есть метод skew. Натуральный логарифм — np.log."
+  - "a.skew(), np.log(a).skew()."
+  - "a = orders[\"amount\"]\nskew_raw = a.___()\nskew_log = np.___(a).skew()"
+  - "scipy.stats.skew по умолчанию считает без поправки на размер выборки, но на тысячах заказов разница меньше допуска. Асимметрия не зависит от основания логарифма: log10 отличается от ln только множителем, и skew даст то же число. kurt — это эксцесс, а не асимметрия."

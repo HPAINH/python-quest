@@ -1,0 +1,23 @@
+id: N3-03-col-mean
+type: array
+title: Средний чек по дням недели
+difficulty: 1
+lesson_section: axis
+statement: |
+  `checks` — средние чеки: строки — недели, столбцы — дни недели (7 столбцов). Запиши в `result` средний чек для каждого дня недели по всем неделям, округлённый до 2 знаков через `np.round`.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  checks = np.round(rng.normal(1500, 300, size=(int(rng.integers(4, 12)), 7)), 2)
+reference: |
+  result = np.round(checks.mean(axis=0), 2)
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = np.round(checks.mean(axis=1), 2)"
+    expect_detector: axis_confusion
+hints:
+  - "Среднее по оси — раздел «Оси»."
+  - "Дни недели — столбцы. Нужно свернуть строки (недели), чтобы на каждый столбец осталось одно среднее."
+  - "checks.mean(axis=0), np.round(..., 2)."
+  - "result = np.round(checks.mean(axis=___), 2)"
+  - "axis=0 убирает ось недель, результат имеет форму (7,) — по значению на день недели. С axis=1 получилось бы среднее за каждую неделю."

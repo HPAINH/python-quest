@@ -1,0 +1,39 @@
+id: C6-10-build-query
+type: function
+function: build_query
+title: Запрос по фильтрам
+difficulty: 2
+lesson_section: args-kwargs
+statement: |
+  Напиши функцию `build_query(table, **filters)`, которая собирает текст SQL-запроса.
+
+  - Без фильтров: `SELECT * FROM table`.
+  - С фильтрами: `SELECT * FROM table WHERE a = 1 AND b = 'x'` — условия по алфавиту имён колонок, строки в одинарных кавычках, числа без кавычек.
+
+  Пример: `build_query("orders", status="delivered", customer_id=7)` → `SELECT * FROM orders WHERE customer_id = 7 AND status = 'delivered'`.
+starter: |
+  def build_query(table, **filters):
+      pass
+reference: |
+  def build_query(table, **filters):
+      query = f"SELECT * FROM {table}"
+      conds = []
+      for col, val in sorted(filters.items()):
+          if isinstance(val, str):
+              conds.append(f"{col} = '{val}'")
+          else:
+              conds.append(f"{col} = {val}")
+      if conds:
+          query += " WHERE " + " AND ".join(conds)
+      return query
+tests:
+  visible: ["build_query('orders', status='delivered', customer_id=7)", "build_query('products')"]
+  hidden: ["build_query('t', a=1)", "build_query('customers', city='Казань', loyalty='gold')", "build_query('x', z=0, y='0', x=1.5)"]
+random: {count: 15, gen: "'build_query(\"orders\", ' + ', '.join(f'{k}={v!r}' for k, v in random.sample([(\"status\", \"cancelled\"), (\"channel\", \"app\"), (\"customer_id\", 42), (\"amount\", 990.5)], random.randint(0, 4))) + ')'"}
+star3: [first_try]
+hints:
+  - "Именованные аргументы собираются в словарь через ** — раздел «*args и **kwargs»."
+  - "Пройди по парам из filters в порядке сортировки по имени колонки. Для каждой пары собери условие: строку — в кавычках, число — как есть. Если условий нет, верни запрос без WHERE, иначе склей их через AND."
+  - "sorted(filters.items()), isinstance(val, str), \" AND \".join(...)."
+  - "def build_query(table, **filters):\n    query = f\"SELECT * FROM {table}\"\n    conds = []\n    for col, val in ___(filters.items()):\n        if isinstance(val, ___):\n            conds.append(f\"{col} = '{val}'\")\n        else:\n            conds.append(f\"{col} = {val}\")\n    if conds:\n        query += \" WHERE \" + \" AND \".___(conds)\n    return query"
+  - "filters — обычный словарь, поэтому работают items и sorted. isinstance проверяет тип значения. В настоящем коде запросы так не собирают — значения передают параметрами, чтобы избежать SQL-инъекций. Здесь задача на **kwargs."

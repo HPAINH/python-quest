@@ -1,0 +1,28 @@
+id: N4-06-monte-carlo
+type: value
+title: Риск перегрузки курьеров
+difficulty: 2
+lesson_section: simulation
+statement: |
+  Курьерская служба справляется с `limit` заказами в день. Заказы приходят случайно, в среднем `lam` в день. Оцени вероятность, что **хотя бы в один** из 7 дней недели заказов будет больше `limit`.
+
+  Используй генератор `rng` из подготовки ровно одним вызовом: `rng.poisson(lam, size=(20_000, 7))` — 20 000 недель по 7 дней. Запиши долю недель с перегрузкой в `result`, округлив до 3 знаков через `round`.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  lam = int(rng.integers(30, 80))
+  limit = lam + int(rng.integers(5, 20))
+reference: |
+  sims = rng.poisson(lam, size=(20_000, 7))
+  result = round(float((sims > limit).any(axis=1).mean()), 3)
+requires: ["no_loops"]
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "sims = rng.poisson(lam, size=(20_000, 7))\nresult = round(float((sims > limit).mean()), 3)"
+  - code: "sims = rng.poisson(lam, size=(20_000, 7))\nresult = round(float((sims >= limit).any(axis=1).mean()), 3)"
+hints:
+  - "Симуляция без циклов — раздел «Симуляции»."
+  - "Каждая строка — неделя. Отметь дни с перегрузкой, для каждой недели проверь, был ли хоть один такой день, и посчитай долю таких недель."
+  - "sims > limit, .any(axis=1), .mean(), round(..., 3)."
+  - "sims = rng.poisson(lam, size=(20_000, 7))\nresult = round(float((sims ___ limit).any(axis=___).mean()), 3)"
+  - "(sims > limit).mean() — доля перегруженных дней, а нужна доля недель, где перегрузка случилась хотя бы раз: она всегда больше. any(axis=1) сворачивает неделю в один True или False. Генератор вызывается ровно один раз, иначе числа не совпадут с эталоном."

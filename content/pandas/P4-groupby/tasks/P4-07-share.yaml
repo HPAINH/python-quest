@@ -1,0 +1,25 @@
+id: P4-07-share
+type: dataframe
+title: Доля заказа у клиента
+difficulty: 2
+lesson_section: transform
+sql_quest_ref: SUM() OVER (PARTITION BY)
+statement: |
+  Для каждого заказа посчитай его долю в сумме всех заказов того же клиента. Запиши в `result` колонки `order_id`, `customer_id`, `share` (доля, округлённая до 4 знаков). Все заказы, исходный порядок.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+reference: |
+  total = orders.groupby("customer_id")["amount"].transform("sum")
+  orders["share"] = (orders["amount"] / total).round(4)
+  result = orders[["order_id", "customer_id", "share"]]
+requires: ["uses:transform"]
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "total = orders.groupby('customer_id')['amount'].sum()\norders['share'] = (orders['amount'] / total).round(4)\nresult = orders[['order_id', 'customer_id', 'share']]"
+hints:
+  - "Значение группы в каждой строке — transform, раздел «transform»."
+  - "transform(\"sum\") по клиенту даст колонку той же длины, что orders, — на неё и дели."
+  - "orders.groupby(\"customer_id\")[\"amount\"].transform(\"sum\")."
+  - "total = orders.groupby(\"customer_id\")[\"amount\"].___(\"sum\")\norders[\"share\"] = (orders[\"amount\"] / ___).round(4)\nresult = orders[[\"order_id\", \"customer_id\", \"share\"]]"
+  - "sum() возвращает одну строку на клиента с подписями-id клиентов, а orders подписан номерами строк. Деление выравнивает подписи, а не позиции, поэтому почти везде получается NaN."

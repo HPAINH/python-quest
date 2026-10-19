@@ -1,0 +1,32 @@
+id: C3-11-rle
+type: stdio
+title: Сжатие строки
+difficulty: 3
+lesson_section: iterate
+statement: |
+  Дана непустая строка из латинских букв. Сожми её: каждая серия одинаковых букв подряд заменяется буквой и длиной серии. Например, `aaabbc` → `a3b2c1`.
+reference: |
+  s = input()
+  out = ""
+  count = 1
+  for i in range(1, len(s)):
+      if s[i] == s[i - 1]:
+          count += 1
+      else:
+          out += s[i - 1] + str(count)
+          count = 1
+  out += s[-1] + str(count)
+  print(out)
+tests:
+  visible: ["aaabbc", "abc"]
+  hidden: ["a", "zzzzzzzzzzzz", "aabbaa", "abba"]
+random: {count: 25, gen: "''.join(random.choice('ab') * random.randint(1, 4) for _ in range(random.randint(1, 8)))"}
+star3: [first_try]
+buggy_variants:
+  - code: "s = input()\nout = ''\ncount = 1\nfor i in range(1, len(s)):\n    if s[i] == s[i - 1]:\n        count += 1\n    else:\n        out += s[i - 1] + str(count)\n        count = 1\nprint(out)"
+hints:
+  - "Это обход по индексам со сравнением соседей — раздел «Обход строки»."
+  - "Иди по строке и сравнивай символ с предыдущим. Совпал — увеличь счётчик серии. Не совпал — допиши в ответ предыдущий символ и длину серии, начни новую серию. После цикла допиши последнюю серию."
+  - "for i in range(1, len(s)), s[i] == s[i - 1], строка-накопитель out, str(count)."
+  - "s = input()\nout = \"\"\ncount = 1\nfor i in range(1, len(s)):\n    if s[i] == s[i - 1]:\n        count ___\n    else:\n        out += s[i - 1] + ___(count)\n        count = ___\nout += s[___] + str(count)\nprint(out)"
+  - "Серия записывается в ответ в момент, когда она заканчивается, — при смене символа. Последняя серия заканчивается вместе со строкой, поэтому её дописывают после цикла. Без этой строки для «aaabbc» получится «a3b2» без «c1»."

@@ -1,0 +1,25 @@
+id: P2-09-fix-chained
+type: fix_bug
+base: value
+title: Исправь бесплатную доставку
+difficulty: 2
+lesson_section: loc-iloc
+statement: |
+  Для заказов с промокодом `FREEDLV` стоимость доставки должна стать 0. Код ничего не меняет — проверь вывод. Исправь его.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+  orders.loc[orders.index % 7 == 0, "promo_code"] = "FREEDLV"
+starter: |
+  orders[orders["promo_code"] == "FREEDLV"]["delivery_cost"] = 0
+  result = orders
+reference: |
+  orders.loc[orders["promo_code"] == "FREEDLV", "delivery_cost"] = 0
+  result = orders
+star3: [first_try]
+hints:
+  - "Изменение по условию — раздел «loc и iloc»."
+  - "Запись в два шага сначала создаёт отфильтрованную копию и меняет её. Нужен один шаг, который адресует исходную таблицу."
+  - "orders.loc[маска, \"delivery_cost\"] = 0."
+  - "orders.___[orders[\"promo_code\"] == \"FREEDLV\", ___] = 0\nresult = orders"
+  - "В pandas 3 цепочное присваивание никогда не меняет исходную таблицу и выдаёт предупреждение ChainedAssignmentError. loc[строки, колонка] = значение адресует ячейки исходной таблицы напрямую."

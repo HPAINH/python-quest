@@ -1,0 +1,32 @@
+id: C2-08-prime
+type: stdio
+title: Простое число
+difficulty: 2
+lesson_section: break-continue
+statement: |
+  Дано натуральное число `n` (до 10⁹). Выведи `YES`, если оно простое, и `NO`, если нет. Единица простым числом не считается.
+
+  Проверка должна укладываться в лимит времени даже для больших `n`.
+reference: |
+  n = int(input())
+  ok = n > 1
+  d = 2
+  while d * d <= n:
+      if n % d == 0:
+          ok = False
+          break
+      d += 1
+  print("YES" if ok else "NO")
+tests:
+  visible: ["17", "15"]
+  hidden: ["1", "2", "4", "999999937", "1000000000", "49"]
+random: {count: 25, gen: "str(random.randint(1, 5000))"}
+star3: [first_try]
+buggy_variants:
+  - code: "n = int(input())\nok = True\nd = 2\nwhile d * d <= n:\n    if n % d == 0:\n        ok = False\n        break\n    d += 1\nprint('YES' if ok else 'NO')"
+hints:
+  - "Проверка простоты разобрана в разделе «break и continue»."
+  - "Перебирай делители d от 2, пока d * d не превысит n. Нашёл делитель — число составное, дальше проверять не нужно. Отдельно учти n = 1."
+  - "while d * d <= n, n % d == 0, break, флаг ok."
+  - "n = int(input())\nok = n > ___\nd = 2\nwhile d * d <= ___:\n    if n % d == 0:\n        ok = ___\n        break\n    d += 1\nprint(\"YES\" if ok else \"NO\")"
+  - "Перебор до корня из n — это около 31 623 шагов для 10⁹, а перебор до n занял бы миллиард шагов и не уложился бы в лимит. ok = n > 1 сразу делает единицу непростой. Запись \"YES\" if ok else \"NO\" — короткая форма if / else."

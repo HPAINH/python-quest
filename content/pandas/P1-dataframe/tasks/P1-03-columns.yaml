@@ -1,0 +1,26 @@
+id: P1-03-columns
+type: dataframe
+title: Две колонки заказов
+difficulty: 1
+lesson_section: dataframe
+statement: |
+  Запиши в `result` таблицу из колонок `order_id`, `order_date` и `amount` таблицы `orders` — именно в таком порядке.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+reference: |
+  result = orders[["order_id", "order_date", "amount"]]
+col_order: true
+outputs:
+  - var: result
+    col_order: true
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = orders[['order_id', 'amount']]"
+    expect_detector: columns_mismatch
+hints:
+  - "Несколько колонок выбирают списком имён — раздел «DataFrame»."
+  - "Внутри квадратных скобок передай список из трёх имён колонок."
+  - "orders[[\"order_id\", \"order_date\", \"amount\"]] — двойные скобки."
+  - "result = orders[[___, ___, ___]]"
+  - "Внешние скобки — выбор из таблицы, внутренние — список Python. Без внутренних скобок pandas будет искать одну колонку с именем-кортежем и выдаст KeyError."

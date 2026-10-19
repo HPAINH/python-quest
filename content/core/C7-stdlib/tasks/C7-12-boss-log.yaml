@@ -1,0 +1,78 @@
+id: C7-12-boss-log
+type: function
+title: "Босс: разбор лога"
+difficulty: 3
+boss: true
+lesson_section: files
+statement: |
+  Сервис ShopData пишет лог в формате `2026-10-17 14:05:33 ERROR Payment timeout`: дата, время, уровень (`INFO`, `WARNING`, `ERROR`) и сообщение. В логе бывают битые строки.
+
+  **Шаг 1.** `parse_line(line)` — возвращает кортеж `(дата, уровень, сообщение)`, где дата — строка `ГГГГ-ММ-ДД`. Выбрасывает `ValueError`, если в строке меньше четырёх частей, уровень не из списка или дата не разбирается через `strptime`.
+
+  **Шаг 2.** `count_levels(path)` — читает файл и возвращает словарь «уровень → количество» по корректным строкам. Пустые и битые строки пропускаются.
+
+  **Шаг 3.** `worst_day(path)` — возвращает дату с наибольшим числом `ERROR` и само число в виде кортежа. При равенстве — более раннюю дату. Если ошибок нет — `None`.
+files:
+  app.log: "2026-10-17 09:00:01 INFO Service started\n2026-10-17 09:15:44 ERROR Payment timeout\n2026-10-17 10:02:10 WARNING Slow query 2.3s\n\n2026-10-18 11:00:00 ERROR Payment timeout\n2026-10-18 11:00:05 ERROR Payment timeout again\nbroken line\n2026-10-18 12:00:00 DEBUG verbose stuff\n2026-10-19 08:00:00 INFO ok\n"
+  clean.log: "2026-01-01 00:00:00 INFO a\n2026-01-01 00:00:01 INFO b\n"
+  ties.log: "2026-03-02 10:00:00 ERROR x\n2026-03-01 10:00:00 ERROR y\n2026-03-03 10:00:00 WARNING z\n"
+  messy.log: "2026-13-01 10:00:00 ERROR bad month\n2026-02-30 10:00:00 ERROR bad day\n2026-02-28 10:00:00 ERROR good one\n2026-02-28 10:00:00 ERROR\n2026-02-27 23:59:59 ERROR a b c d e\n"
+reference: |
+  from collections import Counter
+  from datetime import datetime
+
+  LEVELS = {"INFO", "WARNING", "ERROR"}
+
+  def parse_line(line):
+      parts = line.strip().split(" ", 3)
+      if len(parts) < 4:
+          raise ValueError("мало частей")
+      day, _, level, message = parts
+      if level not in LEVELS:
+          raise ValueError("неизвестный уровень")
+      datetime.strptime(day, "%Y-%m-%d")
+      return day, level, message
+
+  def _records(path):
+      with open(path, encoding="utf-8") as f:
+          for line in f:
+              if not line.strip():
+                  continue
+              try:
+                  yield parse_line(line)
+              except ValueError:
+                  continue
+
+  def count_levels(path):
+      return dict(Counter(level for _, level, _ in _records(path)))
+
+  def worst_day(path):
+      errors = Counter(day for day, level, _ in _records(path) if level == "ERROR")
+      if not errors:
+          return None
+      return min(errors.items(), key=lambda p: (-p[1], p[0]))
+steps:
+  - title: Разобрать строку лога
+    function: parse_line
+    tests:
+      visible: ["parse_line('2026-10-17 14:05:33 ERROR Payment timeout')", "raises(lambda: parse_line('broken line'))"]
+      hidden: ["parse_line('2026-01-01 00:00:00 INFO a b  c\\n')", "raises(lambda: parse_line('2026-01-01 00:00:00 DEBUG x'))", "raises(lambda: parse_line('2026-02-30 00:00:00 INFO x'))", "raises(lambda: parse_line('2026-02-03 00:00:00 ERROR'))", "parse_line('2026-02-03 00:00:00 WARNING disk 91%')"]
+  - title: Посчитать уровни
+    function: count_levels
+    tests:
+      visible: ["count_levels('app.log')", "count_levels('clean.log')"]
+      hidden: ["count_levels('ties.log')", "count_levels('messy.log')"]
+  - title: Худший день
+    function: worst_day
+    tests:
+      visible: ["worst_day('app.log')", "worst_day('clean.log')"]
+      hidden: ["worst_day('ties.log')", "worst_day('messy.log')"]
+star3: [first_try]
+buggy_variants:
+  - code: "def parse_line(line):\n    day, time, level, message = line.split(' ', 3)\n    return day, level, message\n\ndef count_levels(path):\n    out = {}\n    with open(path) as f:\n        for line in f:\n            try:\n                d, l, m = parse_line(line)\n            except ValueError:\n                continue\n            out[l] = out.get(l, 0) + 1\n    return out\n\ndef worst_day(path):\n    return None"
+hints:
+  - "Это задача на весь уровень: разбор строки и raise, чтение файла с with, пропуск ошибок через try и подсчёт через Counter. Главные разделы — «raise», «Файлы» и «collections»."
+  - "parse_line: раздели строку максимум на 4 части по пробелу (сообщение может содержать пробелы), проверь число частей, уровень и дату, иначе выброси ValueError. count_levels и worst_day: читай файл построчно, пропускай пустые строки, вызывай parse_line в try и пропускай битые строки. Считай уровни и ошибки по датам через Counter."
+  - "line.strip().split(\" \", 3), datetime.strptime(day, \"%Y-%m-%d\"), raise ValueError, with open, Counter, min(errors.items(), key=lambda p: (-p[1], p[0]))."
+  - "def parse_line(line):\n    parts = line.strip().split(\" \", ___)\n    if len(parts) < 4:\n        raise ValueError(\"мало частей\")\n    day, _, level, message = parts\n    if level not in {\"INFO\", \"WARNING\", \"ERROR\"}:\n        raise ___(\"уровень\")\n    datetime.strptime(day, ___)\n    return day, level, message\n\ndef count_levels(path):\n    c = Counter()\n    with open(path, encoding=\"utf-8\") as f:\n        for line in f:\n            if not line.strip():\n                continue\n            try:\n                day, level, _ = parse_line(line)\n            except ValueError:\n                ___\n            c[level] += 1\n    return dict(c)"
+  - "split(\" \", 3) режет только по первым трём пробелам, поэтому сообщение «Payment timeout again» остаётся целым. strptime отбраковывает 2026-13-01 и 2026-02-30. Строка «2026-02-28 10:00:00 ERROR» без сообщения — тоже битая: в ней три части. В ties.log по одной ошибке 1 и 2 марта, при равенстве берётся ранняя дата: ('2026-03-01', 1). Общий генератор _records в эталоне убирает повторение кода между шагами 2 и 3."

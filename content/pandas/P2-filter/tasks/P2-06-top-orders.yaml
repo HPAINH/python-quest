@@ -1,0 +1,26 @@
+id: P2-06-top-orders
+type: dataframe
+title: Топ-10 заказов
+difficulty: 2
+lesson_section: sort
+sql_quest_ref: ORDER BY и LIMIT
+statement: |
+  Запиши в `result` 10 самых крупных заказов по сумме: колонки `order_id`, `customer_id`, `amount`. Порядок — по убыванию суммы, при равной сумме — по возрастанию `order_id`.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+reference: |
+  top = orders.sort_values(["amount", "order_id"], ascending=[False, True]).head(10)
+  result = top[["order_id", "customer_id", "amount"]]
+ordered: true
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "result = orders.sort_values('amount').head(10)[['order_id', 'customer_id', 'amount']]"
+  - code: "result = orders.sort_values(['amount', 'order_id'], ascending=[False, True])[['order_id', 'customer_id', 'amount']]"
+    expect_detector: shape_rows
+hints:
+  - "Сортировка по нескольким колонкам — раздел «Сортировка»."
+  - "Отсортируй по сумме по убыванию и по номеру по возрастанию, возьми первые 10 строк и нужные колонки."
+  - "sort_values([\"amount\", \"order_id\"], ascending=[False, True]).head(10)."
+  - "top = orders.sort_values([\"amount\", \"order_id\"], ascending=[___, ___]).head(___)\nresult = top[[\"order_id\", \"customer_id\", \"amount\"]]"
+  - "Порядок строк здесь важен, и проверка его учитывает. Вторая колонка сортировки делает результат однозначным при равных суммах — как ORDER BY amount DESC, order_id в SQL. nlargest(10, 'amount') даст тот же набор при отсутствии равенств."

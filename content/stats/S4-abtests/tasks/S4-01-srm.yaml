@@ -1,0 +1,30 @@
+id: S4-01-srm
+type: stat
+title: Проверка SRM
+difficulty: 1
+lesson_section: srm
+statement: |
+  Эксперимент `exp_checkout` запускали со сплитом 50/50. Проверь размеры групп хи-квадратом согласия. Запиши `srm_p` (допуск ±0.00001) и `srm` — `True`, если p-value меньше 0.01.
+setup: |
+  import pandas as pd
+  from scipy import stats
+  a = pd.read_csv("ab_assignments.csv")
+outputs:
+  - var: srm_p
+    tol: 0.00001
+  - var: srm
+reference: |
+  counts = a[a["experiment"] == "exp_checkout"]["group"].value_counts().sort_index()
+  srm_p = stats.chisquare(counts, f_exp=[counts.sum() / 2] * 2).pvalue
+  srm = bool(srm_p < 0.01)
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "counts = a['group'].value_counts().sort_index()\nsrm_p = stats.chisquare(counts, f_exp=[counts.sum() / 2] * 2).pvalue\nsrm = bool(srm_p < 0.01)"
+    expect_detector: stat_value
+  - code: "counts = a[a['experiment'] == 'exp_checkout']['group'].value_counts().sort_index()\nsrm_p = stats.chisquare(counts, f_exp=[counts.sum() / 2] * 2).statistic\nsrm = bool(srm_p < 0.01)"
+hints:
+  - "SRM — раздел «SRM: честно ли разделились группы»."
+  - "Посчитай размеры групп эксперимента и сравни их с ожидаемыми половинами через stats.chisquare."
+  - "value_counts().sort_index(), stats.chisquare(counts, f_exp=[counts.sum() / 2] * 2).pvalue."
+  - "counts = a[a[\"experiment\"] == ___][\"group\"].value_counts().sort_index()\nsrm_p = stats.chisquare(counts, f_exp=[counts.sum() / ___] * 2).pvalue\nsrm = bool(srm_p < ___)"
+  - "Без f_exp chisquare тоже сравнивает с равными частями, но явный план читается лучше и годится для сплита 90/10. Небольшая случайная разница групп — норма; SRM — когда она слишком велика для случайности."

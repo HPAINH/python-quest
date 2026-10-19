@@ -1,0 +1,22 @@
+id: N1-05-predict-shapes
+type: predict
+title: Форма и тип
+difficulty: 2
+lesson_section: dtype
+statement: |
+  Впиши, что выведет программа.
+code: |
+  import numpy as np
+  a = np.array([[1, 2, 3], [4, 5, 6]])
+  b = a.reshape(3, 2)
+  c = a * 0.5
+  print(a.shape, b.shape, a.ndim)
+  print(b[2], c.dtype)
+  print(a.size, a.T.shape)
+  print(np.arange(1, 7).reshape(-1, 3).sum())
+hints:
+  - "Повтори shape, ndim, dtype и reshape — разделы «Тип и форма» и «Форма и reshape»."
+  - "reshape раскладывает элементы по строкам. Умножение целых на 0.5 даёт дробные. sum() без оси суммирует все элементы."
+  - "Разложи 1…6 в форму (3, 2): строки [1 2], [3 4], [5 6]."
+  - "Четыре строки. В первой три значения, во второй — строка массива и тип, в третьей — размер и форма, в четвёртой — одно число."
+  - "Ответ: «(2, 3) (3, 2) 2», «[5 6] float64», «6 (3, 2)», «21». b[2] — третья строка формы (3, 2). Сумма 1 + … + 6 = 21, reshape на неё не влияет."

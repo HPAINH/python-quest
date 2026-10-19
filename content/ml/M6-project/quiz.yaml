@@ -1,0 +1,86 @@
+quiz:
+  - type: choice
+    q: Зачем функцию признаков встраивают в Pipeline через FunctionTransformer?
+    options: ["Так быстрее", "Чтобы она применялась и к новым данным при прогнозе", "Без неё не работает OneHotEncoder", "Чтобы признаки масштабировались"]
+    answer: 1
+    explain: Иначе модель получит на прогнозе таблицу без новых колонок.
+    section: features
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      s = pd.Series([5, 40, 70, 120])
+      print(pd.cut(s, [0, 30, 60, 180]).astype(str).tolist())
+    answer: "['(0, 30]', '(30, 60]', '(60, 180]', '(60, 180]']"
+    explain: Интервалы открыты слева и закрыты справа.
+    section: eda
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      tp, contacted = 120, 500
+      print(0.3 * 2500 * tp - 300 * contacted)
+    answer: "-60000.0"
+    explain: Удержание 120 × 0.3 × 2500 = 90 000 ₽ меньше затрат 150 000 ₽ — такой порог убыточен.
+    section: business
+  - type: choice
+    q: Почему функция признаков начинается с d = d.copy()?
+    options: ["Так требует pandas", "Чтобы не менять исходную таблицу, которую передали в Pipeline", "Для скорости", "Без copy не работает astype"]
+    answer: 1
+    explain: Побочные эффекты в преобразованиях приводят к трудноуловимым ошибкам.
+    section: mistakes
+  - type: choice
+    q: На каких данных подбирают порог для рассылки?
+    options: ["На обучающих", "На отложенных (валидационных) данных", "На скрытых", "Не важно"]
+    answer: 1
+    explain: На обучающих вероятности слишком оптимистичны.
+    section: business
+
+express:
+  - type: choice
+    q: Почему признак «не заказывал больше 60 дней» помогает логистической регрессии?
+    options: ["Он уменьшает пропуски", "Линейная модель не умеет сама находить пороги, а готовый признак даёт ей скачок риска явно", "Он нужен для OneHotEncoder", "Не помогает"]
+    answer: 1
+    explain: Деревья нашли бы порог сами.
+    section: features
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      proba = np.array([0.9, 0.2, 0.6, 0.4])
+      y = np.array([1, 0, 0, 1])
+      c = proba >= 0.5
+      print(int(c.sum()), int((c & (y == 1)).sum()))
+    answer: "2 1"
+    explain: Контактируем двоих, из них один — настоящий уходящий.
+    section: business
+  - type: choice
+    q: Какие колонки сырой таблицы churn нельзя давать модели?
+    options: ["city и loyalty", "customer_id и cancel_request", "avg_check", "tenure_months"]
+    answer: 1
+    explain: Идентификатор не признак, cancel_request — утечка.
+    section: why
+  - type: choice
+    q: Понижаем порог рассылки. Что растёт?
+    options: ["Только precision", "Число контактов и найденных уходящих, затраты тоже", "Ничего", "Только ROC-AUC"]
+    answer: 1
+    explain: ROC-AUC от порога не зависит.
+    section: business
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      d = pd.DataFrame({"a": [1, 2]})
+      def f(x):
+          x = x.copy()
+          x["b"] = x["a"] * 2
+          return x
+      print(list(f(d).columns), list(d.columns))
+    answer: "['a', 'b'] ['a']"
+    explain: Исходная таблица не изменилась благодаря copy.
+    section: features
+  - type: choice
+    q: Две модели — ROC-AUC 0.840 и 0.834. Что разумно сделать?
+    options: ["Взять первую без раздумий", "Проверить разброс по фолдам: разница может быть в пределах шума, тогда выбрать более простую", "Взять вторую", "Объединить"]
+    answer: 1
+    explain: Простая модель дешевле в поддержке и объяснении.
+    section: model

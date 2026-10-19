@@ -1,0 +1,23 @@
+id: P6-02-monthly-count
+type: dataframe
+title: Заказы по месяцам
+difficulty: 1
+lesson_section: resample
+statement: |
+  Запиши в `result` таблицу с колонками `month` (дата первого дня месяца) и `n_orders` — число всех заказов за каждый месяц, по возрастанию месяца.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv", parse_dates=["order_date"])
+reference: |
+  result = orders.resample("MS", on="order_date").size().rename_axis("month").reset_index(name="n_orders")
+ordered: true
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = orders.resample('ME', on='order_date').size().rename_axis('month').reset_index(name='n_orders')"
+    expect_detector: column_values
+hints:
+  - "Правила периодов — раздел «resample»."
+  - "Сверни заказы по месяцам с подписью первым днём, посчитай размер групп и преврати результат в таблицу с нужными именами колонок."
+  - "orders.resample(\"MS\", on=\"order_date\").size(), rename_axis(\"month\"), reset_index(name=\"n_orders\")."
+  - "result = orders.resample(___, on=\"order_date\").size().rename_axis(___).reset_index(name=\"n_orders\")"
+  - "MS подписывает месяц первым днём, ME — последним: числа те же, а даты в колонке month другие. rename_axis задаёт имя индекса, которое после reset_index станет именем колонки."

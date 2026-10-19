@@ -1,0 +1,86 @@
+quiz:
+  - type: choice
+    q: Какой тип у значения, которое возвращает input()?
+    options: ["int", "str", "float", "Зависит от того, что ввели"]
+    answer: 1
+    explain: input() всегда возвращает строку, даже если ввели цифры. Число получают через int() или float().
+    section: input
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      a = "4"
+      b = "2"
+      print(a + b)
+    answer: "42"
+    explain: Строки не складываются как числа, а склеиваются. "4" + "2" = "42".
+    section: types
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      print(23 // 5, 23 % 5)
+    answer: "4 3"
+    explain: 23 = 5 * 4 + 3. // даёт целую часть деления, % — остаток.
+    section: arithmetic
+  - type: fill
+    q: Впиши пропуск, чтобы программа вывела последнюю цифру числа n.
+    code: |
+      n = 9047
+      print(n ___)
+    answer: ["% 10", "%10"]
+    expect: "7"
+    explain: Остаток от деления на 10 — последняя цифра числа.
+    section: arithmetic
+  - type: choice
+    q: В строке ввода два числа через пробел, например "7 3". Как их правильно прочитать?
+    options: ["a, b = int(input())", "a, b = map(int, input().split())", "a = int(input()); b = int(input())", "a, b = input()"]
+    answer: 1
+    explain: split() делит строку по пробелам на части, map(int, ...) переводит каждую часть в число.
+    section: input
+
+express:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      x = 10
+      x = x * 2
+      x -= 5
+      print(x)
+    answer: "15"
+    explain: 10 * 2 = 20, затем 20 - 5 = 15.
+    section: variables
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      print(1, 2, 3, sep="")
+    answer: "123"
+    explain: sep="" убирает разделитель между значениями.
+    section: print
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      n = 3725
+      print(n // 3600, n % 3600 // 60)
+    answer: "1 2"
+    explain: 3725 // 3600 = 1 час, остаток 125 секунд, 125 // 60 = 2 минуты.
+    section: arithmetic
+  - type: choice
+    q: Что выведет print(7 / 7)?
+    options: ["1", "1.0", "0", "Ошибку"]
+    answer: 1
+    explain: Оператор / всегда возвращает float, даже при делении нацело.
+    section: arithmetic
+  - type: fill
+    q: Впиши пропуск, чтобы программа вывела 3.14.
+    code: |
+      pi = 3.14159
+      print(f"{pi:___}")
+    answer: [".2f"]
+    expect: "3.14"
+    explain: Формат .2f в f-строке оставляет 2 знака после запятой.
+    section: print
+  - type: choice
+    q: Что произойдёт при print("5" + 5)?
+    options: ["Выведет 10", "Выведет 55", "Ошибка TypeError", "Выведет 5 5"]
+    answer: 2
+    explain: Строку и число нельзя сложить — будет TypeError. Нужно привести типы через int() или str().
+    section: types

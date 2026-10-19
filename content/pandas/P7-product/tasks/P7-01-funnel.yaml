@@ -1,0 +1,27 @@
+id: P7-01-funnel
+type: dataframe
+title: Воронка покупки
+difficulty: 1
+lesson_section: funnel
+sql_quest_ref: COUNT(DISTINCT) по шагам
+statement: |
+  Запиши в `result` воронку: таблицу с колонками `event` и `users` — число уникальных пользователей на шагах `view`, `add_to_cart`, `checkout`, `purchase` именно в этом порядке.
+setup: |
+  import pandas as pd
+  events = pd.read_csv("events.csv")
+reference: |
+  steps = ["view", "add_to_cart", "checkout", "purchase"]
+  result = events.groupby("event")["user_id"].nunique().reindex(steps).rename_axis("event").reset_index(name="users")
+ordered: true
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "steps = ['view', 'add_to_cart', 'checkout', 'purchase']\nresult = events.groupby('event')['user_id'].count().reindex(steps).rename_axis('event').reset_index(name='users')"
+    expect_detector: column_values
+  - code: "result = events.groupby('event')['user_id'].nunique().rename_axis('event').reset_index(name='users')"
+    expect_detector: row_order
+hints:
+  - "Воронка — раздел «Воронка»."
+  - "Посчитай уникальных пользователей на каждом событии и расставь шаги в порядке воронки через reindex. Потом преврати Series в таблицу."
+  - "events.groupby(\"event\")[\"user_id\"].nunique().reindex(steps), reset_index(name=\"users\")."
+  - "steps = [\"view\", \"add_to_cart\", \"checkout\", \"purchase\"]\nresult = events.groupby(\"event\")[\"user_id\"].___().reindex(___).rename_axis(\"event\").reset_index(name=\"users\")"
+  - "count считает события: просмотров на порядок больше, чем людей. Без reindex шаги встанут по алфавиту — add_to_cart, checkout, purchase, view — и воронка перестанет читаться."

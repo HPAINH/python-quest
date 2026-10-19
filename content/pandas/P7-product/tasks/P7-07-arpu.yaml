@@ -1,0 +1,35 @@
+id: P7-07-arpu
+type: value
+title: ARPU и ARPPU
+difficulty: 2
+lesson_section: arpu
+statement: |
+  Посчитай три метрики за всё время и округли через `round`:
+  - `arpu` — выручка покупок, делённая на всех пользователей из `users.csv` (2 знака);
+  - `arppu` — выручка, делённая на число платящих пользователей (2 знака);
+  - `payer_share` — доля платящих среди всех пользователей (4 знака).
+setup: |
+  import pandas as pd
+  users = pd.read_csv("users.csv")
+  events = pd.read_csv("events.csv")
+outputs:
+  - var: arpu
+  - var: arppu
+  - var: payer_share
+reference: |
+  buys = events[events["event"] == "purchase"]
+  revenue = buys["revenue"].sum()
+  payers = buys["user_id"].nunique()
+  n = users["user_id"].nunique()
+  arpu = round(revenue / n, 2)
+  arppu = round(revenue / payers, 2)
+  payer_share = round(payers / n, 4)
+star3: [first_try, "max_lines:8"]
+buggy_variants:
+  - code: "buys = events[events['event'] == 'purchase']\nrevenue = buys['revenue'].sum()\npayers = len(buys)\nn = users['user_id'].nunique()\narpu = round(revenue / n, 2)\narppu = round(revenue / payers, 2)\npayer_share = round(payers / n, 4)"
+hints:
+  - "Определения — раздел «ARPU и ARPPU»."
+  - "Выручка — сумма revenue у событий purchase. Платящие — уникальные user_id среди покупок. Все пользователи — из users.csv."
+  - "buys[\"revenue\"].sum(), buys[\"user_id\"].nunique(), users[\"user_id\"].nunique()."
+  - "buys = events[events[\"event\"] == \"purchase\"]\nrevenue = buys[\"revenue\"].sum()\npayers = buys[\"user_id\"].___()\nn = users[\"user_id\"].nunique()\narpu = round(revenue / ___, 2)\narppu = round(revenue / ___, 2)\npayer_share = round(payers / n, 4)"
+  - "len(buys) — число покупок, а не покупателей: кто купил дважды, посчитается дважды. В events есть только пользователи с сессиями, а в users — все зарегистрированные; для ARPU берут всех."

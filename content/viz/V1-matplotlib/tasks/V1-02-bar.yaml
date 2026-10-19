@@ -1,0 +1,33 @@
+id: V1-02-bar
+type: plot
+title: Каналы продаж
+difficulty: 1
+lesson_section: bar
+statement: |
+  Построй столбчатую диаграмму выручки всех заказов по каналам (`channel`). Столбцы — по убыванию выручки слева направо. Нужны заголовок и подписи осей.
+setup: |
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  orders = pd.read_csv("orders.csv")
+plot:
+  labels: true
+  ordered: true
+reference: |
+  s = orders.groupby("channel")["amount"].sum().sort_values(ascending=False)
+  fig, ax = plt.subplots()
+  ax.bar(s.index, s.values)
+  ax.set_title("Выручка по каналам")
+  ax.set_xlabel("Канал")
+  ax.set_ylabel("₽")
+star3: [first_try]
+buggy_variants:
+  - code: "s = orders.groupby('channel')['amount'].sum()\nfig, ax = plt.subplots()\nax.bar(s.index, s.values)\nax.set_title('Выручка')\nax.set_xlabel('Канал')\nax.set_ylabel('₽')"
+    expect_detector: plot_order
+  - code: "s = orders.groupby('channel')['amount'].mean().sort_values(ascending=False)\nfig, ax = plt.subplots()\nax.bar(s.index, s.values)\nax.set_title('Выручка')\nax.set_xlabel('Канал')\nax.set_ylabel('₽')"
+    expect_detector: plot_data
+hints:
+  - "Столбцы и их порядок — раздел «Столбцы»."
+  - "Сгруппируй по каналу, сложи суммы, отсортируй по убыванию и нарисуй ax.bar по индексу и значениям."
+  - "orders.groupby(\"channel\")[\"amount\"].sum().sort_values(ascending=False), ax.bar(s.index, s.values)."
+  - "s = orders.groupby(\"channel\")[\"amount\"].sum().sort_values(ascending=___)\nfig, ax = plt.subplots()\nax.___(s.index, s.values)\nax.set_title(\"...\")\nax.set_xlabel(\"...\")\nax.set_ylabel(\"...\")"
+  - "Без сортировки столбцы встанут по алфавиту каналов. s.plot(kind=\"bar\", ax=ax) даёт тот же график. mean вместо sum отвечает на другой вопрос — средний чек канала."

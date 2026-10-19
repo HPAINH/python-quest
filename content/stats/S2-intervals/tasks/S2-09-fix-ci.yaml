@@ -1,0 +1,29 @@
+id: S2-09-fix-ci
+type: fix_bug
+base: value
+title: Исправь интервал в отчёте
+difficulty: 1
+lesson_section: mistakes
+statement: |
+  В отчёте 95% интервал для среднего времени на сайте (`time_on_site`) всех участников `exp_banner` получился шириной в десятки минут. Найди ошибку. В `ci` — пара границ по нормальному приближению с 1.96.
+setup: |
+  import numpy as np
+  import pandas as pd
+  m = pd.read_csv("ab_metrics.csv")
+outputs:
+  - var: ci
+    tol: 0.001
+starter: |
+  x = m.loc[m["experiment"] == "exp_banner", "time_on_site"]
+  ci = (x.mean() - 1.96 * x.std(), x.mean() + 1.96 * x.std())
+reference: |
+  x = m.loc[m["experiment"] == "exp_banner", "time_on_site"]
+  se = x.std() / np.sqrt(len(x))
+  ci = (x.mean() - 1.96 * se, x.mean() + 1.96 * se)
+star3: [first_try, "max_lines:3"]
+hints:
+  - "Типичная ошибка интервала — раздел «Частые ошибки»."
+  - "Интервал для среднего строится по стандартной ошибке, а в коде — стандартное отклонение отдельных значений."
+  - "se = x.std() / np.sqrt(len(x))."
+  - "x = m.loc[m[\"experiment\"] == \"exp_banner\", \"time_on_site\"]\nse = x.std() / np.sqrt(___)\nci = (x.mean() - 1.96 * ___, x.mean() + 1.96 * se)"
+  - "mean ± 1,96·std — диапазон, где лежит около 95% отдельных пользователей (и то только для нормальных данных). Интервал для среднего в √n раз уже: при 8 000 участников — почти в 90 раз."

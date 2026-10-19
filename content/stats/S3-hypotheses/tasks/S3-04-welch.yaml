@@ -1,0 +1,33 @@
+id: S3-04-welch
+type: stat
+title: t-тест для выручки
+difficulty: 2
+lesson_section: ttest
+statement: |
+  Сравни среднюю выручку на участника (`revenue`, включая нули) групп B и A в `exp_checkout` t-тестом Уэлча (двусторонним). Запиши `p_value` (допуск ±0.0001) и `reject` при alpha = 0.05.
+setup: |
+  import pandas as pd
+  from scipy import stats
+  t = pd.read_csv("ab_metrics.csv").merge(pd.read_csv("ab_assignments.csv"), on=["user_id", "experiment"])
+outputs:
+  - var: p_value
+    tol: 0.0001
+  - var: reject
+reference: |
+  c = t[t["experiment"] == "exp_checkout"]
+  ra = c.loc[c["group"] == "A", "revenue"]
+  rb = c.loc[c["group"] == "B", "revenue"]
+  p_value = stats.ttest_ind(rb, ra, equal_var=False).pvalue
+  reject = bool(p_value < 0.05)
+star3: [first_try, "max_lines:5"]
+buggy_variants:
+  - code: "c = t[(t['experiment'] == 'exp_checkout') & (t['converted'] == 1)]\nra = c.loc[c['group'] == 'A', 'revenue']\nrb = c.loc[c['group'] == 'B', 'revenue']\np_value = stats.ttest_ind(rb, ra, equal_var=False).pvalue\nreject = bool(p_value < 0.05)"
+    expect_detector: stat_value
+  - code: "c = t[t['experiment'] == 'exp_checkout']\nra = c.loc[c['group'] == 'A', 'revenue']\nrb = c.loc[c['group'] == 'B', 'revenue']\np_value = stats.ttest_ind(rb, ra, equal_var=False, alternative='greater').pvalue\nreject = bool(p_value < 0.05)"
+    expect_detector: stat_sided
+hints:
+  - "t-тест Уэлча — раздел «t-тест»."
+  - "Возьми выручку всех участников каждой группы, включая нулевую, и передай в ttest_ind с equal_var=False."
+  - "stats.ttest_ind(rb, ra, equal_var=False).pvalue."
+  - "c = t[t[\"experiment\"] == \"exp_checkout\"]\nra = c.loc[c[\"group\"] == \"A\", \"revenue\"]\nrb = c.loc[c[\"group\"] == \"B\", \"revenue\"]\np_value = stats.ttest_ind(rb, ra, equal_var=___).pvalue\nreject = bool(p_value < 0.05)"
+  - "Выручка на участника включает тех, кто не купил: это главная метрика теста. Выручка только покупателей — другой вопрос («больше ли чек у купивших») с другим ответом."

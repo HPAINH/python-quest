@@ -1,0 +1,29 @@
+id: S1-08-zscore
+type: stat
+title: Подозрительные доставки
+difficulty: 2
+lesson_section: zscore
+statement: |
+  Для **доставленных** заказов посчитай z-оценки `amount` внутри каждого канала (среднее и выборочное std своего канала). Запиши в `n_extreme` число заказов с |z| > 3 (целое) и в `max_z` — наибольшую z-оценку (допуск ±0.001).
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+outputs:
+  - var: n_extreme
+  - var: max_z
+    tol: 0.001
+reference: |
+  d = orders[orders["status"] == "delivered"]
+  g = d.groupby("channel")["amount"]
+  z = (d["amount"] - g.transform("mean")) / g.transform("std")
+  n_extreme = int((z.abs() > 3).sum())
+  max_z = z.max()
+star3: [first_try, "max_lines:5"]
+buggy_variants:
+  - code: "d = orders[orders['status'] == 'delivered']\nz = (d['amount'] - d['amount'].mean()) / d['amount'].std()\nn_extreme = int((z.abs() > 3).sum())\nmax_z = z.max()"
+hints:
+  - "z-оценка — раздел «Стандартизация и выбросы»; transform — уровень P4."
+  - "Для каждой строки нужно среднее и std её канала — это transform после groupby. Потом формула z и маска |z| > 3."
+  - "g = d.groupby(\"channel\")[\"amount\"], (d[\"amount\"] - g.transform(\"mean\")) / g.transform(\"std\")."
+  - "d = orders[orders[\"status\"] == \"delivered\"]\ng = d.groupby(\"channel\")[\"amount\"]\nz = (d[\"amount\"] - g.transform(___)) / g.transform(___)\nn_extreme = int((z.___() > 3).sum())\nmax_z = z.max()"
+  - "Офлайн-чеки в среднем меньше, поэтому заказ, обычный для приложения, может быть экстремальным для кассы. Стандартизация внутри группы сравнивает заказ с его каналом, а не со всем магазином."

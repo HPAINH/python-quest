@@ -1,0 +1,92 @@
+quiz:
+  - type: choice
+    q: Среднее заметно больше медианы. Что это говорит о распределении?
+    options: ["Оно симметричное", "Есть длинный правый хвост: немного очень больших значений", "Есть пропуски", "Данные отсортированы"]
+    answer: 1
+    explain: Крупные значения тянут среднее вверх, а медиану почти не двигают.
+    section: hist
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      counts, edges = np.histogram([1, 2, 2, 3, 9], bins=4)
+      print(counts.tolist(), edges.tolist())
+    answer: "[3, 1, 0, 1] [1.0, 3.0, 5.0, 7.0, 9.0]"
+    explain: Диапазон 1–9 делится на 4 корзины шириной 2. В первую [1, 3) попадают 1, 2, 2, во вторую — 3; последняя корзина включает правую границу 9.
+    section: hist
+  - type: choice
+    q: Что показывают края ящика в boxplot?
+    options: ["Минимум и максимум", "Первый и третий квартили", "Среднее ± стандартное отклонение", "Доверительный интервал"]
+    answer: 1
+    explain: Внутри ящика — средние 50% значений.
+    section: box
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      a = pd.Series([1, 2, 3, 4])
+      print(a.corr(a * 10), a.corr(-a))
+    answer: "1.0 -1.0"
+    explain: Линейная зависимость даёт корреляцию ±1 независимо от масштаба.
+    section: corr
+  - type: choice
+    q: Чем sns.countplot отличается от sns.barplot?
+    options: ["Ничем", "countplot считает строки в каждой категории, barplot рисует среднее значения по категории", "barplot только горизонтальный", "countplot строит гистограмму"]
+    answer: 1
+    explain: barplot по умолчанию усредняет и добавляет доверительный интервал.
+    section: seaborn
+
+express:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      s = pd.Series([1, 2, 3, 4, 100])
+      print(s.median(), s.mean())
+    answer: "3.0 22.0"
+    explain: Один выброс сдвинул среднее, медиана не изменилась.
+    section: hist
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      s = pd.Series([1, 2, 3, 4, 5, 6, 7, 8])
+      q1, q3 = s.quantile(0.25), s.quantile(0.75)
+      print(q1, q3, q3 - q1)
+    answer: "2.75 6.25 3.5"
+    explain: Межквартильный размах — разность третьего и первого квартилей.
+    section: box
+  - type: choice
+    q: Почему у гистограммы задают bins явно?
+    options: ["Без него будет ошибка", "Число корзин меняет картину, а значения по умолчанию у библиотек разные", "Чтобы был заголовок", "bins задаёт цвет"]
+    answer: 1
+    explain: matplotlib по умолчанию берёт 10 корзин, seaborn подбирает число сам.
+    section: mistakes
+  - type: choice
+    q: Корреляция цены и продаж равна −0,6. Какой вывод верен?
+    options: ["Цена вызывает падение продаж", "Дорогие товары в среднем продаются меньше; о причине корреляция не говорит", "Связи нет", "Продажи падают на 60%"]
+    answer: 1
+    explain: Корреляция — мера совместного изменения, а не причинности.
+    section: scatter
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      df = pd.DataFrame({"k": ["a", "b", "a"], "v": [1, 2, 3]})
+      t = df.groupby("k", as_index=False)["v"].sum()
+      print(list(t.columns))
+    answer: "['k', 'v']"
+    explain: as_index=False оставляет ключ колонкой — так таблицу можно передать в seaborn.
+    section: mistakes
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import matplotlib.pyplot as plt
+      import seaborn as sns
+      import pandas as pd
+      df = pd.DataFrame({"c": ["x", "y", "x", "x"]})
+      ax = sns.countplot(data=df, x="c", order=["x", "y"])
+      print([int(p.get_height()) for p in ax.patches], ax.get_xlabel())
+    answer: "[3, 1] c"
+    explain: countplot считает строки и подписывает ось именем колонки.
+    section: seaborn

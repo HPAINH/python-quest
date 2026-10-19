@@ -1,0 +1,37 @@
+id: M1-02-onehot
+type: dataframe
+title: Кодирование категорий
+difficulty: 1
+lesson_section: encoding
+statement: 'Закодируй колонки `city` и `loyalty` из `X` через `OneHotEncoder(handle_unknown="ignore")`. Запиши в `result` таблицу из закодированных колонок с именами из `get_feature_names_out()` — по строке на клиента, в исходном порядке.
+
+  '
+setup: "import numpy as np\nimport pandas as pd\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import OneHotEncoder, StandardScaler\nfrom sklearn.impute import SimpleImputer\nfrom sklearn.compose import ColumnTransformer\nfrom sklearn.pipeline import make_pipeline, Pipeline\nfrom sklearn.linear_model import LogisticRegression\ndf = pd.read_csv(\"churn.csv\")\nX = df.drop(columns=[\"customer_id\", \"cancel_request\", \"churned\"])\ny = df[\"churned\"]\nif SHUFFLE:\n    y = y.sample(frac=1, random_state=1).reset_index(drop=True)\n"
+ordered: true
+reference: 'enc = OneHotEncoder(handle_unknown="ignore")
+
+  codes = enc.fit_transform(X[["city", "loyalty"]]).toarray()
+
+  result = pd.DataFrame(codes, columns=enc.get_feature_names_out())
+
+  '
+star3:
+- first_try
+- max_lines:3
+buggy_variants:
+- code: 'enc = OneHotEncoder(handle_unknown=''ignore'')
+
+    codes = enc.fit_transform(X[[''city'']]).toarray()
+
+    result = pd.DataFrame(codes, columns=enc.get_feature_names_out())'
+  expect_detector: columns_mismatch
+hints:
+- OneHotEncoder — раздел «Кодирование категорий».
+- 'Обучи кодировщик на двух колонках и преобразуй их. Результат — разреженная матрица: toarray() делает её обычным массивом. Имена колонок даёт get_feature_names_out.'
+- enc.fit_transform(X[["city", "loyalty"]]).toarray(), pd.DataFrame(codes, columns=enc.get_feature_names_out()).
+- 'enc = OneHotEncoder(handle_unknown="ignore")
+
+  codes = enc.fit_transform(X[[___, ___]]).toarray()
+
+  result = pd.DataFrame(codes, columns=enc.___())'
+- Каждое значение становится колонкой вида city_Москва с 0 и 1. В скрытых данных городов больше, поэтому и колонок больше — проверка это учитывает.

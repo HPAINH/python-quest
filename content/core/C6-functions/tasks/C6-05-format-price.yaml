@@ -1,0 +1,31 @@
+id: C6-05-format-price
+type: function
+function: format_price
+title: Формат цены
+difficulty: 2
+lesson_section: params
+statement: |
+  Напиши функцию `format_price(amount, *, currency="₽", decimals=2)`, которая возвращает строку с ценой: разряды разделены пробелом, после числа — пробел и валюта.
+
+  `currency` и `decimals` передаются только по имени.
+
+  Примеры: `format_price(1290.5)` → `"1 290.50 ₽"`, `format_price(1000000, currency="$", decimals=0)` → `"1 000 000 $"`.
+starter: |
+  def format_price(amount, *, currency="₽", decimals=2):
+      pass
+reference: |
+  def format_price(amount, *, currency="₽", decimals=2):
+      return f"{amount:,.{decimals}f}".replace(",", " ") + " " + currency
+tests:
+  visible: ["format_price(1290.5)", "format_price(1000000, currency='$', decimals=0)"]
+  hidden: ["format_price(0)", "format_price(999.999)", "format_price(12.3456, decimals=3)", "format_price(-1500, currency='€')"]
+random: {count: 20, gen: "f'format_price({random.randint(0, 10**7) / 100}, decimals={random.randint(0, 3)})'"}
+star3: [first_try, "uses:fstring"]
+buggy_variants:
+  - code: "def format_price(amount, currency='₽', decimals=2):\n    return f'{amount:.{decimals}f} {currency}'"
+hints:
+  - "Параметры после * передаются только по имени — раздел «Параметры и аргументы», а формат числа — f-строки из C0."
+  - "Отформатируй число с нужным количеством знаков и разделителем разрядов, замени запятые на пробелы и допиши валюту."
+  - "Формат f\"{amount:,.{decimals}f}\" ставит запятые между разрядами; .replace(\",\", \" \") меняет их на пробелы."
+  - "def format_price(amount, *, currency=\"₽\", decimals=2):\n    text = f\"{amount:,.{___}f}\"\n    return text.replace(___, \" \") + \" \" + ___"
+  - "В формате ,.2f запятая включает разделитель тысяч, .2f — два знака после точки. Число знаков можно подставить внутрь формата: {amount:,.{decimals}f}. Звёздочка в def делает currency и decimals именованными: format_price(5, '$') вызовет ошибку, и это защищает от путаницы аргументов."

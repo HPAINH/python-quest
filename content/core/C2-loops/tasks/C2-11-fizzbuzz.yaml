@@ -1,0 +1,34 @@
+id: C2-11-fizzbuzz
+type: stdio
+title: FizzBuzz
+difficulty: 2
+lesson_section: for-range
+statement: |
+  Дано `n`. Для каждого числа от 1 до `n` выведи на отдельной строке:
+  - `FizzBuzz`, если число делится и на 3, и на 5;
+  - `Fizz`, если только на 3;
+  - `Buzz`, если только на 5;
+  - само число в остальных случаях.
+reference: |
+  n = int(input())
+  for i in range(1, n + 1):
+      if i % 15 == 0:
+          print("FizzBuzz")
+      elif i % 3 == 0:
+          print("Fizz")
+      elif i % 5 == 0:
+          print("Buzz")
+      else:
+          print(i)
+tests:
+  visible: ["15", "4"]
+  hidden: ["1", "30", "100"]
+star3: [first_try]
+buggy_variants:
+  - code: "n = int(input())\nfor i in range(1, n + 1):\n    if i % 3 == 0:\n        print('Fizz')\n    elif i % 5 == 0:\n        print('Buzz')\n    elif i % 15 == 0:\n        print('FizzBuzz')\n    else:\n        print(i)"
+hints:
+  - "Цикл по числам и цепочка elif внутри — разделы «for и range» и «Цепочка elif» из C1."
+  - "Для каждого числа проверь сначала самое строгое условие: делимость и на 3, и на 5."
+  - "i % 15 == 0 (или i % 3 == 0 and i % 5 == 0), потом i % 3, потом i % 5."
+  - "n = int(input())\nfor i in range(1, n + 1):\n    if i % ___ == 0:\n        print(\"FizzBuzz\")\n    elif i % 3 == 0:\n        print(___)\n    elif ___:\n        print(\"Buzz\")\n    else:\n        print(i)"
+  - "Если начать с проверки на 3, то 15 напечатается как Fizz — до FizzBuzz дело не дойдёт. Число делится и на 3, и на 5 ровно тогда, когда делится на 15."

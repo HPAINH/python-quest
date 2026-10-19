@@ -1,0 +1,92 @@
+quiz:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      s = pd.Series([2, 4, 4, 5, 100])
+      print(s.mean(), s.median(), s.mode().tolist())
+    answer: "23.0 4.0 [4]"
+    explain: Выброс 100 тянет среднее, медиана и мода его не замечают.
+    section: center
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      import pandas as pd
+      x = [1, 2, 3, 4]
+      print(round(np.std(x), 3), round(pd.Series(x).std(), 3))
+    answer: "1.118 1.291"
+    explain: NumPy делит на n, pandas — на n − 1.
+    section: spread
+  - type: choice
+    q: Асимметрия суммы заказа равна 2,4. Что это значит?
+    options: ["Распределение симметрично", "Длинный правый хвост — немного очень крупных заказов", "Длинный левый хвост", "Данные нормальные"]
+    answer: 1
+    explain: Положительная асимметрия — хвост вправо.
+    section: shape
+  - type: fill
+    q: Впиши метод, чтобы получить 97,5-й процентиль стандартного нормального распределения.
+    code: |
+      from scipy import stats
+      print(round(stats.norm.___(0.975), 2))
+    answer: ["ppf"]
+    expect: "1.96"
+    explain: ppf — обратная функция к cdf.
+    section: distributions
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      s = pd.Series([10, 20, 30])
+      print(((s - s.mean()) / s.std()).tolist())
+    answer: "[-1.0, 0.0, 1.0]"
+    explain: Среднее 20, выборочное std 10.
+    section: zscore
+
+express:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      from scipy import stats
+      print(round(stats.binom.cdf(1, n=3, p=0.5), 3), round(stats.binom.sf(1, n=3, p=0.5), 3))
+    answer: "0.5 0.5"
+    explain: P(X ≤ 1) = 1/8 + 3/8, P(X > 1) = 3/8 + 1/8.
+    section: distributions
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      s = pd.Series([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+      q1, q3 = s.quantile([0.25, 0.75])
+      print(q1, q3, q3 + 1.5 * (q3 - q1))
+    answer: "3.25 7.75 14.5"
+    explain: Значения больше 14,5 считались бы выбросами по правилу IQR.
+    section: zscore
+  - type: choice
+    q: Какой вызов даёт P(X ≥ 3) для биномиальной величины?
+    options: ["stats.binom.sf(3, n, p)", "stats.binom.sf(2, n, p)", "stats.binom.cdf(3, n, p)", "1 - stats.binom.pmf(3, n, p)"]
+    answer: 1
+    explain: sf(k) — это P(X > k), для целых P(X ≥ 3) = P(X > 2).
+    section: mistakes
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      from scipy import stats
+      print(round(stats.poisson.pmf(2, mu=2), 4), round(stats.poisson.cdf(0, mu=2), 4))
+    answer: "0.2707 0.1353"
+    explain: e^−2 · 2²/2! и e^−2.
+    section: distributions
+  - type: choice
+    q: Чем медиана лучше среднего для описания типичного чека?
+    options: ["Медиана всегда больше", "Медиана устойчива к выбросам и длинному хвосту", "Среднее нельзя посчитать", "Ничем"]
+    answer: 1
+    explain: Несколько очень крупных заказов почти не двигают медиану.
+    section: center
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      from scipy import stats
+      print(round(stats.norm.cdf(110, loc=100, scale=10) - stats.norm.cdf(90, loc=100, scale=10), 4))
+    answer: "0.6827"
+    explain: В пределах одного стандартного отклонения — около 68% значений.
+    section: distributions

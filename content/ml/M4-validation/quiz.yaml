@@ -1,0 +1,89 @@
+quiz:
+  - type: choice
+    q: Зачем кросс-валидация, если есть train_test_split?
+    options: ["Она быстрее", "Несколько оценок на разных частях надёжнее одной случайной", "Она не требует данных", "Она увеличивает метрику"]
+    answer: 1
+    explain: Разброс по фолдам показывает, насколько оценке можно верить.
+    section: cv
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      from sklearn.model_selection import KFold
+      cv = KFold(3)
+      print([len(test) for _, test in cv.split(list(range(10)))])
+    answer: "[4, 3, 3]"
+    explain: Первые фолды получают на одну строку больше.
+    section: kfold
+  - type: fill
+    q: Впиши имя параметра C логистической регрессии внутри make_pipeline.
+    code: |
+      from sklearn.pipeline import make_pipeline
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LogisticRegression
+      p = make_pipeline(StandardScaler(), LogisticRegression())
+      print("___" in p.get_params())
+    answer: ["logisticregression__C"]
+    expect: "True"
+    explain: Имя шага и параметра через два подчёркивания.
+    section: grid
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      from sklearn.model_selection import TimeSeriesSplit
+      for tr, te in TimeSeriesSplit(3).split(list(range(8))):
+          print(tr.max(), te.min(), end=" ")
+    answer: "1 2 3 4 5 6"
+    explain: Обучение всегда заканчивается до начала проверки.
+    section: timesplit
+  - type: choice
+    q: Один признак сам по себе даёт ROC-AUC 0.95, а вся модель — 0.96. Что проверить первым?
+    options: ["Ничего, это хороший признак", "Не утечка ли он — известен ли он в момент прогноза", "Увеличить число деревьев", "Убрать остальные признаки"]
+    answer: 1
+    explain: Слишком хороший признак — частый признак утечки.
+    section: leaks
+
+express:
+  - type: choice
+    q: Почему подбирать гиперпараметры по тестовой выборке нельзя?
+    options: ["Так медленнее", "Тест перестаёт быть независимым, и итоговая оценка завышена", "sklearn запрещает", "Можно"]
+    answer: 1
+    explain: Для подбора — кросс-валидация на train, тест — один раз в конце.
+    section: mistakes
+  - type: choice
+    q: Что делает GridSearchCV после перебора сетки (refit=True)?
+    options: ["Ничего", "Переобучает лучшую модель на всех переданных данных", "Удаляет худшие модели", "Считает тест"]
+    answer: 1
+    explain: Поэтому объект поиска можно сразу использовать как модель.
+    section: grid
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      s = np.array([-3.0, -5.0, -4.0])
+      print(-s.mean())
+    answer: "4.0"
+    explain: neg_mean_absolute_error возвращает ошибки со знаком минус.
+    section: timesplit
+  - type: choice
+    q: Почему KFold с перемешиванием даёт оптимистичную оценку на временном ряду?
+    options: ["Он стратифицирует", "Модель учится на будущих днях и проверяется на прошлых", "Он использует меньше данных", "Это не так"]
+    answer: 1
+    explain: В работе будущего не будет — только прошлое.
+    section: timesplit
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      from sklearn.model_selection import StratifiedKFold
+      y = np.array([0] * 8 + [1] * 4)
+      cv = StratifiedKFold(4)
+      print([int(y[te].sum()) for _, te in cv.split(y, y)])
+    answer: "[1, 1, 1, 1]"
+    explain: В каждом фолде одна единица — доля класса сохранена.
+    section: kfold
+  - type: choice
+    q: Почему Pipeline важен внутри cross_val_score?
+    options: ["Без него не работает scoring", "Подготовка обучается заново на каждом фолде и не видит его тестовую часть", "Он ускоряет обучение", "Не важен"]
+    answer: 1
+    explain: Иначе scaler, обученный на всех данных, подсмотрит в тестовые фолды.
+    section: cv

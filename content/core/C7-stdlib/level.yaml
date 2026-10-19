@@ -1,0 +1,5 @@
+code: C7
+title: Исключения и стандартная библиотека
+intro: Обрабатываем ошибки в грязных данных, читаем файлы и пользуемся collections, datetime, itertools и math.
+minutes: 30
+expected_tasks: 12

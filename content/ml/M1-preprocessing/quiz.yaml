@@ -1,0 +1,92 @@
+quiz:
+  - type: choice
+    q: Зачем stratify=y в train_test_split?
+    options: ["Чтобы ускорить разбиение", "Чтобы доля классов в train и test была как во всех данных", "Чтобы перемешать колонки", "Чтобы не было пропусков"]
+    answer: 1
+    explain: При редком классе без стратификации в тест может попасть заметно другая доля.
+    section: split
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      from sklearn.preprocessing import OneHotEncoder
+      enc = OneHotEncoder(handle_unknown="ignore").fit(pd.DataFrame({"c": ["a", "b"]}))
+      print(enc.transform(pd.DataFrame({"c": ["b", "z"]})).toarray().tolist())
+    answer: "[[0.0, 1.0], [0.0, 0.0]]"
+    explain: Незнакомое значение z кодируется нулями.
+    section: encoding
+  - type: choice
+    q: На каких данных учат StandardScaler?
+    options: ["На всех данных", "Только на train, а применяют и к train, и к test", "Только на test", "Отдельно на train и на test"]
+    answer: 1
+    explain: Параметры масштабирования — тоже часть модели.
+    section: scaling
+  - type: fill
+    q: Впиши функцию, которая соединит подготовку и модель в один объект.
+    code: |
+      from sklearn.pipeline import make_pipeline
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LogisticRegression
+      m = ___(StandardScaler(), LogisticRegression())
+      print(len(m.steps))
+    answer: ["make_pipeline"]
+    expect: "2"
+    explain: make_pipeline сам придумывает имена шагов.
+    section: pipeline
+  - type: choice
+    q: Почему cancel_request — утечка?
+    options: ["В нём есть пропуски", "Он заполняется после ухода клиента и недоступен в момент прогноза", "Он текстовый", "Он не коррелирует с оттоком"]
+    answer: 1
+    explain: Признаки из будущего делают модель бесполезной на живых данных.
+    section: leaks
+
+express:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      from sklearn.preprocessing import StandardScaler
+      sc = StandardScaler().fit(np.array([[1.0], [3.0]]))
+      print(sc.mean_.tolist(), sc.scale_.tolist(), sc.transform([[5.0]]).tolist())
+    answer: "[2.0] [1.0] [[3.0]]"
+    explain: (5 − 2) / 1 = 3. scale_ — стандартное отклонение с ddof=0.
+    section: scaling
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      from sklearn.model_selection import train_test_split
+      X = np.arange(20).reshape(10, 2)
+      a, b = train_test_split(X, test_size=0.3, random_state=0)
+      print(a.shape, b.shape)
+    answer: "(7, 2) (3, 2)"
+    explain: 30% от 10 строк — 3.
+    section: split
+  - type: choice
+    q: Что делает ColumnTransformer?
+    options: ["Переименовывает колонки", "Применяет разные преобразования к разным колонкам и склеивает результат", "Удаляет пропуски", "Обучает модель"]
+    answer: 1
+    explain: Числа — масштабирование, категории — кодирование.
+    section: pipeline
+  - type: choice
+    q: Scaler обучили на всех данных, потом разбили на train и test. Что не так?
+    options: ["Ничего", "Тест повлиял на параметры масштабирования — оценка модели завышена", "Модель не обучится", "Пропадут категории"]
+    answer: 1
+    explain: "Это утечка: сначала разбиение, потом fit только на train."
+    section: leaks
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      from sklearn.impute import SimpleImputer
+      x = np.array([[1.0], [np.nan], [5.0], [6.0]])
+      print(SimpleImputer(strategy="median").fit_transform(x).ravel().tolist())
+    answer: "[1.0, 5.0, 5.0, 6.0]"
+    explain: Медиана из 1, 5, 6 — 5.
+    section: pipeline
+  - type: choice
+    q: Почему customer_id не включают в признаки?
+    options: ["Он слишком большой", "Номер клиента не описывает поведение, модель выучит случайные закономерности", "sklearn не принимает id", "Это категория"]
+    answer: 1
+    explain: Идентификаторы — не признаки.
+    section: split

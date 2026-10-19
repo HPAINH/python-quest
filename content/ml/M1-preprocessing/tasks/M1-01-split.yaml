@@ -1,0 +1,48 @@
+id: M1-01-split
+type: stat
+title: Честное разбиение
+difficulty: 1
+lesson_section: split
+statement: 'Раздели `X` и `y` на обучение и тест: 25% в тест, со стратификацией по `y`, `random_state=42`. Запиши `n_train` и `n_test` — число строк в частях, а `rate_train` и `rate_test` — долю ушедших клиентов в каждой части (допуск ±0.0001).
+
+  '
+setup: "import numpy as np\nimport pandas as pd\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import OneHotEncoder, StandardScaler\nfrom sklearn.impute import SimpleImputer\nfrom sklearn.compose import ColumnTransformer\nfrom sklearn.pipeline import make_pipeline, Pipeline\nfrom sklearn.linear_model import LogisticRegression\ndf = pd.read_csv(\"churn.csv\")\nX = df.drop(columns=[\"customer_id\", \"cancel_request\", \"churned\"])\ny = df[\"churned\"]\nif SHUFFLE:\n    y = y.sample(frac=1, random_state=1).reset_index(drop=True)\n"
+outputs:
+- var: n_train
+- var: n_test
+- var: rate_train
+  tol: 0.0001
+- var: rate_test
+  tol: 0.0001
+reference: 'X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, stratify=y, random_state=42)
+
+  n_train, n_test = len(X_train), len(X_test)
+
+  rate_train, rate_test = y_train.mean(), y_test.mean()
+
+  '
+star3:
+- first_try
+- max_lines:3
+buggy_variants:
+- code: 'X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
+
+    n_train, n_test = len(X_train), len(X_test)
+
+    rate_train, rate_test = y_train.mean(), y_test.mean()'
+  expect_detector: stat_value
+- code: 'X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+
+    n_train, n_test = len(X_train), len(X_test)
+
+    rate_train, rate_test = y_train.mean(), y_test.mean()'
+hints:
+- Разбиение и стратификация — раздел «train_test_split».
+- 'train_test_split возвращает четыре части: X_train, X_test, y_train, y_test. Доля ушедших — среднее y в части.'
+- train_test_split(X, y, test_size=0.25, stratify=y, random_state=42), y_train.mean().
+- 'X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=___, stratify=___, random_state=42)
+
+  n_train, n_test = len(X_train), len(X_test)
+
+  rate_train, rate_test = y_train.mean(), y_test.mean()'
+- 'Без stratify доли классов в частях немного расходятся — на редком классе это заметно. Порядок возвращаемых частей запоминается так: сначала все X, потом все y.'

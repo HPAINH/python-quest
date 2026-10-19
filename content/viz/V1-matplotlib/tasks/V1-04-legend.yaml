@@ -1,0 +1,35 @@
+id: V1-04-legend
+type: plot
+title: Две линии и легенда
+difficulty: 2
+lesson_section: labels
+statement: |
+  На одном графике построй две линии — месячную выручку всех заказов каналов `app` и `web` (`resample("MS")`). У каждой линии должна быть подпись в легенде. Нужны заголовок и подписи осей.
+setup: |
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  orders = pd.read_csv("orders.csv", parse_dates=["order_date"])
+plot:
+  labels: true
+  legend: true
+reference: |
+  fig, ax = plt.subplots()
+  for ch in ["app", "web"]:
+      m = orders[orders["channel"] == ch].resample("MS", on="order_date")["amount"].sum()
+      ax.plot(m.index, m.values, label=ch)
+  ax.set_title("Выручка по каналам")
+  ax.set_xlabel("Месяц")
+  ax.set_ylabel("₽")
+  ax.legend()
+star3: [first_try, "max_lines:8"]
+buggy_variants:
+  - code: "fig, ax = plt.subplots()\nfor ch in ['app', 'web']:\n    m = orders[orders['channel'] == ch].resample('MS', on='order_date')['amount'].sum()\n    ax.plot(m.index, m.values)\nax.set_title('Выручка')\nax.set_xlabel('Месяц')\nax.set_ylabel('₽')"
+    expect_detector: plot_legend
+  - code: "m = orders[orders['channel'].isin(['app', 'web'])].resample('MS', on='order_date')['amount'].sum()\nfig, ax = plt.subplots()\nax.plot(m.index, m.values, label='app + web')\nax.set_title('Выручка')\nax.set_xlabel('Месяц')\nax.set_ylabel('₽')\nax.legend()"
+    expect_detector: plot_series
+hints:
+  - "Несколько линий и легенда — раздел «Подписи и легенда»."
+  - "В цикле по двум каналам отфильтруй заказы, сверни по месяцам и нарисуй линию с label. После цикла вызови ax.legend()."
+  - "ax.plot(m.index, m.values, label=ch), ax.legend()."
+  - "fig, ax = plt.subplots()\nfor ch in [\"app\", \"web\"]:\n    m = orders[orders[\"channel\"] == ch].resample(\"MS\", on=\"order_date\")[\"amount\"].sum()\n    ax.plot(m.index, m.values, label=___)\nax.set_title(\"...\")\nax.set_xlabel(\"...\")\nax.set_ylabel(\"...\")\nax.___()"
+  - "Без label легенде нечего показать, и график с двумя одинаковыми линиями не читается. Через pivot_table по месяцу и каналу с последующим .plot(ax=ax) легенда появится автоматически."

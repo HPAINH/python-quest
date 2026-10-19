@@ -1,0 +1,23 @@
+id: P2-07-query
+type: dataframe
+title: Офлайн-покупки через query
+difficulty: 1
+lesson_section: query
+statement: |
+  С помощью `query` выбери заказы из канала `offline` с суммой не меньше `limit` и запиши их в `result`. Переменная `limit` задана в подготовке.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+  limit = float(orders.loc[orders["channel"] == "offline", "amount"].sort_values().iloc[-40])
+reference: |
+  result = orders.query("channel == 'offline' and amount >= @limit")
+requires: ["uses:query"]
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = orders.query(\"channel == 'offline' and amount > @limit\")"
+hints:
+  - "Условие строкой — метод query, раздел «query»."
+  - "Внутри строки пиши условие как в SQL. Внешнюю переменную limit подставь через @."
+  - "orders.query(\"channel == 'offline' and amount >= @limit\")."
+  - "result = orders.query(\"channel == ___ and amount >= ___\")"
+  - "Внутри query строковые значения пишут в других кавычках, чем саму строку условия. Без @ pandas будет искать колонку limit. Граница «не меньше» — это >=."

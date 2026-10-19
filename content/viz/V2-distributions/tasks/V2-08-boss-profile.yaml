@@ -1,0 +1,47 @@
+id: V2-08-boss-profile
+type: plot
+title: "Босс: профиль заказов"
+difficulty: 3
+boss: true
+lesson_section: why
+statement: |
+  Собери фигуру из трёх графиков в одну строку по **доставленным** заказам:
+
+  1. гистограмма `amount` на 30 корзин;
+  2. ящики с усами `amount` по каналам (`app`, `offline`, `web`);
+  3. точечный график: по X — число позиций заказа в `order_items`, по Y — `amount`.
+
+  У каждого графика нужен заголовок.
+setup: |
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  import seaborn as sns
+  orders = pd.read_csv("orders.csv")
+  items = pd.read_csv("order_items.csv")
+plot:
+  labels: true
+  hist: true
+reference: |
+  d = orders[orders["status"] == "delivered"]
+  pos = items.groupby("order_id").size().rename("positions")
+  t = d.set_index("order_id").join(pos, how="inner")
+  fig, axes = plt.subplots(1, 3, figsize=(14, 4))
+  axes[0].hist(d["amount"], bins=30)
+  axes[0].set_title("Сумма заказа")
+  sns.boxplot(data=d, x="channel", y="amount", order=["app", "offline", "web"], ax=axes[1])
+  axes[1].set_title("По каналам")
+  axes[2].scatter(t["positions"], t["amount"], s=8)
+  axes[2].set_title("Позиции и сумма")
+  fig.tight_layout()
+star3: [first_try]
+buggy_variants:
+  - code: "d = orders[orders['status'] == 'delivered']\npos = items.groupby('order_id').size().rename('positions')\nt = d.set_index('order_id').join(pos, how='inner')\nfig, axes = plt.subplots(1, 3)\naxes[0].hist(d['amount'], bins=30)\naxes[0].set_title('Сумма')\nsns.boxplot(data=d, x='channel', y='amount', ax=axes[1])\naxes[1].set_title('Каналы')\naxes[2].scatter(t['amount'], t['positions'])\naxes[2].set_title('Позиции')"
+    expect_detector: plot_xy_swap
+  - code: "d = orders[orders['status'] == 'delivered']\npos = items.groupby('order_id').size().rename('positions')\nt = d.set_index('order_id').join(pos, how='inner')\nfig, axes = plt.subplots(1, 3)\naxes[0].hist(d['amount'])\naxes[0].set_title('Сумма')\nsns.boxplot(data=d, x='channel', y='amount', ax=axes[1])\naxes[1].set_title('Каналы')\naxes[2].scatter(t['positions'], t['amount'])\naxes[2].set_title('Позиции')"
+    expect_detector: plot_bins
+hints:
+  - "Всё из уровня: гистограмма с bins, boxplot по группам, scatter и сетка из трёх осей."
+  - "Создай три оси через plt.subplots(1, 3) и рисуй каждый график на своей оси через ax= или методы осей. Для scatter посчитай число позиций на заказ и присоедини к доставленным заказам."
+  - "axes[0].hist(d[\"amount\"], bins=30), sns.boxplot(data=d, x=\"channel\", y=\"amount\", ax=axes[1]), items.groupby(\"order_id\").size(), axes[2].scatter(...)."
+  - "d = orders[orders[\"status\"] == \"delivered\"]\npos = items.groupby(\"order_id\").size().rename(\"positions\")\nt = d.set_index(\"order_id\").join(pos, how=\"inner\")\nfig, axes = plt.subplots(1, ___, figsize=(14, 4))\naxes[0].hist(d[\"amount\"], bins=___)\naxes[0].set_title(\"...\")\nsns.boxplot(data=d, x=\"channel\", y=\"amount\", order=[\"app\", \"offline\", \"web\"], ax=axes[___])\naxes[1].set_title(\"...\")\naxes[2].scatter(t[\"positions\"], t[___], s=8)\naxes[2].set_title(\"...\")"
+  - "Три графика отвечают на три вопроса: какой обычно чек, отличаются ли каналы и растёт ли чек с числом позиций. Если забыть ax= у seaborn, он нарисует на последних активных осях — то есть поверх третьего графика."

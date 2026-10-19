@@ -1,0 +1,30 @@
+id: C2-06-digits
+type: stdio
+title: Количество цифр
+difficulty: 2
+lesson_section: while
+statement: |
+  Дано неотрицательное целое число. Выведи количество цифр в нём. У числа 0 одна цифра.
+
+  Используй цикл `while` и деление, без перевода в строку.
+reference: |
+  n = int(input())
+  count = 1
+  while n >= 10:
+      n //= 10
+      count += 1
+  print(count)
+requires: ["uses:while", "no_call:str", "no_call:len"]
+tests:
+  visible: ["4721", "0"]
+  hidden: ["9", "10", "99", "100", "1000000"]
+random: {count: 20, gen: "str(random.randint(0, 10**random.randint(1, 15)))"}
+star3: [first_try]
+buggy_variants:
+  - code: "n = int(input())\ncount = 0\nwhile n > 0:\n    n //= 10\n    count += 1\nprint(count)"
+hints:
+  - "Пример с подсчётом цифр есть в разделе «Цикл while»."
+  - "Отрезай последнюю цифру делением на 10, пока число не станет однозначным, и считай шаги. Не забудь про 0."
+  - "while n >= 10, n //= 10, счётчик count."
+  - "n = int(input())\ncount = ___\nwhile n >= ___:\n    n //= 10\n    count += 1\nprint(count)"
+  - "Счётчик начинается с 1: у любого числа есть хотя бы одна цифра. Пока число двузначное или больше, отрезаем цифру и прибавляем 1. Для 0 цикл не выполняется — ответ 1. Вариант с while n > 0 и счётчиком 0 даёт для нуля 0 — это ошибка."

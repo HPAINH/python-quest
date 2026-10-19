@@ -1,0 +1,53 @@
+id: C8-09-account
+type: function
+function: Account
+title: Счёт с историей
+difficulty: 3
+lesson_section: methods
+statement: |
+  Напиши класс `Account(owner, limit=0)` — счёт клиента с возможным кредитным лимитом:
+  - `balance` — текущий баланс, сначала 0;
+  - `deposit(amount)` и `withdraw(amount)` возвращают новый баланс. Сумма должна быть больше нуля, иначе `ValueError`. Снять можно, только если баланс не опустится ниже `-limit`, иначе `ValueError`, а баланс не меняется;
+  - `history()` возвращает список успешных операций в виде пар `("+", сумма)` и `("-", сумма)`.
+starter: |
+  class Account:
+      def __init__(self, owner, limit=0):
+          self.owner = owner
+reference: |
+  class Account:
+      def __init__(self, owner, limit=0):
+          self.owner = owner
+          self.limit = limit
+          self.balance = 0
+          self._log = []
+
+      def deposit(self, amount):
+          if amount <= 0:
+              raise ValueError("сумма должна быть больше нуля")
+          self.balance += amount
+          self._log.append(("+", amount))
+          return self.balance
+
+      def withdraw(self, amount):
+          if amount <= 0:
+              raise ValueError("сумма должна быть больше нуля")
+          if self.balance - amount < -self.limit:
+              raise ValueError("недостаточно средств")
+          self.balance -= amount
+          self._log.append(("-", amount))
+          return self.balance
+
+      def history(self):
+          return list(self._log)
+tests:
+  visible: ["a = Account('Аня')\na.deposit(1000)\na.withdraw(300)\n(a.balance, a.history())", "a = Account('Борис')\nraises(lambda: a.withdraw(1))"]
+  hidden: ["a = Account('В', limit=500)\na.withdraw(500)\n(a.balance, raises(lambda: a.withdraw(1)), a.balance)", "a = Account('Г')\n[raises(lambda: a.deposit(0)), raises(lambda: a.deposit(-5)), a.history()]", "a = Account('Д')\na.deposit(100)\nraises(lambda: a.withdraw(101))\n(a.balance, a.history())", "a = Account('Е')\nh = a.history()\nh.append('x')\na.history()"]
+star3: [first_try]
+buggy_variants:
+  - code: "class Account:\n    def __init__(self, owner, limit=0):\n        self.owner = owner\n        self.limit = limit\n        self.balance = 0\n        self._log = []\n    def deposit(self, amount):\n        self.balance += amount\n        self._log.append(('+', amount))\n        return self.balance\n    def withdraw(self, amount):\n        self.balance -= amount\n        if self.balance < -self.limit:\n            raise ValueError('мало денег')\n        self._log.append(('-', amount))\n        return self.balance\n    def history(self):\n        return self._log"
+hints:
+  - "Методы меняют атрибуты объекта, а ошибки выбрасываются через raise — разделы «Методы» и «raise» из C7."
+  - "В __init__ заведи limit, balance = 0 и пустой список операций. В deposit и withdraw сначала проверь сумму, в withdraw — ещё и лимит, и только потом меняй баланс и пиши в историю. history возвращает копию списка, чтобы снаружи его нельзя было испортить."
+  - "self.balance = 0, self._log = [], raise ValueError, if self.balance - amount < -self.limit, return list(self._log)."
+  - "    def withdraw(self, amount):\n        if amount <= 0:\n            raise ValueError(\"сумма\")\n        if self.balance - amount < ___:\n            raise ValueError(\"недостаточно средств\")\n        self.balance -= amount\n        self._log.append((___, amount))\n        return self.balance\n\n    def history(self):\n        return ___(self._log)"
+  - "Порядок важен: сначала проверить, потом менять. Если сначала вычесть, а потом выбросить ошибку, баланс останется испорченным. Копия list(self._log) защищает внутренний список: изменение полученного списка не трогает историю счёта."

@@ -1,0 +1,29 @@
+id: C1-10-max-three
+type: stdio
+title: Наибольшее из трёх
+difficulty: 2
+lesson_section: logic
+statement: |
+  В одной строке даны три целых числа. Выведи наибольшее, не используя `max` и `sorted`.
+reference: |
+  a, b, c = map(int, input().split())
+  if a >= b and a >= c:
+      print(a)
+  elif b >= c:
+      print(b)
+  else:
+      print(c)
+requires: ["no_call:max", "no_call:sorted"]
+tests:
+  visible: ["1 5 3", "9 2 9"]
+  hidden: ["3 3 3", "-1 -5 -2", "0 0 7", "7 0 0", "0 7 0"]
+random: {count: 30, gen: "' '.join(str(random.randint(-20, 20)) for _ in range(3))"}
+star3: [first_try]
+buggy_variants:
+  - code: "a, b, c = map(int, input().split())\nif a > b and a > c:\n    print(a)\nelif b > a and b > c:\n    print(b)\nelse:\n    print(c)"
+hints:
+  - "Нужно сравнить каждое число с остальными — раздел «and, or, not»."
+  - "Если a не меньше b и не меньше c — это ответ. Иначе максимум среди b и c."
+  - "Условия a >= b and a >= c, затем b >= c."
+  - "a, b, c = map(int, input().split())\nif a >= b ___ a >= c:\n    print(a)\nelif b >= ___:\n    print(b)\nelse:\n    print(___)"
+  - "Важны нестрогие сравнения >=. Со строгими > для «9 2 9» ни a, ни b не прошли бы проверку, и сработал бы else — здесь это случайно верно, но для «9 9 2» строгая версия вывела бы 2."

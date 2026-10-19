@@ -1,0 +1,91 @@
+quiz:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      s, n = 20, 100
+      print(s / np.sqrt(n), s / np.sqrt(4 * n))
+    answer: "2.0 1.0"
+    explain: Чтобы вдвое уменьшить стандартную ошибку, нужно вчетверо больше данных.
+    section: se
+  - type: choice
+    q: Что описывает 95% доверительный интервал для среднего чека?
+    options: ["Где лежат 95% чеков", "Диапазон, который при многократном повторении в 95% случаев накрывает настоящее среднее", "Минимум и максимум чеков", "Вероятность покупки"]
+    answer: 1
+    explain: Интервал — про оценку среднего, а не про отдельные значения.
+    section: ci-mean
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      p, n = 0.2, 400
+      se = np.sqrt(p * (1 - p) / n)
+      print(round(se, 3), round(p - 1.96 * se, 3), round(p + 1.96 * se, 3))
+    answer: "0.02 0.161 0.239"
+    explain: √(0.2 · 0.8 / 400) = 0.02.
+    section: ci-prop
+  - type: fill
+    q: Впиши аргумент, чтобы bootstrap-выборка бралась с возвращением.
+    code: |
+      import numpy as np
+      rng = np.random.default_rng(0)
+      x = rng.choice([1, 2, 3], size=10, ___=True)
+      print(len(x))
+    answer: ["replace"]
+    expect: "10"
+    explain: Без возвращения нельзя взять 10 значений из трёх.
+    section: bootstrap
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import math
+      print(math.ceil((2 * 50 / 10) ** 2), int((2 * 45 / 10) ** 2))
+    answer: "100 81"
+    explain: Размер выборки округляют вверх — int отбрасывает дробную часть.
+    section: sample-size
+
+express:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      from scipy import stats
+      print(round(stats.t.ppf(0.975, df=4), 3), round(stats.t.ppf(0.975, df=1000), 3))
+    answer: "2.776 1.962"
+    explain: На маленьких выборках t заметно больше 1,96.
+    section: ci-mean
+  - type: choice
+    q: Интервал по 100 заказам — [2 600; 3 400]. Что будет с шириной по 400 заказам при том же разбросе?
+    options: ["Не изменится", "Станет примерно вдвое уже", "Станет вчетверо уже", "Станет шире"]
+    answer: 1
+    explain: Ширина ∝ 1/√n, а √4 = 2.
+    section: se
+  - type: choice
+    q: Чем bootstrap полезен по сравнению с формулами?
+    options: ["Он точнее формул всегда", "Даёт интервал для любой метрики — медианы, перцентиля, разницы — без готовой формулы", "Не требует данных", "Работает без случайности"]
+    answer: 1
+    explain: Для медианы простой формулы интервала нет.
+    section: bootstrap
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      boot = np.arange(1, 1001)
+      print(np.percentile(boot, [2.5, 97.5]).round(3).tolist())
+    answer: "[25.975, 975.025]"
+    explain: Перцентили с линейной интерполяцией.
+    section: bootstrap
+  - type: choice
+    q: Почему интервал mean ± 1,96·std — ошибка?
+    options: ["Нужно 2,58", "Это диапазон для отдельных значений; для среднего нужна стандартная ошибка std/√n", "std нельзя умножать", "Это верно"]
+    answer: 1
+    explain: Такой «интервал» в √n раз шире настоящего.
+    section: mistakes
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import math
+      z = 1.96
+      print(math.ceil(z ** 2 * 0.5 * 0.5 / 0.05 ** 2))
+    answer: "385"
+    explain: Классика опросов — 385 человек для погрешности ±5 п. п.
+    section: sample-size

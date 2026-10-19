@@ -1,0 +1,34 @@
+id: D4-03-dropout
+type: function
+function: dropout
+title: Inverted dropout
+difficulty: 2
+lesson_section: dropout
+statement: 'Напиши функцию `dropout(A, p, seed)`: маска `mask = np.random.default_rng(seed).random(A.shape) >= p` (оставляем нейрон, если случайное число не меньше `p`), выход — `A · mask / (1 − p)`. Верни кортеж `(out, mask)`.
+
+  '
+setup: "import numpy as np\n\ndef rnd(*shape, seed=0):\n    return np.random.default_rng(seed).normal(size=shape).round(3)\n"
+starter: "def dropout(A, p, seed):\n    pass\n"
+reference: "def dropout(A, p, seed):\n    mask = np.random.default_rng(seed).random(A.shape) >= p\n    return A * mask / (1 - p), mask\n"
+tests:
+  visible:
+  - dropout(np.ones((2, 4)), 0.5, 0)
+  hidden:
+  - dropout(rnd(3, 3, seed=1), 0.2, 2)
+  - dropout(rnd(5, seed=3), 0.0, 4)
+  - dropout(rnd(2, 6, seed=5), 0.9, 6)
+random:
+  count: 15
+  gen: '(lambda s: f''dropout(rnd({random.randint(1, 5)}, {random.randint(1, 5)}, seed={s}), {random.choice([0.1, 0.25, 0.5, 0.8])}, {s + 1})'')(random.randint(0, 999))'
+star3:
+- first_try
+- max_lines:3
+buggy_variants:
+- code: "def dropout(A, p, seed):\n    mask = np.random.default_rng(seed).random(A.shape) >= p\n    return A * mask, mask"
+- code: "def dropout(A, p, seed):\n    mask = np.random.default_rng(seed).random(A.shape) < p\n    return A * mask / (1 - p), mask"
+hints:
+- Dropout — раздел «Dropout».
+- Сгенерируй случайные числа формы A, сравни с p, умножь A на маску и подели на долю оставшихся.
+- mask = np.random.default_rng(seed).random(A.shape) >= p; A * mask / (1 - p).
+- "def dropout(A, p, seed):\n    mask = np.random.default_rng(seed).random(___) >= p\n    return A * mask / ___, mask"
+- 'Маску возвращают, потому что на обратном проходе градиент через выключенные нейроны тоже должен быть нулём: dA = dOut · mask / (1 − p).'

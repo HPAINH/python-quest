@@ -1,0 +1,24 @@
+id: N1-01-vat
+type: array
+title: Цены с НДС
+difficulty: 1
+lesson_section: arrays
+statement: |
+  В переменной `prices` — список цен без НДС (обычный список Python). Преврати его в массив NumPy и запиши в `result` цены с НДС 20%, то есть умноженные на 1.2.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  prices = [int(x) for x in rng.integers(100, 5000, size=int(rng.integers(5, 12)))]
+reference: |
+  result = np.array(prices) * 1.2
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = prices * 1.2"
+  - code: "result = [p * 1.2 for p in prices]"
+    expect_detector: result_type
+hints:
+  - "Массив создаётся из списка через np.array, а арифметика с массивом — поэлементная. Раздел «Массив»."
+  - "Сделай из списка массив и умножь его на 1.2 целиком, без цикла."
+  - "np.array(prices) * 1.2."
+  - "result = np.___(prices) * ___"
+  - "Список нельзя умножить на дробное число — будет TypeError. Генератор списка посчитает верные числа, но вернёт список, а нужен массив: проверка смотрит и на тип результата."

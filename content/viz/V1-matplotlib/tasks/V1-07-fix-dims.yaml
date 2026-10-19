@@ -1,0 +1,29 @@
+id: V1-07-fix-dims
+type: fix_bug
+base: value
+title: Исправь график доставленных
+difficulty: 1
+lesson_section: mistakes
+statement: |
+  Нужен точечный график: по X — `amount`, по Y — `delivery_cost` для доставленных заказов. Код падает — исправь его.
+setup: |
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  orders = pd.read_csv("orders.csv")
+plot:
+  labels: false
+starter: |
+  delivered = orders[orders["status"] == "delivered"]
+  fig, ax = plt.subplots()
+  ax.scatter(orders["amount"], delivered["delivery_cost"])
+reference: |
+  delivered = orders[orders["status"] == "delivered"]
+  fig, ax = plt.subplots()
+  ax.scatter(delivered["amount"], delivered["delivery_cost"])
+star3: [first_try]
+hints:
+  - "Типичная ошибка — раздел «Частые ошибки»."
+  - "X взят из всей таблицы, а Y — из отфильтрованной, поэтому длины разные. Обе колонки нужно брать из одной таблицы."
+  - "ax.scatter(delivered[\"amount\"], delivered[\"delivery_cost\"])."
+  - "ax.scatter(___[\"amount\"], delivered[\"delivery_cost\"])"
+  - "matplotlib сопоставляет X и Y по позициям, поэтому их длины обязаны совпадать. Удобнее брать обе колонки из одной таблицы — так ошибиться невозможно."

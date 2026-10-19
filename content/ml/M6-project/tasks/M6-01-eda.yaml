@@ -1,0 +1,24 @@
+id: M6-01-eda
+type: dataframe
+title: Где уходят чаще
+difficulty: 1
+lesson_section: eda
+statement: 'Построй сводную таблицу доли ушедших клиентов: строки — `loyalty`, колонки — `app_user` (0 и 1), значения — среднее `churned`, округлённое до 3 знаков. Запиши в `result`.
+
+  '
+setup: "import numpy as np\nimport pandas as pd\nfrom sklearn import metrics\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import OneHotEncoder, StandardScaler\nfrom sklearn.impute import SimpleImputer\nfrom sklearn.compose import ColumnTransformer\nfrom sklearn.pipeline import make_pipeline, Pipeline\nfrom sklearn.linear_model import LogisticRegression, LinearRegression\nfrom sklearn.preprocessing import FunctionTransformer\nfrom sklearn.ensemble import HistGradientBoostingClassifier\ndf = pd.read_csv(\"churn.csv\")\nX = df.drop(columns=[\"customer_id\", \"cancel_request\", \"churned\"])\ny = df[\"churned\"]\nif SHUFFLE:\n    y = y.sample(frac=1, random_state=1).reset_index(drop=True)\nraw = df.drop(columns=[\"churned\"])\n"
+reference: 'result = df.pivot_table(index="loyalty", columns="app_user", values="churned", aggfunc="mean").round(3)
+
+  '
+star3:
+- first_try
+- max_lines:1
+buggy_variants:
+- code: result = df.pivot_table(index='loyalty', columns='app_user', values='churned', aggfunc='sum')
+  expect_detector: column_values
+hints:
+- Разведка данных — раздел «Разведка данных».
+- pivot_table с index, columns, values и aggfunc="mean" — доля ушедших в каждой ячейке.
+- df.pivot_table(index="loyalty", columns="app_user", values="churned", aggfunc="mean").round(3).
+- result = df.pivot_table(index=___, columns=___, values="churned", aggfunc=___).round(3)
+- Среднее метки 0/1 — доля. Сумма даёт число ушедших, которое зависит от размера группы и сравнивать группы по нему нельзя.

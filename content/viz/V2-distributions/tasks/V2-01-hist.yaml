@@ -1,0 +1,32 @@
+id: V2-01-hist
+type: plot
+title: Распределение суммы заказа
+difficulty: 1
+lesson_section: hist
+statement: |
+  Построй гистограмму `amount` **доставленных** заказов на 30 корзин. Добавь заголовок.
+setup: |
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  import seaborn as sns
+  orders = pd.read_csv("orders.csv")
+plot:
+  labels: true
+  hist: true
+reference: |
+  delivered = orders[orders["status"] == "delivered"]
+  fig, ax = plt.subplots()
+  ax.hist(delivered["amount"], bins=30)
+  ax.set_title("Сумма доставленного заказа")
+star3: [first_try]
+buggy_variants:
+  - code: "delivered = orders[orders['status'] == 'delivered']\nfig, ax = plt.subplots()\nax.hist(delivered['amount'])\nax.set_title('Сумма')"
+    expect_detector: plot_bins
+  - code: "fig, ax = plt.subplots()\nax.hist(orders['amount'], bins=30)\nax.set_title('Сумма')"
+    expect_detector: plot_data
+hints:
+  - "Гистограмма — раздел «Гистограмма»."
+  - "Отфильтруй доставленные заказы и нарисуй гистограмму их суммы, указав число корзин."
+  - "ax.hist(delivered[\"amount\"], bins=30) или sns.histplot(delivered[\"amount\"], bins=30, ax=ax)."
+  - "delivered = orders[orders[\"status\"] == \"delivered\"]\nfig, ax = plt.subplots()\nax.hist(delivered[\"amount\"], bins=___)\nax.set_title(\"...\")"
+  - "Без bins matplotlib возьмёт 10 корзин, и форма хвоста потеряется. Края корзин зависят от минимума и максимума данных, поэтому фильтр важен даже для формы."

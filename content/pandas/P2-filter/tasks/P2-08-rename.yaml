@@ -1,0 +1,23 @@
+id: P2-08-rename
+type: dataframe
+title: Таблица для отчёта
+difficulty: 1
+lesson_section: columns
+statement: |
+  Подготовь таблицу каталога для отчёта: оставь колонки `product_id`, `name`, `price`, переименуй их в `id`, `товар` и `цена` и добавь колонку `цена_с_ндс` — цена × 1.2, округлённая до 2 знаков. Запиши в `result`.
+setup: |
+  import pandas as pd
+  products = pd.read_csv("products.csv")
+reference: |
+  t = products[["product_id", "name", "price"]].rename(columns={"product_id": "id", "name": "товар", "price": "цена"})
+  result = t.assign(цена_с_ндс=(t["цена"] * 1.2).round(2))
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "t = products[['product_id', 'name', 'price']]\nt.rename(columns={'product_id': 'id', 'name': 'товар', 'price': 'цена'})\nresult = t.assign(цена_с_ндс=(t['price'] * 1.2).round(2))"
+    expect_detector: columns_mismatch
+hints:
+  - "Переименование и новые колонки — раздел «Колонки»."
+  - "Выбери три колонки, переименуй их словарём через rename и присвой результат. Потом добавь колонку через assign или присваиванием."
+  - "products[[...]].rename(columns={...}), t.assign(цена_с_ндс=(t[\"цена\"] * 1.2).round(2))."
+  - "t = products[[\"product_id\", \"name\", \"price\"]].rename(columns={\"product_id\": \"id\", \"name\": ___, \"price\": ___})\nresult = t.assign(цена_с_ндс=(t[\"цена\"] * ___).round(2))"
+  - "rename возвращает новую таблицу и не меняет старую, поэтому результат нужно присвоить. Имена колонок могут быть и на русском: в assign они записываются как имена аргументов, поэтому без пробелов."

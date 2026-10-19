@@ -1,0 +1,34 @@
+id: V3-03-relation
+type: plot
+title: Длинная сессия — больше событий?
+difficulty: 2
+lesson_section: choose
+statement: |
+  Вопрос: «Связана ли длительность сессии с числом событий в ней?» Для каждой сессии посчитай число событий и построй подходящий график: по X — `duration_sec` из `sessions.csv`, по Y — число событий. Только сессии, у которых есть события. Подпиши обе оси.
+setup: |
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  import seaborn as sns
+  sessions = pd.read_csv("sessions.csv")
+  events = pd.read_csv("events.csv")
+plot:
+  labels: true
+reference: |
+  n = events.groupby("session_id").size().rename("n_events")
+  t = sessions.set_index("session_id").join(n, how="inner")
+  fig, ax = plt.subplots()
+  ax.scatter(t["duration_sec"], t["n_events"], s=6, alpha=0.4)
+  ax.set_xlabel("Длительность, с")
+  ax.set_ylabel("Событий")
+star3: [first_try]
+buggy_variants:
+  - code: "n = events.groupby('session_id').size().rename('n_events')\nt = sessions.set_index('session_id').join(n, how='inner')\nfig, ax = plt.subplots()\nax.scatter(t['n_events'], t['duration_sec'])\nax.set_xlabel('Событий')\nax.set_ylabel('Длительность')"
+    expect_detector: plot_xy_swap
+  - code: "n = events.groupby('session_id').size().rename('n_events')\nt = sessions.set_index('session_id').join(n, how='inner')\nfig, ax = plt.subplots()\nax.plot(t['duration_sec'], t['n_events'])\nax.set_xlabel('Длительность')\nax.set_ylabel('Событий')"
+    expect_detector: plot_kind
+hints:
+  - "Связь двух чисел — раздел «Вопрос → тип графика»."
+  - "Посчитай число событий на сессию, присоедини к сессиям и построй точечный график: каждая точка — сессия."
+  - "events.groupby(\"session_id\").size(), sessions.set_index(\"session_id\").join(n, how=\"inner\"), ax.scatter(...)."
+  - "n = events.groupby(\"session_id\").size().rename(\"n_events\")\nt = sessions.set_index(\"session_id\").join(n, how=___)\nfig, ax = plt.subplots()\nax.scatter(t[___], t[\"n_events\"], s=6, alpha=0.4)\nax.set_xlabel(\"...\")\nax.set_ylabel(\"...\")"
+  - "Линия соединила бы точки в порядке строк таблицы и превратилась бы в клубок. alpha делает видимой плотность точек: где их много, цвет гуще."

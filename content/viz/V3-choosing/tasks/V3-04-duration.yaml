@@ -1,0 +1,31 @@
+id: V3-04-duration
+type: plot
+title: Сколько длятся сессии
+difficulty: 1
+lesson_section: distribution
+statement: |
+  Вопрос: «Как распределена длительность сессий?» Построй подходящий график по длительности в **минутах** (`duration_sec / 60`) всех сессий на 40 корзин. Подпиши ось X.
+setup: |
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  import seaborn as sns
+  sessions = pd.read_csv("sessions.csv")
+plot:
+  labels: true
+  hist: true
+reference: |
+  fig, ax = plt.subplots()
+  ax.hist(sessions["duration_sec"] / 60, bins=40)
+  ax.set_xlabel("Минуты")
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "fig, ax = plt.subplots()\nax.hist(sessions['duration_sec'], bins=40)\nax.set_xlabel('Секунды')"
+    expect_detector: plot_data
+  - code: "fig, ax = plt.subplots()\nsns.boxplot(x=sessions['duration_sec'] / 60, ax=ax)\nax.set_xlabel('Минуты')"
+    expect_detector: plot_kind
+hints:
+  - "Распределение одной величины — раздел «Распределения»."
+  - "Переведи секунды в минуты делением на 60 и построй гистограмму на 40 корзин."
+  - "ax.hist(sessions[\"duration_sec\"] / 60, bins=40)."
+  - "fig, ax = plt.subplots()\nax.hist(sessions[\"duration_sec\"] / ___, bins=___)\nax.set_xlabel(\"...\")"
+  - "Высоты столбцов в секундах и минутах совпадают, а края корзин — нет, и проверка это видит. Ящик с усами покажет квартили, но не форму: пик и хвост видны только на гистограмме."

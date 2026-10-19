@@ -1,0 +1,34 @@
+id: D2-06-softmax-ce
+type: function
+function: softmax_ce
+title: Softmax и кросс-энтропия
+difficulty: 2
+lesson_section: loss-grads
+tol: 1.0e-09
+statement: 'Напиши функцию `softmax_ce(Z, y)`: `Z` — логиты формы (n, k), `y` — массив меток классов длины n. Верни кортеж `(loss, dZ)`: `loss` — средняя кросс-энтропия `−log P[i, y_i]`, где `P` — устойчивый softmax по строкам, `dZ` — градиент `loss` по `Z`.
+
+  '
+setup: "import numpy as np\n\ndef rnd(*shape, seed=0):\n    return np.random.default_rng(seed).normal(size=shape).round(3)\n\ndef labels(n, k, seed=0):\n    return np.random.default_rng(seed).integers(0, k, n)\n"
+starter: "def softmax_ce(Z, y):\n    pass\n"
+reference: "def softmax_ce(Z, y):\n    n = Z.shape[0]\n    e = np.exp(Z - Z.max(axis=1, keepdims=True))\n    P = e / e.sum(axis=1, keepdims=True)\n    loss = -np.log(P[np.arange(n), y]).mean()\n    Y = np.eye(Z.shape[1])[y]\n    return loss, (P - Y) / n\n"
+tests:
+  visible:
+  - softmax_ce(np.array([[2.0, 1.0, 0.1], [0.5, 2.5, 0.3]]), np.array([0, 1]))
+  hidden:
+  - softmax_ce(rnd(5, 3, seed=1), labels(5, 3, seed=2))
+  - softmax_ce(np.zeros((4, 2)), np.array([0, 1, 1, 0]))
+  - softmax_ce(rnd(3, 4, seed=3) + 800, labels(3, 4, seed=4))
+random:
+  count: 12
+  gen: '(lambda n, k, s: f''softmax_ce(rnd({n}, {k}, seed={s}) * 3, labels({n}, {k}, seed={s + 1}))'')(random.randint(1, 6), random.randint(2, 5), random.randint(0, 999))'
+star3:
+- first_try
+buggy_variants:
+- code: "def softmax_ce(Z, y):\n    n = Z.shape[0]\n    e = np.exp(Z - Z.max(axis=1, keepdims=True))\n    P = e / e.sum(axis=1, keepdims=True)\n    loss = -np.log(P[np.arange(n), y]).mean()\n    Y = np.eye(Z.shape[1])[y]\n    return loss, P - Y"
+- code: "def softmax_ce(Z, y):\n    n = Z.shape[0]\n    e = np.exp(Z)\n    P = e / e.sum(axis=1, keepdims=True)\n    loss = -np.log(P[np.arange(n), y]).mean()\n    Y = np.eye(Z.shape[1])[y]\n    return loss, (P - Y) / n"
+hints:
+- Кросс-энтропия и её градиент — раздел «Градиенты потерь».
+- Посчитай устойчивый softmax, выбери вероятность правильного класса в каждой строке через P[np.arange(n), y], усредни −log. Градиент — (P − one-hot) / n.
+- P[np.arange(n), y], np.eye(k)[y], (P - Y) / n.
+- "def softmax_ce(Z, y):\n    n = Z.shape[0]\n    e = np.exp(Z - Z.max(axis=1, keepdims=True))\n    P = e / e.sum(axis=1, keepdims=True)\n    loss = -np.log(P[np.arange(n), ___]).mean()\n    Y = np.eye(Z.shape[1])[___]\n    return loss, (P - Y) / ___"
+- Простота (P − Y) / n — причина, по которой softmax и кросс-энтропию всегда считают вместе. Логиты, умноженные на 400, без вычитания максимума дадут nan.

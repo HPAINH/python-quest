@@ -1,0 +1,29 @@
+id: S4-09-fix-power
+type: fix_bug
+base: value
+title: Исправь план теста
+difficulty: 1
+lesson_section: mistakes
+statement: |
+  Аналитик планирует тест: база 10%, цель — 12%, alpha = 0.05, мощность 0.8, равные группы. Его ответ на вопрос «сколько пользователей в **каждой** группе» вдвое завышен. Исправь код; в `result` — целое число.
+setup: |
+  import math
+  from statsmodels.stats.power import NormalIndPower
+  from statsmodels.stats.proportion import proportion_effectsize
+same_ok: true
+starter: |
+  h = proportion_effectsize(0.12, 0.10)
+  n = NormalIndPower().solve_power(effect_size=h, alpha=0.05, power=0.8, ratio=1)
+  result = 2 * math.ceil(n)
+reference: |
+  h = proportion_effectsize(0.12, 0.10)
+  n = NormalIndPower().solve_power(effect_size=h, alpha=0.05, power=0.8, ratio=1)
+  result = math.ceil(n)
+data: false
+star3: [first_try, "max_lines:3"]
+hints:
+  - "Типичная ошибка плана — раздел «Частые ошибки»."
+  - "Проверь, что именно возвращает solve_power: размер одной группы или всего теста."
+  - "solve_power возвращает nobs1 — размер первой группы."
+  - "result = math.ceil(___)"
+  - "При ratio=1 обе группы одного размера, и всего в тесте 2·n участников. Удвоенное число в ответе на вопрос «в каждой группе» заставит держать тест вдвое дольше нужного."

@@ -1,0 +1,23 @@
+id: N2-01-last-week
+type: array
+title: Последняя неделя
+difficulty: 1
+lesson_section: indexing
+statement: |
+  В `daily` — выручка магазина по дням, последний элемент — вчера. Запиши в `result` выручку за последние 7 дней в обратном порядке: от вчерашнего дня к более ранним.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  daily = rng.integers(10_000, 90_000, size=int(rng.integers(10, 40)))
+reference: |
+  result = daily[-7:][::-1]
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = daily[-7:]"
+  - code: "result = daily[:7][::-1]"
+hints:
+  - "Срезы с отрицательными индексами и шагом -1 — раздел «Индексы и срезы»."
+  - "Сначала возьми последние 7 элементов, потом разверни их."
+  - "daily[-7:] и срез [::-1]."
+  - "result = daily[___][::___]"
+  - "daily[-7:] — от седьмого с конца до последнего. [::-1] разворачивает. Можно и одним срезом: daily[:-8:-1]."

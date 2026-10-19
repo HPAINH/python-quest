@@ -1,0 +1,7 @@
+code: M4
+title: Валидация
+intro: Кросс-валидация, стратифицированные фолды, GridSearchCV, разбиение по времени и утечка цели.
+minutes: 35
+expected_tasks: 10
+packages: [numpy, pandas, scipy, scikit-learn]
+data: [churn, demand]

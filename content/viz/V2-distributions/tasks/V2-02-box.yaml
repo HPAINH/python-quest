@@ -1,0 +1,31 @@
+id: V2-02-box
+type: plot
+title: Чек по уровням лояльности
+difficulty: 2
+lesson_section: box
+statement: |
+  Построй ящики с усами для `amount` всех заказов по уровню лояльности клиента (`loyalty` из `customers`): три ящика — `bronze`, `silver`, `gold`.
+setup: |
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  import seaborn as sns
+  orders = pd.read_csv("orders.csv")
+  customers = pd.read_csv("customers.csv")
+plot:
+  labels: false
+reference: |
+  t = orders.merge(customers[["customer_id", "loyalty"]], on="customer_id")
+  fig, ax = plt.subplots()
+  sns.boxplot(data=t, x="loyalty", y="amount", order=["bronze", "silver", "gold"], ax=ax)
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "t = orders.merge(customers[['customer_id', 'loyalty']], on='customer_id')\nfig, ax = plt.subplots()\nsns.boxplot(data=t, x='loyalty', y='delivery_cost', ax=ax)"
+    expect_detector: plot_data
+  - code: "t = orders.merge(customers[['customer_id', 'loyalty']], on='customer_id')\nfig, ax = plt.subplots()\nax.hist(t['amount'], bins=30)"
+    expect_detector: plot_kind
+hints:
+  - "Ящики по группам — разделы «Ящик с усами» и «seaborn»."
+  - "Добавь к заказам уровень лояльности клиента через merge, затем sns.boxplot с x — группа, y — сумма."
+  - "orders.merge(customers[[\"customer_id\", \"loyalty\"]], on=\"customer_id\"), sns.boxplot(data=t, x=\"loyalty\", y=\"amount\", order=[...])."
+  - "t = orders.merge(customers[[\"customer_id\", ___]], on=\"customer_id\")\nfig, ax = plt.subplots()\nsns.boxplot(data=t, x=___, y=\"amount\", order=[\"bronze\", \"silver\", \"gold\"], ax=ax)"
+  - "Проверка сравнивает медианы, квартили, усы и выбросы — порядок ящиков на результат не влияет, но order делает график читаемым: уровни идут по возрастанию. Подойдёт и ax.boxplot со списком из трёх выборок."

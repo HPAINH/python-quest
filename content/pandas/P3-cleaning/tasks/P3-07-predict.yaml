@@ -1,0 +1,25 @@
+id: P3-07-predict
+type: predict
+title: Что останется после чистки
+difficulty: 2
+lesson_section: str
+statement: |
+  Впиши, что выведет программа.
+code: |
+  import pandas as pd
+  df = pd.DataFrame({
+      "city": [" Казань", "казань", None, "Самара ", "Казань"],
+      "year": ["1990", "н/д", "1985", "2001", "1990"],
+  })
+  city = df["city"].str.strip().str.title()
+  print(city.nunique(), city.isna().sum())
+  year = pd.to_numeric(df["year"], errors="coerce")
+  print(year.max(), int(year.isna().sum()))
+  print(df.duplicated().sum(), df.drop_duplicates(subset=["year"]).shape[0])
+  print(city.fillna("?").str.len().tolist())
+hints:
+  - "Повтори разделы «Строки: .str», «Типы» и «Дубликаты»."
+  - "После strip и title остаются «Казань» и «Самара». Пропуск так и остаётся пропуском. to_numeric с coerce даёт float."
+  - "Полных повторов строк в исходной таблице нет: « Казань» и «Казань» — разные строки. Разных значений year четыре: 1990, н/д, 1985, 2001."
+  - "Четыре строки: два числа, два числа, два числа, список длин."
+  - "Ответ: «2 1», «2001.0 1», «0 4», «[6, 6, 1, 6, 6]». Max по float-колонке печатается как 2001.0, «?» имеет длину 1."

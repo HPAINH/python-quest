@@ -1,0 +1,42 @@
+id: P6-10-boss-dau
+type: dataframe
+title: "Босс: активные пользователи"
+difficulty: 3
+boss: true
+lesson_section: rolling
+statement: |
+  Продуктовая команда смотрит на активность пользователей в `events.csv`. Активный пользователь за период — тот, у кого было хотя бы одно событие.
+
+  Создай три переменные:
+  1. `dau` — число активных пользователей по дням за всё время (Series, индекс — все дни подряд);
+  2. `dau7` — скользящее среднее `dau` за 7 дней, округлённое до 2 знаков, только за сентябрь 2026;
+  3. `best_week` — дата понедельника недели с наибольшим числом **уникальных** активных пользователей, строкой вида `2026-09-07`. Неделя — с понедельника по воскресенье.
+setup: |
+  import pandas as pd
+  events = pd.read_csv("events.csv", parse_dates=["event_time"])
+outputs:
+  - var: dau
+    title: активные по дням
+    ordered: true
+  - var: dau7
+    title: скользящее среднее за сентябрь
+    ordered: true
+  - var: best_week
+    title: лучшая неделя
+reference: |
+  dau = events.resample("D", on="event_time")["user_id"].nunique()
+  dau7 = dau.rolling(7).mean().round(2).loc["2026-09"]
+  week = events["event_time"].dt.to_period("W").dt.start_time
+  wau = events.groupby(week)["user_id"].nunique()
+  best_week = wau.idxmax().strftime("%Y-%m-%d")
+star3: [first_try]
+buggy_variants:
+  - code: "dau = events.resample('D', on='event_time')['user_id'].count()\ndau7 = dau.rolling(7).mean().round(2).loc['2026-09']\nweek = events['event_time'].dt.to_period('W').dt.start_time\nwau = events.groupby(week)['user_id'].nunique()\nbest_week = wau.idxmax().strftime('%Y-%m-%d')"
+    expect_detector: column_values
+  - code: "dau = events.resample('D', on='event_time')['user_id'].nunique()\ndau7 = dau.loc['2026-09'].rolling(7).mean().round(2)\nweek = events['event_time'].dt.to_period('W').dt.start_time\nwau = events.groupby(week)['user_id'].nunique()\nbest_week = wau.idxmax().strftime('%Y-%m-%d')"
+hints:
+  - "Всё из уровня: resample с nunique, rolling, срез по месяцу и неделя через to_period(\"W\")."
+  - "DAU — это nunique по user_id после resample по дням. Для лучшей недели нельзя складывать DAU: один человек, заходивший 5 дней, посчитается 5 раз. Сгруппируй события по началу недели и посчитай nunique заново."
+  - "events.resample(\"D\", on=\"event_time\")[\"user_id\"].nunique(), dau.rolling(7).mean(), events[\"event_time\"].dt.to_period(\"W\").dt.start_time, wau.idxmax().strftime(\"%Y-%m-%d\")."
+  - "dau = events.resample(\"D\", on=\"event_time\")[\"user_id\"].___()\ndau7 = dau.rolling(7).mean().round(2).loc[___]\nweek = events[\"event_time\"].dt.to_period(\"W\").dt.start_time\nwau = events.groupby(week)[\"user_id\"].nunique()\nbest_week = wau.___().strftime(\"%Y-%m-%d\")"
+  - "count считает события, а не людей. WAU не равен сумме DAU за неделю — это классическая ловушка продуктовых метрик. Период \"W\" в to_period по умолчанию заканчивается в воскресенье, а start_time даёт понедельник."

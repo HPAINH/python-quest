@@ -1,0 +1,26 @@
+id: C2-03-sum-even
+type: stdio
+title: Сумма чётных
+difficulty: 1
+lesson_section: accumulators
+statement: |
+  Дано натуральное число `n`. Выведи сумму всех чётных чисел от 1 до `n` включительно.
+reference: |
+  n = int(input())
+  total = 0
+  for i in range(2, n + 1, 2):
+      total += i
+  print(total)
+tests:
+  visible: ["10", "7"]
+  hidden: ["1", "2", "1000"]
+random: {count: 20, gen: "str(random.randint(1, 10000))"}
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "n = int(input())\nfor i in range(2, n + 1, 2):\n    total = 0\n    total += i\nprint(total)"
+hints:
+  - "Это накопитель — раздел «Накопители и счётчики»."
+  - "Заведи сумму до цикла, пройди по чётным числам и прибавляй каждое."
+  - "total = 0, range(2, n + 1, 2) — шаг 2 сразу даёт чётные; total += i."
+  - "n = int(input())\ntotal = ___\nfor i in range(2, n + 1, ___):\n    total ___ i\nprint(total)"
+  - "range(2, n + 1, 2) идёт 2, 4, 6… до n включительно. Сумма объявлена до цикла, иначе она обнулялась бы на каждом шаге. Для звезды: print(sum(range(2, n + 1, 2))) — sum складывает всю последовательность."

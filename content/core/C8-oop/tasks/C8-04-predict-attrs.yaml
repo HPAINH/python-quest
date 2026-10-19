@@ -1,0 +1,33 @@
+id: C8-04-predict-attrs
+type: predict
+title: Чужой код с атрибутами
+difficulty: 2
+lesson_section: classes
+statement: |
+  Это код коллеги. Впиши, что он выведет.
+code: |
+  class Order:
+      count = 0
+      fee = 99
+
+      def __init__(self, amount):
+          Order.count += 1
+          self.id = Order.count
+          self.amount = amount
+
+      def total(self):
+          return self.amount + self.fee
+
+  a = Order(1000)
+  b = Order(500)
+  b.fee = 0
+  print(a.id, b.id, Order.count)
+  print(a.total(), b.total())
+  Order.fee = 199
+  print(a.total(), b.total())
+hints:
+  - "Различай атрибуты класса и атрибуты объекта — раздел «Классы и объекты»."
+  - "count и fee объявлены в теле класса и общие для всех. b.fee = 0 создаёт у объекта b собственный атрибут, который закрывает атрибут класса. Изменение Order.fee видно только объектам без своего fee."
+  - "Посчитай id по порядку создания, затем total для a и b до и после смены Order.fee."
+  - "Три строки по 2–3 числа. У объекта b стоимость доставки не меняется после последнего присваивания."
+  - "Ответ: «1 2 2», «1099 500», «1199 500». Order.count += 1 меняет общий счётчик. a читает fee класса — сначала 99, потом 199. У b свой fee = 0, поэтому изменение класса его не задевает."

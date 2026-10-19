@@ -1,0 +1,26 @@
+id: P3-08-dates
+type: dataframe
+title: Даты в трёх форматах
+difficulty: 2
+lesson_section: dates
+statement: |
+  В `orders_raw` даты записаны как `2026-03-04`, `04.03.2026` и `2026/03/04`. Запиши в `result` колонки `order_id` и `order_date`, где `order_date` — настоящая дата (`datetime`). Исходный порядок, повторы не удаляй.
+setup: |
+  import pandas as pd
+  raw = pd.read_csv("orders_raw.csv")
+reference: |
+  raw["order_date"] = pd.to_datetime(raw["order_date"], format="mixed", dayfirst=True)
+  result = raw[["order_id", "order_date"]]
+requires: ["uses:to_datetime"]
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "raw['order_date'] = pd.to_datetime(raw['order_date'])\nresult = raw[['order_id', 'order_date']]"
+    expect_detector: date_parse
+  - code: "raw['order_date'] = pd.to_datetime(raw['order_date'], format='mixed')\nresult = raw[['order_id', 'order_date']]"
+    expect_detector: column_values
+hints:
+  - "Перевод текста в даты — раздел «Даты»."
+  - "Форматы смешаны, поэтому нужен format=\"mixed\". В формате 04.03.2026 первым идёт день — подскажи это pandas."
+  - "pd.to_datetime(raw[\"order_date\"], format=\"mixed\", dayfirst=True)."
+  - "raw[\"order_date\"] = pd.to_datetime(raw[\"order_date\"], format=___, dayfirst=___)\nresult = raw[[\"order_id\", \"order_date\"]]"
+  - "Без format pandas берёт формат по первой строке и падает на первой непохожей. Без dayfirst строка 04.03.2026 читается по-американски как 3 апреля — ошибки не будет, но даты окажутся неверными."

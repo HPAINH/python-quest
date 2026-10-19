@@ -1,0 +1,25 @@
+id: P7-08-predict
+type: predict
+title: Мини-воронка
+difficulty: 2
+lesson_section: funnel
+statement: |
+  Впиши, что выведет программа.
+code: |
+  import pandas as pd
+  e = pd.DataFrame({
+      "user": [1, 1, 1, 2, 2, 3, 4, 4, 4, 4],
+      "event": ["view", "cart", "buy", "view", "view", "view", "view", "cart", "cart", "buy"],
+      "rev": [0, 0, 500, 0, 0, 0, 0, 0, 0, 300],
+  })
+  f = e.groupby("event")["user"].nunique().reindex(["view", "cart", "buy"])
+  print(f.tolist())
+  print((f / f.shift(1)).round(2).tolist())
+  print(e.groupby("event").size().reindex(["view", "cart", "buy"]).tolist())
+  print(e["rev"].sum() / e["user"].nunique(), e["rev"].sum() / f["buy"])
+hints:
+  - "Повтори разделы «Воронка», «Конверсия» и «ARPU и ARPPU»."
+  - "Смотрели все четверо, в корзину положили пользователи 1 и 4, купили тоже 1 и 4."
+  - "size считает строки-события: у view их пять, у cart — три."
+  - "Четыре строки: три списка и два числа."
+  - "Ответ: «[4, 2, 2]», «[nan, 0.5, 1.0]», «[5, 3, 2]», «200.0 400.0». ARPU = 800 / 4, ARPPU = 800 / 2."

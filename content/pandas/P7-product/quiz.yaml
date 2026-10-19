@@ -1,0 +1,102 @@
+quiz:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      e = pd.DataFrame({"user": [1, 1, 2, 3, 3, 3], "event": ["view", "view", "view", "view", "cart", "buy"]})
+      print(e.groupby("event")["user"].nunique().reindex(["view", "cart", "buy"]).tolist())
+    answer: "[3, 1, 1]"
+    explain: Пользователь 1 смотрел дважды, но считается один раз.
+    section: funnel
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      f = pd.Series([200, 50, 20])
+      print((f / f.shift(1)).round(2).tolist(), (f / f.iloc[0]).round(2).tolist())
+    answer: "[nan, 0.25, 0.4] [1.0, 0.25, 0.1]"
+    explain: Пошаговая конверсия делит на предыдущий шаг, общая — на первый.
+    section: conversion
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      a = pd.Period("2026-03", "M")
+      b = pd.Period("2026-05", "M")
+      print((b - a).n)
+    answer: "2"
+    explain: Разность месяцев — смещение на 2 месяца.
+    section: cohorts
+  - type: fill
+    q: Впиши метод, чтобы развернуть смещения в колонки.
+    code: |
+      import pandas as pd
+      s = pd.Series([10, 4, 8], index=pd.MultiIndex.from_tuples([("mar", 0), ("mar", 1), ("apr", 0)]))
+      print(s.___(fill_value=0).values.tolist())
+    answer: ["unstack"]
+    expect: "[[8, 0], [10, 4]]"
+    explain: unstack переносит последний уровень индекса в колонки; когорты сортируются по алфавиту.
+    section: retention
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      revenue = 9000
+      users = 300
+      payers = 30
+      print(revenue / users, revenue / payers, payers / users)
+    answer: "30.0 300.0 0.1"
+    explain: ARPU = ARPPU × доля платящих — 300 × 0.1 = 30.
+    section: arpu
+
+express:
+  - type: choice
+    q: Почему в воронке считают nunique пользователей, а не число событий?
+    options: ["Так быстрее", "Один человек может совершить шаг много раз — события завысят шаг и исказят конверсию", "count не работает с текстом", "Разницы нет"]
+    answer: 1
+    explain: Воронка отвечает на вопрос «сколько людей дошло», а не «сколько было кликов».
+    section: funnel
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      s = pd.DataFrame({"p": ["app", "app", "web", "web", "web"], "bought": [True, False, True, False, False]})
+      print(s.groupby("p")["bought"].mean().round(2).tolist())
+    answer: "[0.5, 0.33]"
+    explain: Среднее булевой колонки — доля True.
+    section: conversion
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      active = pd.DataFrame({0: [100, 80], 1: [30, 0]}, index=["mar", "apr"])
+      size = pd.Series([100, 80], index=["mar", "apr"])
+      print(active.div(size, axis=0)[1].tolist())
+    answer: "[0.3, 0.0]"
+    explain: Каждая строка делится на размер своей когорты.
+    section: retention
+  - type: choice
+    q: Чем ARPU отличается от ARPPU?
+    options: ["Ничем", "ARPU делит выручку на всех пользователей, ARPPU — только на платящих", "ARPU — за месяц, ARPPU — за год", "ARPPU всегда меньше"]
+    answer: 1
+    explain: ARPPU не меньше ARPU, потому что платящих не больше, чем всех.
+    section: arpu
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      d = pd.to_datetime(pd.Series(["2026-03-31", "2026-04-01"]))
+      print(d.dt.to_period("M").astype(str).tolist())
+    answer: "['2026-03', '2026-04']"
+    explain: Соседние дни могут попасть в разные когорты.
+    section: cohorts
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      users = pd.DataFrame({"id": [1, 2, 3, 4], "src": ["ads", "ads", "seo", "seo"]})
+      buys = pd.DataFrame({"id": [1, 1, 3], "rev": [100, 50, 90]})
+      rev = buys.merge(users, on="id").groupby("src")["rev"].sum()
+      print((rev / users.groupby("src").size()).tolist())
+    answer: "[75.0, 45.0]"
+    explain: ARPU сегмента делит выручку сегмента на всех его пользователей.
+    section: arpu

@@ -1,0 +1,27 @@
+id: C5-11-retention
+type: stdio
+title: Вернувшиеся клиенты
+difficulty: 2
+lesson_section: sets
+statement: |
+  Даны две строки — ID клиентов, делавших заказы в сентябре и в октябре (целые числа через пробел, возможны повторы). Выведи три строки:
+  1. `вернулись: N` — сколько клиентов заказывали в оба месяца;
+  2. `ушли: N` — сколько заказывали в сентябре, но не в октябре;
+  3. `новые: N` — сколько впервые заказали в октябре.
+reference: |
+  sep = set(map(int, input().split()))
+  octo = set(map(int, input().split()))
+  print(f"вернулись: {len(sep & octo)}")
+  print(f"ушли: {len(sep - octo)}")
+  print(f"новые: {len(octo - sep)}")
+tests:
+  visible: ["1 2 3 4 4\n3 4 5", "1\n2"]
+  hidden: ["5 5 5\n5", "1 2 3\n1 2 3", "10 20\n30 40 30", "1 01 2\n1"]
+random: {count: 20, gen: "' '.join(str(random.randint(1, 10)) for _ in range(random.randint(1, 10))) + '\\n' + ' '.join(str(random.randint(1, 10)) for _ in range(random.randint(1, 10)))"}
+star3: [first_try]
+hints:
+  - "Операции над множествами — раздел «Множества»."
+  - "Сделай два множества. Вернувшиеся — пересечение, ушедшие — разность сентябрь минус октябрь, новые — разность октябрь минус сентябрь."
+  - "set(map(int, ...)), операторы & и -, len."
+  - "sep = set(map(int, input().split()))\nocto = set(map(int, input().split()))\nprint(f\"вернулись: {len(sep ___ octo)}\")\nprint(f\"ушли: {len(sep ___ octo)}\")\nprint(f\"новые: {len(octo ___ sep)}\")"
+  - "Повторы внутри месяца не важны — множество их убирает. В pandas это же считают через drop_duplicates и merge, а в SQL — через INTERSECT и EXCEPT. Числа переводим в int, чтобы «01» и «1» считались одним клиентом."

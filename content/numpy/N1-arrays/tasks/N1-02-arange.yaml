@@ -1,0 +1,25 @@
+id: N1-02-arange
+type: array
+title: Номера заказов
+difficulty: 1
+lesson_section: create
+statement: |
+  Даны целые `start`, `stop` и `step`. Запиши в `result` массив чисел от `start` до `stop` **включительно** с шагом `step`. Гарантируется, что `stop - start` делится на `step`.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  step = int(rng.integers(2, 6))
+  start = int(rng.integers(100, 200))
+  stop = start + step * int(rng.integers(3, 15))
+reference: |
+  result = np.arange(start, stop + 1, step)
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = np.arange(start, stop, step)"
+    expect_detector: array_shape
+hints:
+  - "Диапазон с шагом даёт np.arange — раздел «Создание массивов»."
+  - "Как и у range, правая граница arange не входит в результат. Чтобы stop попал в массив, сдвинь границу."
+  - "np.arange(start, stop + 1, step)."
+  - "result = np.arange(start, ___, step)"
+  - "np.arange(start, stop, step) остановится на последнем числе перед stop — массив окажется на элемент короче. Достаточно сдвинуть границу на 1, ведь шаг — целое число не меньше 2."

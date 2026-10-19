@@ -1,0 +1,27 @@
+id: N3-06-cumsum
+type: value
+variants_count: 5
+title: Выручка нарастающим итогом
+difficulty: 1
+lesson_section: aggregates
+statement: |
+  В `daily` — выручка по дням месяца. Запиши в `result` номер первого дня (считая с 1), к концу которого выручка с начала месяца достигла плана `plan` или превысила его. Если план не выполнен, запиши `-1`.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  daily = rng.integers(20_000, 80_000, size=30)
+  plan = int(daily.sum() * (0.4 + (SEED % 5) * 0.25))
+reference: |
+  total = np.cumsum(daily)
+  hit = np.where(total >= plan)[0]
+  result = int(hit[0]) + 1 if len(hit) else -1
+star3: [first_try]
+buggy_variants:
+  - code: "total = np.cumsum(daily)\nresult = int(np.argmax(total >= plan)) + 1"
+  - code: "total = np.cumsum(daily)\nhit = np.where(total > plan)[0]\nresult = int(hit[0]) if len(hit) else -1"
+hints:
+  - "Накопительная сумма — np.cumsum, поиск индекса — np.where. Разделы «Накопление и статистика» и «where и поиск» уровня N2."
+  - "Посчитай накопительную сумму. Найди индексы, где она не меньше плана. Если такие есть — первый индекс плюс один (дни считаются с 1), иначе -1."
+  - "np.cumsum(daily), np.where(total >= plan)[0], hit[0] + 1."
+  - "total = np.___(daily)\nhit = np.where(total ___ plan)[0]\nresult = int(hit[0]) + ___ if len(hit) else -1"
+  - "argmax по маске вернёт 0, если ни одного True нет, — и ответ «день 1» окажется неверным при невыполненном плане. Поэтому сначала проверяем, есть ли совпадения. Индексы массива начинаются с нуля, а дни — с единицы."

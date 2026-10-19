@@ -1,0 +1,99 @@
+id: M5-08-boss
+type: dataframe
+title: 'Босс: сегменты клиентов'
+difficulty: 3
+boss: true
+lesson_section: segments
+statement: 'Маркетинг просит 4 сегмента клиентов. Возьми колонки `orders_90d`, `avg_check`, `days_since_last`, `discount_share`, заполни пропуски медианами, стандартизируй и раздели на кластеры `KMeans(4, n_init=10, random_state=0)`.
+
+
+  Запиши в `profile` таблицу с колонками `segment`, `size`, `orders`, `days`, `discount`, `churn` — номер сегмента, число клиентов, средние `orders_90d`, `days_since_last`, `discount_share` и долю ушедших (средние — 2 знака, доля — 3). Сегменты пронумеруй **от 0** по возрастанию средних `days_since_last`: сегмент 0 — самые свежие клиенты. Строки — по номеру сегмента.
+
+  '
+setup: 'import numpy as np
+
+  import pandas as pd
+
+  from sklearn.cluster import KMeans
+
+  from sklearn.decomposition import PCA
+
+  from sklearn.preprocessing import StandardScaler
+
+  from sklearn.metrics import silhouette_score
+
+  from sklearn.datasets import make_blobs
+
+  df = pd.read_csv("churn.csv")
+
+  '
+outputs:
+- var: profile
+  title: профиль сегментов
+  ordered: true
+reference: 'seg = ["orders_90d", "avg_check", "days_since_last", "discount_share"]
+
+  Z = StandardScaler().fit_transform(df[seg].fillna(df[seg].median()))
+
+  df["cluster"] = KMeans(4, n_init=10, random_state=0).fit_predict(Z)
+
+  order = df.groupby("cluster")["days_since_last"].mean().sort_values().index
+
+  df["segment"] = df["cluster"].map({c: i for i, c in enumerate(order)})
+
+  profile = df.groupby("segment").agg(size=("customer_id", "count"), orders=("orders_90d", "mean"), days=("days_since_last", "mean"), discount=("discount_share", "mean"), churn=("churned", "mean")).reset_index()
+
+  profile[["orders", "days", "discount"]] = profile[["orders", "days", "discount"]].round(2)
+
+  profile["churn"] = profile["churn"].round(3)
+
+  '
+star3:
+- first_try
+buggy_variants:
+- code: 'seg = [''orders_90d'', ''avg_check'', ''days_since_last'', ''discount_share'']
+
+    Z = StandardScaler().fit_transform(df[seg].fillna(df[seg].median()))
+
+    df[''segment''] = KMeans(4, n_init=10, random_state=0).fit_predict(Z)
+
+    profile = df.groupby(''segment'').agg(size=(''customer_id'', ''count''), orders=(''orders_90d'', ''mean''), days=(''days_since_last'', ''mean''), discount=(''discount_share'', ''mean''), churn=(''churned'', ''mean'')).reset_index()
+
+    profile[[''orders'', ''days'', ''discount'']] = profile[[''orders'', ''days'', ''discount'']].round(2)
+
+    profile[''churn''] = profile[''churn''].round(3)'
+  expect_detector: row_mismatch
+- code: 'seg = [''orders_90d'', ''avg_check'', ''days_since_last'', ''discount_share'']
+
+    X = df[seg].fillna(df[seg].median())
+
+    df[''cluster''] = KMeans(4, n_init=10, random_state=0).fit_predict(X)
+
+    order = df.groupby(''cluster'')[''days_since_last''].mean().sort_values().index
+
+    df[''segment''] = df[''cluster''].map({c: i for i, c in enumerate(order)})
+
+    profile = df.groupby(''segment'').agg(size=(''customer_id'', ''count''), orders=(''orders_90d'', ''mean''), days=(''days_since_last'', ''mean''), discount=(''discount_share'', ''mean''), churn=(''churned'', ''mean'')).reset_index()
+
+    profile[[''orders'', ''days'', ''discount'']] = profile[[''orders'', ''days'', ''discount'']].round(2)
+
+    profile[''churn''] = profile[''churn''].round(3)'
+  expect_detector: column_values
+hints:
+- 'Всё из уровня: подготовка, KMeans и профиль сегментов.'
+- После кластеризации посчитай среднюю давность заказа по кластерам, отсортируй и построй словарь «номер кластера → номер сегмента». Профиль — groupby по сегменту с именованной агрегацией.
+- 'df.groupby("cluster")["days_since_last"].mean().sort_values().index, {c: i for i, c in enumerate(order)}, groupby("segment").agg(...).'
+- 'seg = [...]
+
+  Z = StandardScaler().fit_transform(df[seg].fillna(df[seg].median()))
+
+  df["cluster"] = KMeans(4, n_init=10, random_state=0).fit_predict(Z)
+
+  order = df.groupby("cluster")["days_since_last"].mean().___().index
+
+  df["segment"] = df["cluster"].map({c: i for i, c in enumerate(___)})
+
+  profile = df.groupby("segment").agg(size=("customer_id", "count"), orders=("orders_90d", "mean"), days=("days_since_last", "mean"), discount=("discount_share", "mean"), churn=("churned", "mean")).reset_index()
+
+  ...'
+- Перенумерация по смыслу делает сегменты сравнимыми между запусками и данными. Сегмент с давним последним заказом уходит в несколько раз чаще остальных — с ним и работают в первую очередь.

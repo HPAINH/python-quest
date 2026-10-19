@@ -1,0 +1,24 @@
+id: N1-08-fix-reshape
+type: fix_bug
+base: value
+title: Исправь сетку часов
+difficulty: 1
+lesson_section: reshape
+statement: |
+  В `hourly` — посещения сайта по часам за `days` полных суток. Код должен разложить их в таблицу «сутки × час» (24 столбца), но падает. Исправь его.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  days = int(rng.integers(2, 6))
+  hourly = rng.integers(0, 120, size=days * 24)
+starter: |
+  result = hourly.reshape(24, 24)
+reference: |
+  result = hourly.reshape(days, 24)
+star3: [first_try]
+hints:
+  - "Прочитай ошибку reshape — раздел «Форма и reshape»."
+  - "Число элементов в новой форме должно совпадать с исходным: days × 24, а не 24 × 24."
+  - "Первая ось — число суток: days или -1."
+  - "result = hourly.reshape(___, 24)"
+  - "В массиве days × 24 элементов. Форма (24, 24) требует 576 элементов, поэтому reshape выбрасывает ValueError. Подойдёт и hourly.reshape(-1, 24)."

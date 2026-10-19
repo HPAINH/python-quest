@@ -1,0 +1,32 @@
+id: S3-09-fix-decision
+type: fix_bug
+base: value
+title: Исправь вывод теста
+difficulty: 1
+lesson_section: mistakes
+statement: |
+  Скрипт проверяет конверсию `exp_checkout` хи-квадратом без поправки и почему-то пишет «эффекта нет». Найди ошибку. Нужны `p_value` и `reject` при alpha = 0.05.
+setup: |
+  import pandas as pd
+  from scipy import stats
+  t = pd.read_csv("ab_metrics.csv").merge(pd.read_csv("ab_assignments.csv"), on=["user_id", "experiment"])
+type_hint: stat
+outputs:
+  - var: p_value
+    tol: 0.00001
+  - var: reject
+starter: |
+  c = t[t["experiment"] == "exp_checkout"]
+  p_value = stats.chi2_contingency(pd.crosstab(c["group"], c["converted"]), correction=False)[1]
+  reject = bool(p_value > 0.05)
+reference: |
+  c = t[t["experiment"] == "exp_checkout"]
+  p_value = stats.chi2_contingency(pd.crosstab(c["group"], c["converted"]), correction=False)[1]
+  reject = bool(p_value < 0.05)
+star3: [first_try, "max_lines:3"]
+hints:
+  - "Правило решения — раздел «H0, alpha и p-value» и «Частые ошибки»."
+  - "p-value посчитан верно. Проверь условие, по которому принимается решение."
+  - "H0 отвергают, когда p-value меньше alpha."
+  - "reject = bool(p_value ___ 0.05)"
+  - "Маленький p-value означает, что такая разница редко возникает случайно, — поэтому H0 и отвергают. Перевёрнутый знак — частая опечатка, которая выворачивает вывод отчёта наизнанку."

@@ -1,0 +1,47 @@
+id: M4-01-cv
+type: stat
+title: Кросс-валидация
+difficulty: 1
+lesson_section: cv
+statement: 'Оцени Pipeline `pipe` из `setup` кросс-валидацией: `cv=StratifiedKFold(5, shuffle=True, random_state=0)`, `scoring="roc_auc"`, на всех `X`, `y`. Запиши `cv_mean` и `cv_std` — среднее и стандартное отклонение пяти оценок (`np.std`, допуск ±0.0001).
+
+  '
+setup: "import numpy as np\nimport pandas as pd\nfrom sklearn import metrics\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import OneHotEncoder, StandardScaler\nfrom sklearn.impute import SimpleImputer\nfrom sklearn.compose import ColumnTransformer\nfrom sklearn.pipeline import make_pipeline, Pipeline\nfrom sklearn.linear_model import LogisticRegression, LinearRegression\nfrom sklearn.model_selection import cross_val_score, KFold, StratifiedKFold, GridSearchCV, TimeSeriesSplit\nfrom sklearn.ensemble import HistGradientBoostingClassifier, HistGradientBoostingRegressor\ndf = pd.read_csv(\"churn.csv\")\nX = df.drop(columns=[\"customer_id\", \"cancel_request\", \"churned\"])\ny = df[\"churned\"]\nif SHUFFLE:\n    y = y.sample(frac=1, random_state=1).reset_index(drop=True)\ncat = [\"city\", \"loyalty\"]\nnum = [c for c in X.columns if c not in cat]\npre = ColumnTransformer([\n    (\"num\", make_pipeline(SimpleImputer(strategy=\"median\"), StandardScaler()), num),\n    (\"cat\", OneHotEncoder(handle_unknown=\"ignore\"), cat),\n])\npipe = make_pipeline(pre, LogisticRegression(max_iter=1000))\n"
+outputs:
+- var: cv_mean
+  tol: 0.0001
+- var: cv_std
+  tol: 0.0001
+reference: 'cv = StratifiedKFold(5, shuffle=True, random_state=0)
+
+  scores = cross_val_score(pipe, X, y, cv=cv, scoring="roc_auc")
+
+  cv_mean = scores.mean()
+
+  cv_std = scores.std()
+
+  '
+star3:
+- first_try
+- max_lines:4
+buggy_variants:
+- code: 'cv = StratifiedKFold(5, shuffle=True, random_state=0)
+
+    scores = cross_val_score(pipe, X, y, cv=cv)
+
+    cv_mean = scores.mean()
+
+    cv_std = scores.std()'
+  expect_detector: stat_value
+hints:
+- cross_val_score — раздел «Кросс-валидация».
+- Создай объект StratifiedKFold и передай его в cv, метрику — в scoring. Функция вернёт массив из пяти оценок.
+- cross_val_score(pipe, X, y, cv=cv, scoring="roc_auc"), scores.mean(), scores.std().
+- 'cv = StratifiedKFold(5, shuffle=True, random_state=0)
+
+  scores = cross_val_score(pipe, X, y, cv=___, scoring=___)
+
+  cv_mean = scores.mean()
+
+  cv_std = scores.std()'
+- Без scoring считается accuracy. Разброс в сотые доли означает, что разница моделей меньше 0.01 — скорее шум, чем улучшение.

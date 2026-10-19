@@ -1,0 +1,29 @@
+id: C4-08-fill-above
+type: fill_gaps
+base: stdio
+title: Выше среднего
+difficulty: 1
+lesson_section: comprehension
+statement: |
+  В строке через пробел даны целые числа. Выведи, сколько из них строго больше среднего арифметического.
+
+  Заполни пропуски.
+template: |
+  nums = [int(x) for x in input().___()]
+  avg = sum(nums) / ___(nums)
+  print(len([x for x in nums if x ___ avg]))
+reference: |
+  nums = [int(x) for x in input().split()]
+  avg = sum(nums) / len(nums)
+  print(len([x for x in nums if x > avg]))
+tests:
+  visible: ["1 2 3 10", "5 5 5"]
+  hidden: ["7", "1 2", "-5 0 5", "100 1 1 1"]
+random: {count: 20, gen: "' '.join(str(random.randint(-20, 20)) for _ in range(random.randint(1, 12)))"}
+star3: [first_try]
+hints:
+  - "Среднее и отбор — раздел «Генераторы списков»."
+  - "Раздели строку на числа, посчитай среднее как сумму, делённую на количество, и посчитай числа больше среднего."
+  - "Метод split, функция len, оператор >."
+  - "Первый пропуск — метод деления строки. Второй — функция, которая даёт количество элементов. Третий — строгое сравнение «больше»."
+  - "Среднее нужно знать заранее, поэтому числа сохраняются в список — за один проход без списка это не сделать. Для «5 5 5» среднее 5, и ни одно число строго не больше — ответ 0."

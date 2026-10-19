@@ -1,0 +1,33 @@
+id: C6-06-fib
+type: function
+function: fib
+title: Числа Фибоначчи
+difficulty: 2
+lesson_section: recursion
+statement: |
+  Напиши функцию `fib(n)`, которая возвращает n-е число Фибоначчи: `fib(1) = 1`, `fib(2) = 1`, каждое следующее равно сумме двух предыдущих. `n` — от 1 до 90.
+
+  Решение должно быть быстрым для `n = 90`, поэтому наивная рекурсия не подойдёт.
+starter: |
+  def fib(n):
+      pass
+reference: |
+  def fib(n):
+      a, b = 1, 1
+      for _ in range(n - 1):
+          a, b = b, a + b
+      return a
+tests:
+  visible: ["fib(1)", "fib(7)"]
+  hidden: ["fib(2)", "fib(3)", "fib(30)", "fib(90)"]
+random: {count: 15, gen: "f'fib({random.randint(1, 90)})'"}
+star3: [first_try]
+buggy_variants:
+  - code: "def fib(n):\n    if n <= 2:\n        return 1\n    return fib(n - 1) + fib(n - 2)"
+    expect_detector: infinite_loop
+hints:
+  - "Про медленную рекурсию сказано в разделе «Рекурсия», а цикл с двумя переменными — как в алгоритме Евклида из C2."
+  - "Храни два последних числа. На каждом шаге новое число — их сумма, а пара сдвигается вперёд. Повтори n - 1 раз."
+  - "a, b = 1, 1; цикл for _ in range(n - 1); a, b = b, a + b; return a."
+  - "def fib(n):\n    a, b = 1, 1\n    for _ in range(___):\n        a, b = ___, a + b\n    return ___"
+  - "fib(7): пары (1,1) → (1,2) → (2,3) → (3,5) → (5,8) → (8,13), после 6 шагов a = 13. Рекурсивная версия для fib(90) сделала бы около 10¹⁸ вызовов — проверка остановит её по лимиту шагов."

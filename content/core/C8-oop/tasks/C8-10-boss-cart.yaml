@@ -1,0 +1,98 @@
+id: C8-10-boss-cart
+type: function
+title: "Босс: корзина ShopData"
+difficulty: 3
+boss: true
+lesson_section: dataclass
+statement: |
+  Собери модель корзины. Каждая часть проверяется отдельным шагом.
+
+  **Шаг 1.** `Item` — `@dataclass` с полями `sku` (str), `price` (float), `qty` (int, по умолчанию 1) и методом `total()` → `price × qty`, округлённая до 2 знаков.
+
+  **Шаг 2.** `Cart` — класс корзины:
+  - `add(sku, price, qty=1)` добавляет товар. Если такой `sku` уже есть, увеличивает его количество, а цену берёт новую;
+  - `remove(sku, qty=1)` уменьшает количество и удаляет позицию при нуле. Если товара нет, выбрасывает `KeyError`;
+  - `len(cart)` — число **разных** товаров;
+  - `items()` — список `Item`, отсортированный по `sku`;
+  - `subtotal()` — сумма `total()` всех позиций, округлённая до 2 знаков.
+
+  **Шаг 3.** `Cart.total(promo=None)` — итог к оплате, округлённый до 2 знаков:
+  - `"SALE10"` — скидка 10% на `subtotal`;
+  - `"BUY3"` — самый дешёвый товар в корзине бесплатно (одна штука), если всего штук в корзине от 3;
+  - доставка 299 ₽ добавляется, если сумма после скидки меньше 3000 ₽. Пустая корзина стоит 0.
+reference: |
+  from dataclasses import dataclass
+
+  @dataclass
+  class Item:
+      sku: str
+      price: float
+      qty: int = 1
+
+      def total(self):
+          return round(self.price * self.qty, 2)
+
+  class Cart:
+      def __init__(self):
+          self._items = {}
+
+      def add(self, sku, price, qty=1):
+          if sku in self._items:
+              old = self._items[sku]
+              self._items[sku] = Item(sku, price, old.qty + qty)
+          else:
+              self._items[sku] = Item(sku, price, qty)
+
+      def remove(self, sku, qty=1):
+          if sku not in self._items:
+              raise KeyError(sku)
+          item = self._items[sku]
+          item.qty -= qty
+          if item.qty <= 0:
+              del self._items[sku]
+
+      def __len__(self):
+          return len(self._items)
+
+      def items(self):
+          return sorted(self._items.values(), key=lambda it: it.sku)
+
+      def subtotal(self):
+          return round(sum(it.total() for it in self._items.values()), 2)
+
+      def total(self, promo=None):
+          if not self._items:
+              return 0
+          amount = self.subtotal()
+          if promo == "SALE10":
+              amount = amount * 0.9
+          elif promo == "BUY3" and sum(it.qty for it in self._items.values()) >= 3:
+              amount -= min(it.price for it in self._items.values())
+          if amount < 3000:
+              amount += 299
+          return round(amount, 2)
+steps:
+  - title: Позиция корзины
+    function: Item
+    tests:
+      visible: ["Item('TEA', 450.0, 2).total()", "Item('X', 9.99)"]
+      hidden: ["Item('A', 0.1, 3).total()", "Item('A', 1.0) == Item('A', 1.0, 1)", "Item('Q', 5.0, 0).total()"]
+  - title: Корзина
+    function: Cart
+    tests:
+      visible: ["c = Cart()\nc.add('TEA', 450, 2)\nc.add('COF', 990)\nc.add('TEA', 460)\n(len(c), c.items(), c.subtotal())", "c = Cart()\nraises(lambda: c.remove('X'))"]
+      hidden: ["c = Cart()\nc.add('A', 10, 2)\nc.remove('A')\nc.remove('A')\n(len(c), c.subtotal())", "c = Cart()\nc.add('B', 1)\nc.add('A', 2)\n[i.sku for i in c.items()]", "Cart().subtotal()", "a, b = Cart(), Cart()\na.add('X', 1)\n(len(a), len(b))", "c = Cart()\nc.add('A', 100, 3)\nc.remove('A', 5)\nlen(c)"]
+  - title: Итог с промокодом и доставкой
+    function: Cart
+    tests:
+      visible: ["c = Cart()\nc.add('TEA', 450, 2)\nc.add('COF', 990)\n[c.total(), c.total('SALE10'), c.total('BUY3')]", "Cart().total('SALE10')"]
+      hidden: ["c = Cart()\nc.add('A', 3000)\n[c.total(), c.total('SALE10')]", "c = Cart()\nc.add('A', 1000, 2)\n[c.total('BUY3'), c.total('sale10')]", "c = Cart()\nc.add('A', 2000)\nc.add('B', 100)\nc.add('C', 1500)\nc.total('BUY3')", "c = Cart()\nc.add('A', 3333.33)\nc.total('SALE10')"]
+star3: [first_try]
+buggy_variants:
+  - code: "from dataclasses import dataclass\n\n@dataclass\nclass Item:\n    sku: str\n    price: float\n    qty: int = 1\n    def total(self):\n        return round(self.price * self.qty, 2)\n\nclass Cart:\n    def __init__(self):\n        self._items = {}\n    def add(self, sku, price, qty=1):\n        self._items[sku] = Item(sku, price, qty)\n    def remove(self, sku, qty=1):\n        del self._items[sku]\n    def __len__(self):\n        return len(self._items)\n    def items(self):\n        return sorted(self._items.values(), key=lambda it: it.sku)\n    def subtotal(self):\n        return round(sum(it.total() for it in self._items.values()), 2)\n    def total(self, promo=None):\n        amount = self.subtotal()\n        if promo == 'SALE10':\n            amount *= 0.9\n        if amount < 3000:\n            amount += 299\n        return round(amount, 2)"
+hints:
+  - "Нужны dataclass (раздел «dataclass»), класс с методами и __len__ (разделы «Методы» и «Специальные методы»), raise из C7."
+  - "Храни позиции в словаре sku → Item, тогда повторное добавление легко находит товар. remove уменьшает количество и удаляет позицию при нуле. items сортирует значения словаря по sku. total: пустая корзина — 0; иначе возьми subtotal, примени промокод, затем добавь доставку, если сумма меньше 3000."
+  - "self._items = {}, Item(sku, price, old.qty + qty), del self._items[sku], raise KeyError, sorted(..., key=lambda it: it.sku), sum(it.qty ...), min(it.price ...)."
+  - "    def total(self, promo=None):\n        if not self._items:\n            return ___\n        amount = self.subtotal()\n        if promo == \"SALE10\":\n            amount = amount * ___\n        elif promo == \"BUY3\" and sum(it.qty for it in self._items.values()) >= ___:\n            amount -= min(it.price for it in self._items.values())\n        if amount < ___:\n            amount += 299\n        return round(amount, 2)"
+  - "Корзина из примера: чай 2 × 450 и кофе 990, subtotal 1890. Без промокода 1890 + 299 = 2189. SALE10: 1701 + 299 = 2000. BUY3: штук 3, самый дешёвый товар — чай за 450, 1440 + 299 = 1739. Доставка считается после скидки, поэтому 3000 со скидкой 10% (2700) снова платит 299. Словарь даёт быстрый поиск по sku, а dataclass — готовые __repr__ и __eq__ для вывода и тестов."

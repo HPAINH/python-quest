@@ -1,0 +1,41 @@
+id: M4-09-fill-grid
+type: fill_gaps
+base: value
+type_hint: stat
+title: Сетка для Pipeline
+difficulty: 1
+lesson_section: grid
+statement: 'Заполни пропуски `___`, чтобы `GridSearchCV` подобрал `C` для `pipe` из `setup`. Нужны `best_C` и `best_score` (допуск ±0.0001).
+
+  '
+setup: "import numpy as np\nimport pandas as pd\nfrom sklearn import metrics\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import OneHotEncoder, StandardScaler\nfrom sklearn.impute import SimpleImputer\nfrom sklearn.compose import ColumnTransformer\nfrom sklearn.pipeline import make_pipeline, Pipeline\nfrom sklearn.linear_model import LogisticRegression, LinearRegression\nfrom sklearn.model_selection import cross_val_score, KFold, StratifiedKFold, GridSearchCV, TimeSeriesSplit\nfrom sklearn.ensemble import HistGradientBoostingClassifier, HistGradientBoostingRegressor\ndf = pd.read_csv(\"churn.csv\")\nX = df.drop(columns=[\"customer_id\", \"cancel_request\", \"churned\"])\ny = df[\"churned\"]\nif SHUFFLE:\n    y = y.sample(frac=1, random_state=1).reset_index(drop=True)\ncat = [\"city\", \"loyalty\"]\nnum = [c for c in X.columns if c not in cat]\npre = ColumnTransformer([\n    (\"num\", make_pipeline(SimpleImputer(strategy=\"median\"), StandardScaler()), num),\n    (\"cat\", OneHotEncoder(handle_unknown=\"ignore\"), cat),\n])\npipe = make_pipeline(pre, LogisticRegression(max_iter=1000))\n"
+outputs:
+- var: best_C
+- var: best_score
+  tol: 0.0001
+template: 'cv = StratifiedKFold(3, shuffle=True, random_state=0)
+
+  g = ___(pipe, {"___": [0.1, 1]}, cv=cv, scoring="roc_auc").fit(X, y)
+
+  best_C = g.best_params_["logisticregression__C"]
+
+  best_score = g.___
+
+  '
+reference: 'cv = StratifiedKFold(3, shuffle=True, random_state=0)
+
+  g = GridSearchCV(pipe, {"logisticregression__C": [0.1, 1]}, cv=cv, scoring="roc_auc").fit(X, y)
+
+  best_C = g.best_params_["logisticregression__C"]
+
+  best_score = g.best_score_
+
+  '
+star3:
+- first_try
+hints:
+- GridSearchCV — раздел «Подбор гиперпараметров».
+- 'Три пропуска: класс поиска по сетке, имя параметра внутри Pipeline и атрибут с лучшей оценкой.'
+- GridSearchCV, logisticregression__C, best_score_.
+- 'Имя параметра: имя шага в нижнем регистре, два подчёркивания, имя параметра.'
+- 'Ответ: GridSearchCV, logisticregression__C, best_score_. Атрибуты обученных объектов sklearn оканчиваются подчёркиванием.'

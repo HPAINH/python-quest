@@ -1,0 +1,47 @@
+id: C7-07-file-sales
+type: function
+function: total_sales
+title: Продажи из файла
+difficulty: 2
+lesson_section: files
+statement: |
+  В рабочей папке лежат файлы кассы. Каждая строка — `дата;сумма`. Пустые строки и строки с ошибкой в сумме нужно пропустить.
+
+  Напиши функцию `total_sales(path)`, которая возвращает кортеж из двух чисел: сумма продаж, округлённая до 2 знаков, и количество пропущенных непустых строк. Открывай файл через `with`.
+files:
+  day1.txt: "2026-10-17;1290.50\n2026-10-17;990\n\n2026-10-17;450\n"
+  day2.txt: "2026-10-18;abc\n2026-10-18;100\n2026-10-18;\nбез разделителя\n"
+  empty.txt: ""
+  day3.txt: "2026-10-19;0.10\n2026-10-19;0.20\n"
+  day4.txt: "2026-10-20;-50\n2026-10-20;1e3\n\n\n2026-10-20; 7 \n"
+starter: |
+  def total_sales(path):
+      pass
+reference: |
+  def total_sales(path):
+      total = 0.0
+      bad = 0
+      with open(path, encoding="utf-8") as f:
+          for line in f:
+              line = line.strip()
+              if not line:
+                  continue
+              try:
+                  total += float(line.split(";")[1])
+              except (ValueError, IndexError):
+                  bad += 1
+      return round(total, 2), bad
+requires: ["uses:with", "uses:try"]
+tests:
+  visible: ["total_sales('day1.txt')", "total_sales('day2.txt')"]
+  hidden: ["total_sales('empty.txt')", "total_sales('day3.txt')", "total_sales('day4.txt')"]
+star3: [first_try]
+buggy_variants:
+  - code: "def total_sales(path):\n    total = 0.0\n    bad = 0\n    with open(path) as f:\n        for line in f:\n            try:\n                total += float(line.split(';')[1])\n            except ValueError:\n                bad += 1\n    return round(total, 2), bad"
+    expect_detector: index_error
+hints:
+  - "Чтение файла построчно — раздел «Файлы», пропуск ошибок — раздел «try и except»."
+  - "Открой файл через with и иди по строкам. Убери пробелы и перевод строки; пустые строки пропускай. Сумму бери после точки с запятой и переводи в float внутри try. Если не получилось — увеличь счётчик ошибок."
+  - "with open(path, encoding=\"utf-8\") as f, line.strip(), line.split(\";\")[1], except (ValueError, IndexError)."
+  - "def total_sales(path):\n    total = 0.0\n    bad = 0\n    with open(path, encoding=\"utf-8\") as f:\n        for line in f:\n            line = line.___()\n            if not line:\n                ___\n            try:\n                total += float(line.split(\";\")[___])\n            except (ValueError, ___):\n                bad += 1\n    return round(total, 2), bad"
+  - "В строке «без разделителя» нет «;», поэтому split даёт один элемент, и [1] вызывает IndexError — его тоже надо ловить. Пустая сумма «2026-10-18;» даёт float('') → ValueError. float сам пропускает пробелы вокруг числа и понимает запись 1e3."

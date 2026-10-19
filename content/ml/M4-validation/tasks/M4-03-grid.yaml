@@ -1,0 +1,46 @@
+id: M4-03-grid
+type: stat
+title: Подбор силы регуляризации
+difficulty: 2
+lesson_section: grid
+statement: 'Подбери `C` логистической регрессии в `pipe` из значений `[0.01, 0.1, 1, 10]` через `GridSearchCV` с `cv=StratifiedKFold(3, shuffle=True, random_state=0)` и `scoring="roc_auc"` на всех данных. Запиши `best_C` и `best_score` (допуск ±0.0001).
+
+  '
+setup: "import numpy as np\nimport pandas as pd\nfrom sklearn import metrics\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import OneHotEncoder, StandardScaler\nfrom sklearn.impute import SimpleImputer\nfrom sklearn.compose import ColumnTransformer\nfrom sklearn.pipeline import make_pipeline, Pipeline\nfrom sklearn.linear_model import LogisticRegression, LinearRegression\nfrom sklearn.model_selection import cross_val_score, KFold, StratifiedKFold, GridSearchCV, TimeSeriesSplit\nfrom sklearn.ensemble import HistGradientBoostingClassifier, HistGradientBoostingRegressor\ndf = pd.read_csv(\"churn.csv\")\nX = df.drop(columns=[\"customer_id\", \"cancel_request\", \"churned\"])\ny = df[\"churned\"]\nif SHUFFLE:\n    y = y.sample(frac=1, random_state=1).reset_index(drop=True)\ncat = [\"city\", \"loyalty\"]\nnum = [c for c in X.columns if c not in cat]\npre = ColumnTransformer([\n    (\"num\", make_pipeline(SimpleImputer(strategy=\"median\"), StandardScaler()), num),\n    (\"cat\", OneHotEncoder(handle_unknown=\"ignore\"), cat),\n])\npipe = make_pipeline(pre, LogisticRegression(max_iter=1000))\n"
+outputs:
+- var: best_C
+- var: best_score
+  tol: 0.0001
+reference: 'cv = StratifiedKFold(3, shuffle=True, random_state=0)
+
+  g = GridSearchCV(pipe, {"logisticregression__C": [0.01, 0.1, 1, 10]}, cv=cv, scoring="roc_auc").fit(X, y)
+
+  best_C = g.best_params_["logisticregression__C"]
+
+  best_score = g.best_score_
+
+  '
+star3:
+- first_try
+- max_lines:4
+buggy_variants:
+- code: 'cv = StratifiedKFold(3, shuffle=True, random_state=0)
+
+    g = GridSearchCV(pipe, {''logisticregression__C'': [0.01, 0.1, 1, 10]}, cv=cv).fit(X, y)
+
+    best_C = g.best_params_[''logisticregression__C'']
+
+    best_score = g.best_score_'
+  expect_detector: stat_value
+hints:
+- GridSearchCV и имена параметров — раздел «Подбор гиперпараметров».
+- 'Сетка — словарь {имя параметра: список значений}. В make_pipeline шаг логистической регрессии называется logisticregression, параметр — C.'
+- 'GridSearchCV(pipe, {"logisticregression__C": [...]}, cv=cv, scoring="roc_auc").fit(X, y), g.best_params_, g.best_score_.'
+- 'cv = StratifiedKFold(3, shuffle=True, random_state=0)
+
+  g = GridSearchCV(pipe, {"___": [0.01, 0.1, 1, 10]}, cv=cv, scoring="roc_auc").fit(X, y)
+
+  best_C = g.best_params_["logisticregression__C"]
+
+  best_score = g.best_score_'
+- 'C — обратная сила регуляризации: меньше C — проще модель. По accuracy лучшим часто оказывается другое C, чем по ROC-AUC: метрика подбора должна совпадать с метрикой задачи.'

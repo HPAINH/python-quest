@@ -1,0 +1,7 @@
+code: M3
+title: Деревья и ансамбли
+intro: Дерево решений и переобучение, случайный лес, градиентный бустинг и важность признаков.
+minutes: 35
+expected_tasks: 10
+packages: [numpy, pandas, scipy, scikit-learn]
+data: [churn, demand]

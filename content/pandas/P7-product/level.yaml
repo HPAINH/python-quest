@@ -1,0 +1,7 @@
+code: P7
+title: Продуктовая аналитика
+intro: Воронка, конверсии, когорты, retention и ARPU на событиях сайта и приложения — классика тестовых заданий аналитика.
+minutes: 35
+expected_tasks: 10
+packages: [numpy, pandas]
+data: [events]

@@ -1,0 +1,31 @@
+id: C2-07-until-zero
+type: stdio
+title: Числа до нуля
+difficulty: 2
+lesson_section: while
+statement: |
+  Вводятся целые числа, каждое на своей строке. Последнее число — `0`, оно в подсчёт не входит. Перед нулём есть хотя бы одно число.
+
+  Выведи через пробел количество чисел и их среднее с двумя знаками после запятой.
+reference: |
+  count = 0
+  total = 0
+  x = int(input())
+  while x != 0:
+      count += 1
+      total += x
+      x = int(input())
+  print(count, f"{total / count:.2f}")
+tests:
+  visible: ["5\n8\n0", "-3\n0"]
+  hidden: ["1\n0", "10\n20\n30\n40\n0", "-1\n1\n0"]
+random: {count: 20, gen: "'\\n'.join(str(random.choice([random.randint(-50, -1), random.randint(1, 50)])) for _ in range(random.randint(1, 12))) + '\\n0'"}
+star3: [first_try]
+buggy_variants:
+  - code: "count = 0\ntotal = 0\nwhile True:\n    x = int(input())\n    count += 1\n    total += x\n    if x == 0:\n        break\nprint(count, f'{total / count:.2f}')"
+hints:
+  - "Количество чисел заранее неизвестно — нужен while из раздела «Цикл while»."
+  - "Прочитай первое число до цикла. Пока оно не ноль: учти его в счётчике и сумме и прочитай следующее."
+  - "while x != 0, count += 1, total += x, x = int(input()) в конце тела, формат .2f."
+  - "count = 0\ntotal = 0\nx = int(input())\nwhile x != ___:\n    count += 1\n    total += ___\n    x = ___\nprint(count, f\"{total / count:___}\")"
+  - "Чтение до цикла и в конце тела гарантирует, что ноль проверяется условием и не попадает в сумму. Если сначала прибавить, а потом проверить, ноль будет посчитан как число, и среднее испортится."

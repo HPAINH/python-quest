@@ -1,0 +1,29 @@
+id: S1-05-binom
+type: stat
+title: Три покупки из двадцати визитов
+difficulty: 2
+lesson_section: distributions
+data: false
+variants_count: 4
+statement: |
+  Посетитель делает покупку с вероятностью `p` (задана в переменной). Найди вероятность, что из 20 визитов будет **не меньше трёх** покупок. Запиши в `prob`, допуск ±0.000001.
+setup: |
+  from scipy import stats
+  p = round(0.05 + (SEED % 7) * 0.01, 2)
+outputs:
+  - var: prob
+    tol: 0.000001
+reference: |
+  prob = stats.binom.sf(2, n=20, p=p)
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "prob = stats.binom.sf(3, n=20, p=p)"
+    expect_detector: stat_value
+  - code: "prob = stats.binom.pmf(3, n=20, p=p)"
+    expect_detector: stat_value
+hints:
+  - "Биномиальное распределение и sf — раздел «Распределения»."
+  - "Нужна вероятность P(X ≥ 3). sf(k) — это P(X > k), значит k на единицу меньше."
+  - "stats.binom.sf(2, n=20, p=p) или 1 - stats.binom.cdf(2, n=20, p=p)."
+  - "prob = stats.binom.sf(___, n=20, p=p)"
+  - "Для дискретной величины «не меньше трёх» = «больше двух». pmf(3) — вероятность ровно трёх покупок, это меньше."

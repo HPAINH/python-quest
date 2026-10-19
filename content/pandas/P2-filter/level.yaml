@@ -1,0 +1,7 @@
+code: P2
+title: Выбор и фильтрация
+intro: Колонки, loc и iloc, фильтры с несколькими условиями, isin, between, query и сортировка — WHERE и ORDER BY в pandas.
+minutes: 30
+expected_tasks: 12
+packages: [numpy, pandas]
+data: true

@@ -1,0 +1,44 @@
+id: C6-12-flatten
+type: function
+function: flatten
+title: Развернуть вложенный список
+difficulty: 3
+lesson_section: recursion
+statement: |
+  Напиши рекурсивную функцию `flatten(items)`, которая получает список, где элементы могут быть числами или снова списками любой глубины, и возвращает плоский список всех чисел в том же порядке.
+
+  Пример: `flatten([1, [2, [3, 4]], 5])` → `[1, 2, 3, 4, 5]`.
+starter: |
+  def flatten(items):
+      pass
+reference: |
+  def flatten(items):
+      out = []
+      for x in items:
+          if isinstance(x, list):
+              out.extend(flatten(x))
+          else:
+              out.append(x)
+      return out
+requires: ["uses:recursion"]
+tests:
+  visible: ["flatten([1, [2, [3, 4]], 5])", "flatten([])"]
+  hidden: ["flatten([[[[7]]]])", "flatten([[], [1], [[], 2]])", "flatten([1, 2, 3])", "flatten([[1, [2]], [[3], 4], 5])"]
+random:
+  count: 20
+  helpers: |
+    def nest(d):
+        if d == 0 or random.random() < 0.4:
+            return random.randint(0, 9)
+        return [nest(d - 1) for _ in range(random.randint(0, 3))]
+  gen: "f'flatten({[nest(4) for _ in range(random.randint(0, 4))]})'"
+star3: [first_try]
+buggy_variants:
+  - code: "def flatten(items):\n    out = []\n    for x in items:\n        if isinstance(x, list):\n            out.extend(x)\n        else:\n            out.append(x)\n    return out"
+    expect_detector: null
+hints:
+  - "Вложенные структуры обрабатывает рекурсия — раздел «Рекурсия»."
+  - "Пройди по элементам. Если элемент — число, добавь его в ответ. Если список — разверни его той же функцией flatten и добавь все полученные числа."
+  - "isinstance(x, list), out.extend(flatten(x)), out.append(x)."
+  - "def flatten(items):\n    out = []\n    for x in items:\n        if isinstance(x, ___):\n            out.extend(___(x))\n        else:\n            out.___(x)\n    return out"
+  - "Базовый случай здесь — элемент-число: его не нужно разворачивать. extend добавляет все элементы списка, а append добавил бы список целиком. Если разворачивать вложенный список без рекурсии, второй уровень вложенности останется списком."

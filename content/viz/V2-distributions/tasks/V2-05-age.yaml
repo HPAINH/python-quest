@@ -1,0 +1,32 @@
+id: V2-05-age
+type: plot
+title: Возраст клиентов
+difficulty: 2
+lesson_section: hist
+statement: |
+  Построй гистограмму возраста клиентов на 2026 год (`2026 - birth_year`) на 20 корзин. Клиентов без года рождения не учитывай. Подпиши ось X.
+setup: |
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  import seaborn as sns
+  customers = pd.read_csv("customers.csv")
+plot:
+  labels: true
+  hist: true
+reference: |
+  age = (2026 - customers["birth_year"]).dropna()
+  fig, ax = plt.subplots()
+  ax.hist(age, bins=20)
+  ax.set_xlabel("Возраст")
+star3: [first_try, "max_lines:4"]
+buggy_variants:
+  - code: "fig, ax = plt.subplots()\nax.hist(customers['birth_year'].dropna(), bins=20)\nax.set_xlabel('Год')"
+    expect_detector: plot_data
+  - code: "age = (2026 - customers['birth_year']).dropna()\nfig, ax = plt.subplots()\nax.hist(age, bins=20)"
+    expect_detector: plot_labels
+hints:
+  - "Гистограмма — раздел «Гистограмма», пропуски — уровень P3."
+  - "Вычисли возраст как разность 2026 и года рождения, убери пропуски и построй гистограмму на 20 корзин."
+  - "(2026 - customers[\"birth_year\"]).dropna(), ax.hist(age, bins=20), ax.set_xlabel(...)."
+  - "age = (2026 - customers[\"birth_year\"]).___()\nfig, ax = plt.subplots()\nax.hist(age, bins=___)\nax.set_xlabel(\"...\")"
+  - "Гистограмма года рождения — зеркальное отражение гистограммы возраста: те же высоты столбцов в обратном порядке. ax.hist сам пропускает NaN, но dropna делает намерение явным."

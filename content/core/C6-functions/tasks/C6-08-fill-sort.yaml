@@ -1,0 +1,30 @@
+id: C6-08-fill-sort
+type: fill_gaps
+base: function
+function: cheapest
+title: Самые дешёвые товары
+difficulty: 1
+lesson_section: lambda
+statement: |
+  Функция `cheapest(items, k=3)` получает список пар `(название, цена)` и возвращает названия `k` самых дешёвых товаров по возрастанию цены. При одинаковой цене — по алфавиту.
+
+  Заполни пропуски.
+template: |
+  def cheapest(items, k=___):
+      ordered = sorted(items, key=___ it: (it[1], it[0]))
+      return [name for name, price in ordered[:___]]
+reference: |
+  def cheapest(items, k=3):
+      ordered = sorted(items, key=lambda it: (it[1], it[0]))
+      return [name for name, price in ordered[:k]]
+tests:
+  visible: ["cheapest([('сыр', 1290), ('чай', 450), ('кофе', 990), ('хлеб', 55)])", "cheapest([('a', 5), ('b', 5)], k=1)"]
+  hidden: ["cheapest([])", "cheapest([('x', 1)], k=5)", "cheapest([('b', 2), ('a', 2), ('c', 1)], 2)"]
+random: {count: 20, gen: "f'cheapest({[(random.choice(\"abcdef\"), random.randint(1, 9)) for _ in range(random.randint(0, 7))]}, {random.randint(1, 4)})'"}
+star3: [first_try]
+hints:
+  - "Ключ сортировки задаётся lambda — раздел «lambda и функции как значения»."
+  - "Значение k по умолчанию — 3. Сортируй по паре (цена, название), бери первые k элементов и оставляй только названия."
+  - "Число по умолчанию, ключевое слово lambda и срез [:k]."
+  - "Первый пропуск — число, второй — слово для короткой функции, третий — имя параметра с количеством."
+  - "key=lambda it: (it[1], it[0]) сортирует по цене, а при равенстве — по названию. Срез [:k] безопасен, даже если товаров меньше k. Генератор списка оставляет только названия."

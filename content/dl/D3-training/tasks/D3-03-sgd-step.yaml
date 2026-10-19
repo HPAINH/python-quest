@@ -1,0 +1,35 @@
+id: D3-03-sgd-step
+type: function
+function: sgd_step
+title: Шаг градиентного спуска
+difficulty: 1
+lesson_section: sgd
+tol: 1.0e-12
+statement: 'Напиши функцию `sgd_step(params, grads, lr)`: `params` и `grads` — списки массивов одинаковых форм. Верни **новый** список параметров после шага `p − lr·g`, исходные массивы не меняй.
+
+  '
+setup: "import numpy as np\n\ndef rnd(*shape, seed=0):\n    return np.random.default_rng(seed).normal(size=shape).round(3)\n\ndef labels(n, k, seed=0):\n    return np.random.default_rng(seed).integers(0, k, n)\n"
+starter: "def sgd_step(params, grads, lr):\n    pass\n"
+reference: "def sgd_step(params, grads, lr):\n    return [p - lr * g for p, g in zip(params, grads)]\n"
+tests:
+  visible:
+  - sgd_step([np.array([1.0, 2.0])], [np.array([0.5, -1.0])], 0.1)
+  hidden:
+  - sgd_step([rnd(2, 3, seed=1), rnd(3, seed=2)], [rnd(2, 3, seed=3), rnd(3, seed=4)], 0.5)
+  - sgd_step([np.zeros(2)], [np.ones(2)], 1.0)
+  - sgd_step([rnd(4, seed=5), rnd(1, seed=6), rnd(2, 2, seed=7)], [rnd(4, seed=8), rnd(1, seed=9), rnd(2, 2, seed=10)], 0.01)
+random:
+  count: 10
+  gen: '(lambda s: f''sgd_step([rnd(3, seed={s}), rnd(2, 2, seed={s + 1})], [rnd(3, seed={s + 2}), rnd(2, 2, seed={s + 3})], {random.choice([0.01, 0.1, 1.0])})'')(random.randint(0, 999))'
+star3:
+- first_try
+- max_lines:2
+buggy_variants:
+- code: "def sgd_step(params, grads, lr):\n    return [p + lr * g for p, g in zip(params, grads)]"
+- code: "def sgd_step(params, grads, lr):\n    return [p - g for p, g in zip(params, grads)]"
+hints:
+- Шаг спуска — раздел «Градиентный спуск».
+- Пройди по парам «параметр — градиент» и для каждой посчитай p − lr·g. Новый список — через списковое включение.
+- '[p - lr * g for p, g in zip(params, grads)].'
+- "def sgd_step(params, grads, lr):\n    return [p ___ lr * g for p, g in zip(params, ___)]"
+- Градиент показывает направление роста потери, поэтому шаг делают против него. Запись p - lr * g создаёт новый массив; p -= lr * g изменила бы исходный.

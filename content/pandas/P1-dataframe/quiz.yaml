@@ -1,0 +1,95 @@
+quiz:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      s = pd.Series([10, 20, 30], index=["a", "b", "c"])
+      print(s["b"], s.sum(), (s > 15).sum())
+    answer: "20 60 2"
+    explain: Значение получают по подписи индекса. Сравнение даёт Series из True/False, сумма считает True.
+    section: series
+  - type: choice
+    q: Что вернёт df[["order_id", "amount"]]?
+    options: ["Series", "DataFrame из двух колонок", "Ошибку", "Список"]
+    answer: 1
+    explain: Список имён во внешних скобках выбирает несколько колонок — получается таблица.
+    section: dataframe
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      df = pd.DataFrame({"p": [100, 200], "q": [3, 1]})
+      df["t"] = df["p"] * df["q"]
+      print(df.shape, df["t"].tolist())
+    answer: "(2, 3) [300, 200]"
+    explain: Новая колонка считается сразу для всех строк, колонок стало три.
+    section: dataframe
+  - type: fill
+    q: Впиши метод, чтобы получить частоты значений колонки.
+    code: |
+      import pandas as pd
+      s = pd.Series(["a", "b", "a", "a"])
+      print(s.___()["a"])
+    answer: ["value_counts"]
+    expect: "3"
+    explain: value_counts считает, сколько раз встретилось каждое значение.
+    section: explore
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      s = pd.Series(["x", None, "y", None])
+      print(s.isna().sum(), s.nunique())
+    answer: "2 2"
+    explain: Пропусков два. nunique не считает пропуски значением.
+    section: explore
+
+express:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      df = pd.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "x"]})
+      print(df.shape[0], list(df.columns), df["b"].value_counts().iloc[0])
+    answer: "3 ['a', 'b'] 2"
+    explain: shape[0] — число строк. value_counts сортирует частоты по убыванию, первая — 2.
+    section: explore
+  - type: choice
+    q: Почему orders["amount"].mean без скобок — ошибка?
+    options: ["Так нельзя писать в pandas", "Это сам метод, а не его результат — в переменной окажется функция", "mean работает только для DataFrame", "Нужно писать mean[]"]
+    answer: 1
+    explain: Чтобы вызвать метод, нужны круглые скобки — mean().
+    section: mistakes
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      s = pd.Series(["app", "web", "app", "app"])
+      print(s.value_counts(normalize=True)["app"])
+    answer: "0.75"
+    explain: normalize=True даёт доли — app встречается в 3 случаях из 4.
+    section: explore
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      orders = pd.read_csv("orders.csv")
+      print(orders.columns[0], orders.shape[1])
+    answer: "order_id 8"
+    explain: В таблице orders 8 колонок, первая — order_id.
+    section: read-csv
+  - type: choice
+    q: Почему orders.count не подходит для обращения к колонке с именем count?
+    options: ["Колонок с таким именем не бывает", "count — это метод DataFrame, и через точку вызовется он, а не колонка", "Имена колонок пишут только заглавными", "Нужно писать orders->count"]
+    answer: 1
+    explain: Для имён, совпадающих с методами, используй квадратные скобки — orders["count"].
+    section: dataframe
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      s = pd.Series([2.5, 3.5, None])
+      print(s.mean(), s.count(), len(s))
+    answer: "3.0 2 3"
+    explain: mean и count пропускают NaN, а len считает все строки.
+    section: series

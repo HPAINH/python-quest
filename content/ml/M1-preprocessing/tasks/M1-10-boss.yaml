@@ -1,0 +1,56 @@
+id: M1-10-boss
+type: model
+title: 'Босс: модель оттока для CRM'
+difficulty: 3
+boss: true
+lesson_section: why
+statement: 'CRM-команда хочет каждую неделю рассылать удерживающие предложения клиентам с риском ухода. Подготовь модель.
+
+
+  - На входе — сырая таблица `raw` со всеми колонками `churn.csv`, кроме `churned`; в ней есть `customer_id` и утечка `cancel_request` — обе в модель попадать не должны.
+
+  - Подготовку (пропуски, масштаб, категории с новыми значениями) и логистическую регрессию с `class_weight="balanced"` собери в один Pipeline.
+
+  - Обучи его на всех данных и запиши в `model`. Модель будет получать таблицы в формате `raw`.
+
+
+  Порог — ROC-AUC не ниже 0.80 на скрытой выборке. Дополнительно проверка обучит модель с перемешанной целью — она не должна пройти порог.
+
+  '
+setup: "import numpy as np\nimport pandas as pd\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import OneHotEncoder, StandardScaler\nfrom sklearn.impute import SimpleImputer\nfrom sklearn.compose import ColumnTransformer\nfrom sklearn.pipeline import make_pipeline, Pipeline\nfrom sklearn.linear_model import LogisticRegression\ndf = pd.read_csv(\"churn.csv\")\nX = df.drop(columns=[\"customer_id\", \"cancel_request\", \"churned\"])\ny = df[\"churned\"]\nif SHUFFLE:\n    y = y.sample(frac=1, random_state=1).reset_index(drop=True)\nraw = df.drop(columns=[\"churned\"])\n"
+model:
+  metric: roc_auc
+  threshold: 0.8
+  data: churn
+  target: churned
+  drop: []
+  baseline: 'from sklearn.dummy import DummyClassifier
+
+    model = DummyClassifier().fit(raw, y)'
+  leak_check: true
+reference: "cat = [\"city\", \"loyalty\"]\nnum = [c for c in raw.columns if c not in cat + [\"customer_id\", \"cancel_request\"]]\npre = ColumnTransformer([\n    (\"num\", make_pipeline(SimpleImputer(strategy=\"median\"), StandardScaler()), num),\n    (\"cat\", OneHotEncoder(handle_unknown=\"ignore\"), cat),\n], remainder=\"drop\")\nmodel = make_pipeline(pre, LogisticRegression(max_iter=1000, class_weight=\"balanced\"))\nmodel.fit(raw, y)\n"
+star3:
+- first_try
+buggy_variants:
+- code: 'cat = [''city'', ''loyalty'']
+
+    num = [c for c in raw.columns if c not in cat + [''customer_id'']]
+
+    pre = ColumnTransformer([(''num'', make_pipeline(SimpleImputer(strategy=''median''), StandardScaler()), num), (''cat'', OneHotEncoder(handle_unknown=''ignore''), cat)])
+
+    model = make_pipeline(pre, LogisticRegression(max_iter=1000, class_weight=''balanced'')).fit(raw, y)'
+  expect_detector: model_overfit
+- code: 'cat = [''city'', ''loyalty'']
+
+    num = [c for c in raw.columns if c not in cat]
+
+    pre = ColumnTransformer([(''num'', StandardScaler(), num), (''cat'', OneHotEncoder(handle_unknown=''ignore''), cat)])
+
+    model = make_pipeline(pre, LogisticRegression(max_iter=1000, class_weight=''balanced'')).fit(raw, y)'
+  expect_detector: model_nan
+hints:
+- 'Всё из уровня: ColumnTransformer со своими шагами для чисел и категорий, Pipeline с моделью, и ни одного лишнего признака.'
+- Числовые колонки перечисли явно, исключив customer_id и cancel_request. ColumnTransformer с remainder="drop" (по умолчанию) отбросит всё, что не перечислено. Модель обучай на raw целиком.
+- num = [c for c in raw.columns if c not in cat + ["customer_id", "cancel_request"]], LogisticRegression(max_iter=1000, class_weight="balanced").
+- "cat = [\"city\", \"loyalty\"]\nnum = [c for c in raw.columns if c not in cat + [___, ___]]\npre = ColumnTransformer([\n    (\"num\", make_pipeline(SimpleImputer(strategy=\"median\"), StandardScaler()), num),\n    (\"cat\", OneHotEncoder(handle_unknown=\"ignore\"), cat),\n], remainder=\"drop\")\nmodel = make_pipeline(pre, LogisticRegression(max_iter=1000, class_weight=___))\nmodel.fit(raw, y)"
+- 'С cancel_request модель на обучении почти идеальна, а на живых клиентах заявки ещё нет — и качество падает. class_weight="balanced" увеличивает вес редкого класса: ROC-AUC от этого почти не меняется, а вот порог 0.5 становится осмысленным для рассылки.'

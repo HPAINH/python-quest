@@ -1,0 +1,25 @@
+id: N4-01-order-totals
+type: array
+title: Суммы заказов матрицей
+difficulty: 1
+lesson_section: linalg
+statement: |
+  `qty` — матрица количеств: строки — заказы, столбцы — товары. `price` — цены товаров. Запиши в `result` суммы всех заказов одной операцией матричного умножения.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  k = int(rng.integers(3, 8))
+  qty = rng.integers(0, 4, size=(int(rng.integers(5, 20)), k))
+  price = np.round(rng.uniform(50, 3000, size=k), 2)
+reference: |
+  result = qty @ price
+requires: ["no_loops"]
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = qty * price"
+hints:
+  - "Матричное умножение — оператор @, раздел «Матрицы»."
+  - "Каждая сумма заказа — скалярное произведение строки qty на вектор цен. Оператор @ делает это для всех строк сразу."
+  - "qty @ price."
+  - "result = qty ___ price"
+  - "qty * price умножает поэлементно и даёт таблицу стоимостей позиций, а не суммы заказов. @ сразу складывает произведения по строке. То же самое: (qty * price).sum(axis=1)."

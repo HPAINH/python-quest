@@ -1,0 +1,27 @@
+id: P6-05-gaps
+type: dataframe
+title: Через сколько дней возвращаются
+difficulty: 2
+lesson_section: shift
+sql_quest_ref: LAG с PARTITION BY
+statement: |
+  Для каждого заказа посчитай, сколько дней прошло с **предыдущего** заказа того же клиента. Запиши в `result` колонки `order_id`, `customer_id`, `gap_days` (целое число дней; у первого заказа клиента — пропуск). Порядок строк любой.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv", parse_dates=["order_date"])
+reference: |
+  t = orders.sort_values(["customer_id", "order_date", "order_id"])
+  t["gap_days"] = (t["order_date"] - t.groupby("customer_id")["order_date"].shift(1)).dt.days
+  result = t[["order_id", "customer_id", "gap_days"]]
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "t = orders.sort_values(['customer_id', 'order_date', 'order_id'])\nt['gap_days'] = (t['order_date'] - t['order_date'].shift(1)).dt.days\nresult = t[['order_id', 'customer_id', 'gap_days']]"
+    expect_detector: column_values
+  - code: "t = orders.sort_values(['customer_id', 'order_date', 'order_id'])\nt['gap_days'] = (t.groupby('customer_id')['order_date'].shift(-1) - t['order_date']).dt.days\nresult = t[['order_id', 'customer_id', 'gap_days']]"
+    expect_detector: row_mismatch
+hints:
+  - "Предыдущее значение в группе — shift с groupby, раздел «shift, diff, pct_change»."
+  - "Отсортируй заказы по клиенту и дате, возьми дату предыдущего заказа клиента через groupby + shift(1) и вычти её из текущей даты. У разности дат есть .dt.days."
+  - "t.groupby(\"customer_id\")[\"order_date\"].shift(1), (t[\"order_date\"] - prev).dt.days."
+  - "t = orders.sort_values([\"customer_id\", \"order_date\", \"order_id\"])\nt[\"gap_days\"] = (t[\"order_date\"] - t.groupby(___)[\"order_date\"].shift(___)).dt.days\nresult = t[[\"order_id\", \"customer_id\", \"gap_days\"]]"
+  - "Без groupby первый заказ клиента получит разницу с последним заказом предыдущего клиента — бессмысленное число. shift(-1) — это следующий заказ, аналог LEAD, а не LAG."

@@ -1,0 +1,7 @@
+code: P5
+title: Соединения таблиц
+intro: merge, виды соединений, ключи, ловушка дубликатов и concat — JOIN и UNION в pandas.
+minutes: 30
+expected_tasks: 10
+packages: [numpy, pandas]
+data: true

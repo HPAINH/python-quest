@@ -1,0 +1,29 @@
+id: M2-05-confusion
+type: value
+title: Матрица ошибок
+difficulty: 1
+lesson_section: clf-metrics
+statement: 'Для модели из `setup` построй матрицу ошибок на `X_test` при пороге 0.5 и запиши её в `result` списком списков `[[TN, FP], [FN, TP]]`.
+
+  '
+setup: "import numpy as np\nimport pandas as pd\nfrom sklearn import metrics\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import OneHotEncoder, StandardScaler\nfrom sklearn.impute import SimpleImputer\nfrom sklearn.compose import ColumnTransformer\nfrom sklearn.pipeline import make_pipeline, Pipeline\nfrom sklearn.linear_model import LogisticRegression, LinearRegression\ndf = pd.read_csv(\"churn.csv\")\nX = df.drop(columns=[\"customer_id\", \"cancel_request\", \"churned\"])\ny = df[\"churned\"]\nif SHUFFLE:\n    y = y.sample(frac=1, random_state=1).reset_index(drop=True)\ncat = [\"city\", \"loyalty\"]\nnum = [c for c in X.columns if c not in cat]\npre = ColumnTransformer([\n    (\"num\", make_pipeline(SimpleImputer(strategy=\"median\"), StandardScaler()), num),\n    (\"cat\", OneHotEncoder(handle_unknown=\"ignore\"), cat),\n])\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, stratify=y, random_state=42)\nclf = make_pipeline(pre, LogisticRegression(max_iter=1000)).fit(X_train, y_train)\nproba = clf.predict_proba(X_test)[:, 1]\n"
+reference: 'pred = (proba >= 0.5).astype(int)
+
+  result = metrics.confusion_matrix(y_test, pred).tolist()
+
+  '
+star3:
+- first_try
+- max_lines:2
+buggy_variants:
+- code: 'pred = (proba >= 0.5).astype(int)
+
+    result = metrics.confusion_matrix(pred, y_test).tolist()'
+hints:
+- Матрица ошибок — раздел «Метрики классификации».
+- Получи метки по порогу и передай в confusion_matrix сначала истину, потом прогноз. tolist() сделает обычный список.
+- metrics.confusion_matrix(y_test, pred).tolist().
+- 'pred = (proba >= 0.5).astype(int)
+
+  result = metrics.confusion_matrix(___, ___).tolist()'
+- 'Порядок аргументов важен: строки — истинный класс, колонки — предсказанный. Перепутав, получишь транспонированную матрицу: FP и FN поменяются местами.'

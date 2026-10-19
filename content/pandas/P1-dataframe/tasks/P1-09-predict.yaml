@@ -1,0 +1,22 @@
+id: P1-09-predict
+type: predict
+title: Что покажет pandas
+difficulty: 2
+lesson_section: explore
+statement: |
+  Впиши, что выведет программа.
+code: |
+  import pandas as pd
+  df = pd.DataFrame({
+      "city": ["Казань", "Москва", None, "Казань", "Москва", "Москва"],
+      "amount": [990, 450, 1290, None, 300, 700],
+  })
+  print(df.shape, df["city"].nunique())
+  print(df["city"].value_counts().iloc[0], df.isna().sum().sum())
+  print(df["amount"].mean(), df["amount"].count())
+hints:
+  - "Повтори value_counts, nunique, isna и поведение агрегатов с пропусками — раздел «Первый осмотр таблицы»."
+  - "Пропуски не считаются в nunique, count и mean. isna().sum().sum() считает пропуски во всей таблице."
+  - "Москва встречается 3 раза. Среднее считается по пяти суммам."
+  - "Три строки: форма и число городов, самая частая частота и общее число пропусков, среднее и количество сумм."
+  - "Ответ: «(6, 2) 2», «3 2», «746.0 5». Сумма известных сумм 3730, делённая на 5, — 746.0. Пропуски по одному в каждой колонке, всего 2."

@@ -1,0 +1,35 @@
+id: M5-07-predict
+type: predict
+title: Кластеры и компоненты
+difficulty: 2
+lesson_section: kmeans
+statement: 'Впиши, что выведет программа.
+
+  '
+code: 'import numpy as np
+
+  from sklearn.cluster import KMeans
+
+  from sklearn.decomposition import PCA
+
+  X = np.array([[0.0, 0.0], [0.0, 1.0], [10.0, 0.0], [10.0, 1.0]])
+
+  km = KMeans(2, n_init=10, random_state=0).fit(X)
+
+  print(sorted(np.bincount(km.labels_).tolist()), round(km.inertia_, 2))
+
+  print(km.predict([[9.0, 0.5]])[0] == km.labels_[2])
+
+  p = PCA().fit(X)
+
+  print(p.explained_variance_ratio_.round(3).tolist())
+
+  print(PCA(1).fit_transform(X).shape)
+
+  '
+hints:
+- Повтори разделы «KMeans» и «PCA».
+- Два кластера — левая и правая пары. Центры (0, 0.5) и (10, 0.5), каждая точка на расстоянии 0.5 от центра.
+- 'Разброс по X: значения 0 и 10, дисперсия 25. По Y: 0 и 1, дисперсия 0.25. Доли — 25 / 25.25 и 0.25 / 25.25.'
+- 'Четыре строки: список и число, логическое значение, список из двух долей, форма массива.'
+- 'Ответ: «[2, 2] 1.0», «True», «[0.99, 0.01]», «(4, 1)».'

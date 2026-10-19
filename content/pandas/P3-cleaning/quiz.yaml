@@ -1,0 +1,100 @@
+quiz:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      s = pd.Series([10.0, None, 30.0])
+      print(s.fillna(0).sum(), s.mean(), s.isna().sum())
+    answer: "40.0 20.0 1"
+    explain: fillna заменяет пропуск нулём. mean пропуск пропускает — (10 + 30) / 2.
+    section: missing
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      s = pd.Series(["12", "н/д", "7"])
+      print(pd.to_numeric(s, errors="coerce").sum())
+    answer: "19.0"
+    explain: errors="coerce" превращает «н/д» в NaN, сумма считается по остальным.
+    section: types
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      df = pd.DataFrame({"id": [1, 1, 2], "v": ["a", "a", "b"]})
+      print(df.duplicated().sum(), len(df.drop_duplicates()))
+    answer: "1 2"
+    explain: Вторая строка полностью повторяет первую.
+    section: duplicates
+  - type: fill
+    q: Впиши метод, чтобы привести города к одному виду.
+    code: |
+      import pandas as pd
+      s = pd.Series(["  Москва", "МОСКВА ", "москва"])
+      print(s.str.strip().str.___().nunique())
+    answer: ["lower", "upper", "title", "capitalize", "casefold"]
+    expect: "1"
+    explain: После strip и приведения регистра остаётся одно значение.
+    section: str
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      d = pd.to_datetime(pd.Series(["2026-10-17", "01.02.2026"]), format="mixed", dayfirst=True)
+      print(d.dt.month.tolist(), d.dt.dayofweek.tolist())
+    answer: "[10, 2] [5, 6]"
+    explain: dayfirst=True читает 01.02.2026 как 1 февраля. 17 октября 2026 — суббота (5), 1 февраля 2026 — воскресенье (6).
+    section: dates
+
+express:
+  - type: choice
+    q: Почему raw["amount"].astype(float) падает на значении «1 290,50»?
+    options: ["float не умеет большие числа", "В строке пробел между разрядами и запятая — сначала их нужно убрать и заменить", "Нужно писать astype(int)", "Это не ошибка"]
+    answer: 1
+    explain: Перед переводом текст чистят — str.replace(" ", "") и str.replace(",", ".").
+    section: types
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      df = pd.DataFrame({"a": [1, None, 3], "b": [None, "x", "y"]})
+      print(len(df.dropna()), len(df.dropna(subset=["a"])))
+    answer: "1 2"
+    explain: dropna без subset убирает строку при любом пропуске. С subset — только при пропуске в a.
+    section: missing
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      s = pd.Series(["anna@mail.ru", None, "ivan@yandex.ru"])
+      print(s.str.contains("mail", na=False).tolist())
+    answer: "[True, False, False]"
+    explain: na=False превращает пропуск в False, и маску можно использовать в фильтре.
+    section: str
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      df = pd.DataFrame({"id": [1, 1, 2], "v": [5, 6, 7]})
+      print(df.drop_duplicates(subset=["id"], keep="last")["v"].tolist())
+    answer: "[6, 7]"
+    explain: Дубликатом считается совпадение id, keep="last" оставляет последнее вхождение.
+    section: duplicates
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      a = pd.to_datetime(pd.Series(["2026-01-01", "2026-03-01"]))
+      print((a.iloc[1] - a.iloc[0]).days, a.dt.to_period("M").astype(str).tolist())
+    answer: "59 ['2026-01', '2026-03']"
+    explain: В январе 31 день, в феврале 2026 года — 28. to_period("M") оставляет месяц.
+    section: dates
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import pandas as pd
+      s = pd.Series(["7", None, "12"])
+      print(pd.to_numeric(s).astype("Int64").tolist())
+    answer: "[7, <NA>, 12]"
+    explain: Int64 с заглавной буквы допускает пропуск — он выводится как <NA>.
+    section: types

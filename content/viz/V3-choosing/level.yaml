@@ -1,0 +1,7 @@
+code: V3
+title: Правильный график
+intro: Какой график отвечает на вопрос — время, сравнение, части целого, распределение, связь — и типичные ошибки графиков.
+minutes: 25
+expected_tasks: 8
+packages: [numpy, pandas, matplotlib, seaborn]
+data: [events]

@@ -1,0 +1,15 @@
+id: D3-07-predict
+type: predict
+title: Обучение по шагам
+difficulty: 2
+lesson_section: sgd
+statement: 'Впиши, что выведет программа.
+
+  '
+code: "import numpy as np\nw = 10.0\nfor lr in [0.1, 0.5]:\n    v = w\n    for _ in range(2):\n        v -= lr * 2 * v\n    print(lr, round(v, 4))\np = np.clip(np.array([0.0, 1.0]), 1e-3, 1 - 1e-3)\nprint(p.tolist())\nidx = np.array([3, 1, 4, 0, 2])\nprint([idx[i:i + 2].tolist() for i in range(0, 5, 2)])\n"
+hints:
+- Повтори разделы «Градиентный спуск», «Функции потерь» и «Мини-батчи».
+- 'Для потери v² градиент 2v, шаг: v ← v − lr·2v = v·(1 − 2lr).'
+- 'При lr = 0.1 множитель 0.8, при 0.5 — 0: минимум за один шаг. clip заменяет 0 и 1 на eps и 1 − eps.'
+- 'Четыре строки: две пары чисел, список, список списков.'
+- 'Ответ: «0.1 6.4», «0.5 0.0», «[0.001, 0.999]», «[[3, 1], [4, 0], [2]]».'

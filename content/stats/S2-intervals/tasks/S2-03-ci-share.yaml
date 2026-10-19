@@ -1,0 +1,36 @@
+id: S2-03-ci-share
+type: stat
+title: Доля отмен в приложении
+difficulty: 2
+lesson_section: ci-prop
+statement: |
+  Оцени долю отменённых заказов (`status` равен `cancelled`) в канале `app` и 95% интервал для неё по нормальному приближению. Запиши `share` и `ci` — пару границ, допуск ±0.00001.
+setup: |
+  import numpy as np
+  import pandas as pd
+  from scipy import stats
+  orders = pd.read_csv("orders.csv")
+outputs:
+  - var: share
+    tol: 0.00001
+  - var: ci
+    tol: 0.00001
+reference: |
+  app = orders[orders["channel"] == "app"]
+  n = len(app)
+  share = (app["status"] == "cancelled").mean()
+  se = np.sqrt(share * (1 - share) / n)
+  z = stats.norm.ppf(0.975)
+  ci = (share - z * se, share + z * se)
+star3: [first_try, "max_lines:6"]
+buggy_variants:
+  - code: "app = orders[orders['channel'] == 'app']\nn = len(orders)\nshare = (app['status'] == 'cancelled').mean()\nse = np.sqrt(share * (1 - share) / n)\nz = stats.norm.ppf(0.975)\nci = (share - z * se, share + z * se)"
+    expect_detector: stat_value
+  - code: "app = orders[orders['channel'] == 'app']\nn = len(app)\nshare = (app['status'] == 'cancelled').mean()\nse = np.sqrt(share * (1 - share) / n)\nz = stats.norm.ppf(0.95)\nci = (share - z * se, share + z * se)"
+    expect_detector: stat_value
+hints:
+  - "Интервал для доли — раздел «Интервал для доли»."
+  - "Доля — среднее булевой маски. SE = √(p(1 − p) / n), где n — число заказов канала. Для 95% берут квантиль 0,975."
+  - "(app[\"status\"] == \"cancelled\").mean(), np.sqrt(share * (1 - share) / n), stats.norm.ppf(0.975)."
+  - "app = orders[orders[\"channel\"] == \"app\"]\nn = len(___)\nshare = (app[\"status\"] == \"cancelled\").mean()\nse = np.sqrt(share * (1 - share) / ___)\nz = stats.norm.ppf(___)\nci = (share - z * se, share + z * se)"
+  - "Двусторонний 95% интервал оставляет по 2,5% с каждой стороны, поэтому квантиль 0,975, а не 0,95. n — размер той выборки, по которой посчитана доля."

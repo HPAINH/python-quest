@@ -1,0 +1,52 @@
+id: M1-04-impute
+type: stat
+title: Пропуски медианой
+difficulty: 2
+lesson_section: pipeline
+statement: 'В `avg_check` и `email_opens_30d` есть пропуски. Раздели данные как раньше, обучи `SimpleImputer(strategy="median")` на этих двух колонках train и запиши `fill_values` — значения, которыми он заполняет пропуски (атрибут `statistics_`, список из двух чисел, допуск ±0.01), и `n_missing_test` — сколько всего пропусков в этих колонках теста.
+
+  '
+setup: "import numpy as np\nimport pandas as pd\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import OneHotEncoder, StandardScaler\nfrom sklearn.impute import SimpleImputer\nfrom sklearn.compose import ColumnTransformer\nfrom sklearn.pipeline import make_pipeline, Pipeline\nfrom sklearn.linear_model import LogisticRegression\ndf = pd.read_csv(\"churn.csv\")\nX = df.drop(columns=[\"customer_id\", \"cancel_request\", \"churned\"])\ny = df[\"churned\"]\nif SHUFFLE:\n    y = y.sample(frac=1, random_state=1).reset_index(drop=True)\n"
+outputs:
+- var: fill_values
+  tol: 0.01
+- var: n_missing_test
+reference: 'cols = ["avg_check", "email_opens_30d"]
+
+  X_train, X_test, y_train, y_test = train_test_split(X[cols], y, test_size=0.25, stratify=y, random_state=42)
+
+  imp = SimpleImputer(strategy="median").fit(X_train)
+
+  fill_values = imp.statistics_.tolist()
+
+  n_missing_test = int(X_test.isna().sum().sum())
+
+  '
+star3:
+- first_try
+- max_lines:5
+buggy_variants:
+- code: 'cols = [''avg_check'', ''email_opens_30d'']
+
+    X_train, X_test, y_train, y_test = train_test_split(X[cols], y, test_size=0.25, stratify=y, random_state=42)
+
+    imp = SimpleImputer().fit(X_train)
+
+    fill_values = imp.statistics_.tolist()
+
+    n_missing_test = int(X_test.isna().sum().sum())'
+  expect_detector: stat_value
+hints:
+- SimpleImputer — раздел «Pipeline и ColumnTransformer».
+- Обучи импьютер на двух колонках train; выученные медианы лежат в statistics_. Пропуски теста — isna().sum() по таблице.
+- SimpleImputer(strategy="median").fit(X_train).statistics_.tolist(), X_test.isna().sum().sum().
+- 'cols = ["avg_check", "email_opens_30d"]
+
+  X_train, X_test, y_train, y_test = train_test_split(X[cols], y, test_size=0.25, stratify=y, random_state=42)
+
+  imp = SimpleImputer(strategy=___).fit(X_train)
+
+  fill_values = imp.___.tolist()
+
+  n_missing_test = int(X_test.isna().sum().sum())'
+- По умолчанию SimpleImputer заполняет средним — на скошенном чеке среднее заметно выше медианы. Заполнять тест нужно значениями, выученными на train.

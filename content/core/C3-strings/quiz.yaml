@@ -1,0 +1,95 @@
+quiz:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      s = "Analytics"
+      print(s[0], s[-1], s[2:5])
+    answer: "A s aly"
+    explain: s[0] — первый символ, s[-1] — последний, s[2:5] — символы с индексами 2, 3, 4.
+    section: slices
+  - type: choice
+    q: Что произойдёт при s = "cat"; s[0] = "b"?
+    options: ["s станет bat", "s станет bcat", "TypeError: строки нельзя менять по индексу", "Ничего не изменится, без ошибки"]
+    answer: 2
+    explain: Строки неизменяемы. Новую строку собирают так — "b" + s[1:].
+    section: indexes
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      words = "  data   science  ".split()
+      print(len(words))
+      print("_".join(words))
+    answer: "2\ndata_science"
+    explain: split() без аргумента режет по любым пробелам и отбрасывает пустые части. join склеивает части через подчёркивание.
+    section: split-join
+  - type: fill
+    q: Впиши пропуск, чтобы программа вывела строку задом наперёд — atad.
+    code: |
+      s = "data"
+      print(s[___])
+    answer: ["::-1"]
+    expect: "atad"
+    explain: Срез с шагом -1 проходит строку с конца.
+    section: slices
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      name = "  Anna  "
+      name.strip()
+      print(len(name))
+    answer: "8"
+    explain: strip() возвращает новую строку, а name не меняется. Результат нужно записать — name = name.strip().
+    section: methods
+
+express:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      s = "ShopData"
+      print(s[-4:], s[::3])
+    answer: "Data Spt"
+    explain: s[-4:] — последние 4 символа. s[::3] — каждый третий символ начиная с нулевого — индексы 0, 3, 6, то есть S, p, t.
+    section: slices
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      t = "banana"
+      print(t.count("an"), t.find("n"), t.find("x"))
+    answer: "2 2 -1"
+    explain: Подстрока an встречается дважды. Первая n стоит на индексе 2. Если подстроки нет, find возвращает -1.
+    section: methods
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      line = "a=1;b=22;c=333"
+      parts = line.split(";")
+      print(parts[1].split("=")[1])
+    answer: "22"
+    explain: После split(";") получаем три части. Во второй части b=22 берём значение после знака равенства.
+    section: split-join
+  - type: choice
+    q: Какая запись проверяет, что строка s — палиндром?
+    options: ["s == s.reverse()", "s == s[::-1]", "s == reversed(s)", "s[0] == s[-1]"]
+    answer: 1
+    explain: s[::-1] — строка задом наперёд. У строк нет метода reverse, а reversed возвращает не строку.
+    section: slices
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      count = 0
+      for ch in "R2-D2 and C-3PO":
+          if ch.isdigit():
+              count += 1
+      print(count)
+    answer: "3"
+    explain: Цифры — 2, 2 и 3.
+    section: iterate
+  - type: fill
+    q: Впиши пропуск, чтобы программа вывела 1, 2, 3.
+    code: |
+      nums = ["1", "2", "3"]
+      print(___.join(nums))
+    answer: ["\", \"", "', '"]
+    expect: "1, 2, 3"
+    explain: Разделитель — строка из запятой и пробела, у неё вызывается join.
+    section: split-join

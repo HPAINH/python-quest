@@ -1,0 +1,47 @@
+id: M3-05-boost-reg
+type: model
+title: Бустинг для спроса
+difficulty: 2
+lesson_section: boosting
+statement: 'Обучи на всех `Xd`, `yd` (набор спроса) Pipeline из кодирования категории и `HistGradientBoostingRegressor(random_state=0)` и запиши в `model`. Порог — MAE не больше 5.8 штук на скрытой выборке других товаров.
+
+  '
+setup: "import numpy as np\nimport pandas as pd\nfrom sklearn import metrics\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import OneHotEncoder, StandardScaler\nfrom sklearn.impute import SimpleImputer\nfrom sklearn.compose import ColumnTransformer\nfrom sklearn.pipeline import make_pipeline, Pipeline\nfrom sklearn.linear_model import LogisticRegression, LinearRegression\nfrom sklearn.tree import DecisionTreeClassifier\nfrom sklearn.ensemble import RandomForestClassifier, HistGradientBoostingClassifier, HistGradientBoostingRegressor\nfrom sklearn.inspection import permutation_importance\ndd = pd.read_csv(\"demand.csv\", parse_dates=[\"date\"])\ndd[\"month\"] = dd[\"date\"].dt.month\nXd = dd.drop(columns=[\"date\", \"product_id\", \"units\"])\nyd = dd[\"units\"]\nif SHUFFLE:\n    yd = yd.sample(frac=1, random_state=1).reset_index(drop=True)\npre_d = ColumnTransformer([(\"cat\", OneHotEncoder(handle_unknown=\"ignore\"), [\"category\"])], remainder=\"passthrough\")\n"
+model:
+  var: model
+  metric: mae
+  threshold: 5.8
+  test_setup: 'import pandas as pd
+
+    _d = pd.read_csv("demand.csv", parse_dates=["date"])
+
+    _d["month"] = _d["date"].dt.month
+
+    X_test = _d.drop(columns=["date", "product_id", "units"])
+
+    y_test = _d["units"]
+
+    '
+  data: demand
+  baseline: 'from sklearn.dummy import DummyRegressor
+
+    model = DummyRegressor().fit(Xd, yd)'
+reference: 'model = make_pipeline(pre_d, HistGradientBoostingRegressor(random_state=0))
+
+  model.fit(Xd, yd)
+
+  '
+star3:
+- first_try
+- max_lines:2
+buggy_variants:
+- code: model = make_pipeline(pre_d, LinearRegression()).fit(Xd, yd)
+  expect_detector: model_metric
+hints:
+- Бустинг — раздел «Градиентный бустинг».
+- Регрессионный бустинг ставится после того же pre_d, что в уровне M2.
+- make_pipeline(pre_d, HistGradientBoostingRegressor(random_state=0)).fit(Xd, yd).
+- 'model = make_pipeline(pre_d, ___(random_state=0))
+
+  model.fit(Xd, yd)'
+- Для регрессии берут ...Regressor, для классификации — ...Classifier. Бустинг ловит, что погода влияет на мороженое и суп в разные стороны.

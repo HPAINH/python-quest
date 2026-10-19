@@ -1,0 +1,38 @@
+id: D2-08-boss-backward
+type: function
+function: backward2
+title: 'Босс: обратный проход сети'
+difficulty: 3
+boss: true
+lesson_section: layer-grads
+tol: 1.0e-09
+statement: 'Напиши функцию `backward2(X, y, W1, b1, W2, b2)` для сети из уровня D1: `Z1 = X @ W1 + b1`, `H = ReLU(Z1)`, `Z2 = H @ W2 + b2`, `P = softmax(Z2)`, потеря — средняя кросс-энтропия по меткам `y`. Верни кортеж градиентов потери `(dW1, db1, dW2, db2)`.
+
+
+  Проверь себя численным градиентом из этого уровня: расхождение должно быть меньше 1e-5.
+
+  '
+setup: "import numpy as np\n\ndef rnd(*shape, seed=0):\n    return np.random.default_rng(seed).normal(size=shape).round(3)\n\ndef labels(n, k, seed=0):\n    return np.random.default_rng(seed).integers(0, k, n)\n"
+starter: "def backward2(X, y, W1, b1, W2, b2):\n    pass\n"
+reference: "def backward2(X, y, W1, b1, W2, b2):\n    n = X.shape[0]\n    Z1 = X @ W1 + b1\n    H = np.maximum(0, Z1)\n    Z2 = H @ W2 + b2\n    e = np.exp(Z2 - Z2.max(axis=1, keepdims=True))\n    P = e / e.sum(axis=1, keepdims=True)\n    dZ2 = (P - np.eye(W2.shape[1])[y]) / n\n    dW2 = H.T @ dZ2\n    db2 = dZ2.sum(axis=0)\n    dH = dZ2 @ W2.T\n    dZ1 = dH * (Z1 > 0)\n    dW1 = X.T @ dZ1\n    db1 = dZ1.sum(axis=0)\n    return dW1, db1, dW2, db2\n"
+tests:
+  visible:
+  - backward2(rnd(3, 2, seed=1), np.array([0, 1, 1]), rnd(2, 4, seed=2), np.zeros(4), rnd(4, 2, seed=3), np.zeros(2))
+  hidden:
+  - backward2(rnd(6, 4, seed=4), labels(6, 3, seed=5), rnd(4, 5, seed=6), rnd(5, seed=7), rnd(5, 3, seed=8), rnd(3, seed=9))
+  - backward2(rnd(1, 3, seed=10), np.array([2]), rnd(3, 3, seed=11), rnd(3, seed=12), rnd(3, 4, seed=13), np.zeros(4))
+  - backward2(rnd(8, 2, seed=14), labels(8, 2, seed=15), rnd(2, 6, seed=16), np.zeros(6), rnd(6, 2, seed=17), np.zeros(2))
+random:
+  count: 10
+  gen: '(lambda n, i, h, k, s: f''backward2(rnd({n}, {i}, seed={s}), labels({n}, {k}, seed={s + 1}), rnd({i}, {h}, seed={s + 2}), rnd({h}, seed={s + 3}), rnd({h}, {k}, seed={s + 4}), rnd({k}, seed={s + 5}))'')(random.randint(1, 7), random.randint(1, 4), random.randint(2, 6), random.randint(2, 4), random.randint(0, 999))'
+star3:
+- first_try
+buggy_variants:
+- code: "def backward2(X, y, W1, b1, W2, b2):\n    n = X.shape[0]\n    Z1 = X @ W1 + b1\n    H = np.maximum(0, Z1)\n    Z2 = H @ W2 + b2\n    e = np.exp(Z2 - Z2.max(axis=1, keepdims=True))\n    P = e / e.sum(axis=1, keepdims=True)\n    dZ2 = (P - np.eye(W2.shape[1])[y]) / n\n    dW2 = H.T @ dZ2\n    db2 = dZ2.sum(axis=0)\n    dH = dZ2 @ W2.T\n    dZ1 = dH\n    dW1 = X.T @ dZ1\n    db1 = dZ1.sum(axis=0)\n    return dW1, db1, dW2, db2\n"
+- code: "def backward2(X, y, W1, b1, W2, b2):\n    n = X.shape[0]\n    Z1 = X @ W1 + b1\n    H = np.maximum(0, Z1)\n    Z2 = H @ W2 + b2\n    e = np.exp(Z2 - Z2.max(axis=1, keepdims=True))\n    P = e / e.sum(axis=1, keepdims=True)\n    dZ2 = P - np.eye(W2.shape[1])[y]\n    dW2 = H.T @ dZ2\n    db2 = dZ2.sum(axis=0)\n    dH = dZ2 @ W2.T\n    dZ1 = dH * (Z1 > 0)\n    dW1 = X.T @ dZ1\n    db1 = dZ1.sum(axis=0)\n    return dW1, db1, dW2, db2\n"
+hints:
+- 'Всё из уровня: softmax с кросс-энтропией, градиенты слоя и ReLU, цепочка от выхода ко входу.'
+- 'Повтори прямой проход, сохранив Z1, H и P. Затем назад: dZ2 = (P − Y) / n; градиенты второго слоя; dH = dZ2 @ W2.T; через ReLU — dZ1; градиенты первого слоя.'
+- dZ2 = (P - np.eye(k)[y]) / n; dW2 = H.T @ dZ2; dH = dZ2 @ W2.T; dZ1 = dH * (Z1 > 0); dW1 = X.T @ dZ1.
+- "    dZ2 = (P - np.eye(W2.shape[1])[y]) / n\n    dW2 = H.T @ ___\n    db2 = dZ2.sum(axis=0)\n    dH = dZ2 @ W2.___\n    dZ1 = dH * (Z1 ___ 0)\n    dW1 = X.T @ dZ1\n    db1 = dZ1.sum(axis=0)\n    return dW1, db1, dW2, db2"
+- 'Каждый шаг назад — та же пара операций: умножить на транспонированные веса и на производную активации. Забыть производную ReLU — значит пропускать градиент через «выключенные» нейроны; проверка численным градиентом ловит это сразу.'

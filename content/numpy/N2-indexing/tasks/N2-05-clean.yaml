@@ -1,0 +1,24 @@
+id: N2-05-clean
+type: array
+title: Чистим показания
+difficulty: 2
+lesson_section: where
+statement: |
+  Датчик температуры склада пишет `-999`, когда не может снять показание. Запиши в `result` массив `temps`, в котором `-999` заменены на `np.nan`, а остальные значения не тронуты.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  temps = np.round(rng.normal(4, 1.5, size=int(rng.integers(12, 30))), 1)
+  temps[rng.choice(len(temps), size=3, replace=False)] = -999
+reference: |
+  result = np.where(temps == -999, np.nan, temps)
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = temps[temps != -999]"
+    expect_detector: array_shape
+hints:
+  - "Замену по условию делает np.where — раздел «where и поиск»."
+  - "Для каждого элемента: если он равен -999, бери np.nan, иначе — исходное значение."
+  - "np.where(temps == -999, np.nan, temps)."
+  - "result = np.where(temps ___ -999, ___, temps)"
+  - "Маска temps != -999 выбросила бы испорченные элементы, и массив стал бы короче — а нужно сохранить позиции, чтобы показания совпадали со временем замера. np.nan — специальное значение «нет данных»."

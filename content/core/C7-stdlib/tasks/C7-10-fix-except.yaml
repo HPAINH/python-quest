@@ -1,0 +1,33 @@
+id: C7-10-fix-except
+type: fix_bug
+base: function
+function: avg_check
+title: Исправь средний чек
+difficulty: 1
+lesson_section: exceptions
+statement: |
+  Функция `avg_check(total, orders)` должна возвращать средний чек `total / orders`, округлённый до 2 знаков, а при нуле заказов — `0.0`. Сейчас при нуле заказов она падает. Исправь её, сохранив try / except.
+starter: |
+  def avg_check(total, orders):
+      try:
+          return round(total / orders, 2)
+      except ValueError:
+          return 0.0
+reference: |
+  def avg_check(total, orders):
+      try:
+          return round(total / orders, 2)
+      except ZeroDivisionError:
+          return 0.0
+requires: ["uses:try"]
+tests:
+  visible: ["avg_check(1000, 3)", "avg_check(500, 0)"]
+  hidden: ["avg_check(0, 0)", "avg_check(0, 5)", "avg_check(99.99, 1)"]
+random: {count: 15, gen: "f'avg_check({random.randint(0, 100000) / 100}, {random.randint(0, 9)})'"}
+star3: [first_try]
+hints:
+  - "Запусти код и посмотри, какой тип ошибки возникает при делении на ноль — раздел «try и except»."
+  - "except ловит только указанный тип. Деление на ноль выбрасывает не ValueError."
+  - "Нужен ZeroDivisionError."
+  - "    except ___:\n        return 0.0"
+  - "Деление на ноль — ZeroDivisionError. except ValueError его не ловит, поэтому ошибка выходит наружу. Ловить все ошибки голым except тоже плохо: так спрячется и опечатка вроде totl."

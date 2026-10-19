@@ -1,0 +1,24 @@
+id: P1-01-read
+type: dataframe
+title: Первый взгляд на клиентов
+difficulty: 1
+lesson_section: read-csv
+statement: |
+  Прочитай файл `customers.csv` и запиши в `result` первые 10 строк таблицы.
+setup: |
+  import pandas as pd
+reference: |
+  result = pd.read_csv("customers.csv").head(10)
+star3: [first_try, "max_lines:1"]
+ordered: true
+buggy_variants:
+  - code: "result = pd.read_csv('customers.csv').head()"
+    expect_detector: shape_rows
+  - code: "result = pd.read_csv('orders.csv').head(10)"
+    expect_detector: columns_mismatch
+hints:
+  - "Файл читает pd.read_csv, первые строки даёт head — раздел «Чтение CSV»."
+  - "Прочитай файл по имени и возьми первые 10 строк."
+  - "pd.read_csv(\"customers.csv\").head(10)."
+  - "result = pd.read_csv(\"___\").head(___)"
+  - "head() без аргумента возвращает 5 строк, поэтому число нужно указать. Файлы лежат в рабочей папке задачи, путь — просто имя файла."

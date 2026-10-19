@@ -1,0 +1,26 @@
+id: S2-04-n-mean
+type: value
+title: Сколько заказов нужно
+difficulty: 2
+lesson_section: sample-size
+statement: |
+  Финансист хочет знать средний чек с точностью ±50 ₽ при 95% уверенности. Оцени разброс как выборочное std `amount` всех заказов и найди нужное число заказов. Запиши в `result` целое число, округлённое вверх.
+setup: |
+  import math
+  import pandas as pd
+  from scipy import stats
+  orders = pd.read_csv("orders.csv")
+reference: |
+  s = orders["amount"].std()
+  z = stats.norm.ppf(0.975)
+  result = math.ceil((z * s / 50) ** 2)
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "s = orders['amount'].std()\nz = stats.norm.ppf(0.975)\nresult = int((z * s / 50) ** 2)"
+  - code: "s = orders['amount'].std()\nz = stats.norm.ppf(0.975)\nresult = math.ceil(z * s / 50)"
+hints:
+  - "Формула размера выборки — раздел «Размер выборки»."
+  - "Из E = z · s / √n следует n = (z · s / E)². Результат округли вверх."
+  - "math.ceil((stats.norm.ppf(0.975) * s / 50) ** 2)."
+  - "s = orders[\"amount\"].std()\nz = stats.norm.ppf(___)\nresult = math.___((z * s / 50) ** 2)"
+  - "Округление вниз даёт выборку чуть меньше нужной — точность не будет достигнута. Без квадрата получится не число наблюдений, а √n."

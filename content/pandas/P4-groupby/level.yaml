@@ -1,0 +1,7 @@
+code: P4
+title: Группировки
+intro: groupby, agg, transform и сводные таблицы — GROUP BY, HAVING и оконные функции в pandas.
+minutes: 35
+expected_tasks: 12
+packages: [numpy, pandas]
+data: true

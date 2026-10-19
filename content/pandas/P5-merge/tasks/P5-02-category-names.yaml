@@ -1,0 +1,25 @@
+id: P5-02-category-names
+type: dataframe
+title: Товар и его категория
+difficulty: 2
+lesson_section: merge
+statement: |
+  Запиши в `result` колонки `product_id`, `name` (название товара), `category` (название категории) и `price` для всех товаров. В `products` и `categories` колонка с названием называется одинаково — `name`.
+setup: |
+  import pandas as pd
+  products = pd.read_csv("products.csv")
+  categories = pd.read_csv("categories.csv")
+reference: |
+  cats = categories.rename(columns={"name": "category"})
+  t = products.merge(cats, on="category_id")
+  result = t[["product_id", "name", "category", "price"]]
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "t = products.merge(categories, on='category_id')\nresult = t[['product_id', 'name_x', 'name_y', 'price']]"
+    expect_detector: columns_mismatch
+hints:
+  - "Конфликт имён колонок — раздел «merge», последний абзац."
+  - "Переименуй name в categories в category до соединения — тогда конфликта не будет."
+  - "categories.rename(columns={\"name\": \"category\"}), products.merge(cats, on=\"category_id\")."
+  - "cats = categories.rename(columns={\"name\": ___})\nt = products.merge(cats, on=___)\nresult = t[[\"product_id\", \"name\", \"category\", \"price\"]]"
+  - "Без переименования pandas создаст name_x и name_y — работать будет, но имена неговорящие. Можно и через suffixes, а затем rename — но переименование заранее короче."

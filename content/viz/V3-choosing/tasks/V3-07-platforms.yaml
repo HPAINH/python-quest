@@ -1,0 +1,35 @@
+id: V3-07-platforms
+type: plot
+title: Тренды платформ
+difficulty: 2
+lesson_section: time
+statement: |
+  Вопрос: «Как менялось число покупок по неделям в приложении и на сайте?» Построй две линии — число событий `purchase` по неделям (`resample("W")`) для `platform` `app` и `web` (платформа — из сессии события). Нужны легенда и заголовок.
+setup: |
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  import seaborn as sns
+  events = pd.read_csv("events.csv", parse_dates=["event_time"])
+  sessions = pd.read_csv("sessions.csv")
+plot:
+  labels: true
+  legend: true
+reference: |
+  b = events[events["event"] == "purchase"].merge(sessions[["session_id", "platform"]], on="session_id")
+  fig, ax = plt.subplots()
+  for p in ["app", "web"]:
+      w = b[b["platform"] == p].resample("W", on="event_time").size()
+      ax.plot(w.index, w.values, label=p)
+  ax.set_title("Покупки по неделям")
+  ax.legend()
+star3: [first_try, "max_lines:8"]
+buggy_variants:
+  - code: "b = events[events['event'] == 'purchase'].merge(sessions[['session_id', 'platform']], on='session_id')\nw = b.resample('W', on='event_time').size()\nfig, ax = plt.subplots()\nax.plot(w.index, w.values, label='все')\nax.set_title('Покупки')\nax.legend()"
+    expect_detector: plot_series
+  - code: "b = events.merge(sessions[['session_id', 'platform']], on='session_id')\nfig, ax = plt.subplots()\nfor p in ['app', 'web']:\n    w = b[b['platform'] == p].resample('W', on='event_time').size()\n    ax.plot(w.index, w.values, label=p)\nax.set_title('Покупки')\nax.legend()"
+hints:
+  - "Сравнение трендов — раздел «Время»."
+  - "Оставь покупки, добавь к ним платформу из сессий и в цикле по платформам нарисуй недельное число покупок с label. В конце — legend."
+  - "events[events[\"event\"] == \"purchase\"].merge(sessions[[\"session_id\", \"platform\"]], on=\"session_id\"), resample(\"W\", on=\"event_time\").size(), ax.legend()."
+  - "b = events[events[\"event\"] == ___].merge(sessions[[\"session_id\", \"platform\"]], on=\"session_id\")\nfig, ax = plt.subplots()\nfor p in [\"app\", \"web\"]:\n    w = b[b[\"platform\"] == p].resample(\"W\", on=\"event_time\").size()\n    ax.plot(w.index, w.values, label=___)\nax.set_title(\"...\")\nax.___()"
+  - "Две линии на одних осях сравнивают тренды напрямую. Последняя неделя может быть неполной — в отчёте её стоит пометить или отрезать, иначе кажется, что покупки упали."

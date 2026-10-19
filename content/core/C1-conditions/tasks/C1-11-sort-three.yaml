@@ -1,0 +1,30 @@
+id: C1-11-sort-three
+type: stdio
+title: Три числа по порядку
+difficulty: 3
+lesson_section: nested
+statement: |
+  В одной строке даны три целых числа. Выведи их в порядке возрастания через пробел.
+
+  Нельзя использовать `sorted`, `sort`, `min` и `max` — только сравнения.
+reference: |
+  a, b, c = map(int, input().split())
+  if a > b:
+      a, b = b, a
+  if b > c:
+      b, c = c, b
+  if a > b:
+      a, b = b, a
+  print(a, b, c)
+requires: ["no_call:sorted", "no_call:sort", "no_call:min", "no_call:max"]
+tests:
+  visible: ["3 1 2", "5 5 1"]
+  hidden: ["1 2 3", "3 2 1", "2 3 1", "-5 0 -5", "7 7 7"]
+random: {count: 30, gen: "' '.join(str(random.randint(-9, 9)) for _ in range(3))"}
+star3: [first_try]
+hints:
+  - "Это задача на последовательные сравнения — разделы «if и else» и «Вложенные условия»."
+  - "Меняй местами соседние числа, если они стоят не по порядку: сравни первое со вторым, потом второе с третьим, потом снова первое со вторым."
+  - "Обмен значений в Python: a, b = b, a."
+  - "a, b, c = map(int, input().split())\nif a > b:\n    a, b = ___\nif b > c:\n    b, c = ___\nif ___:\n    a, b = b, a\nprint(a, b, c)"
+  - "Первые два обмена «выталкивают» наибольшее число в c. Третий обмен упорядочивает оставшиеся a и b. Запись a, b = b, a меняет значения местами без временной переменной."

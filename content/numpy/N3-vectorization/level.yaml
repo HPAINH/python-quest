@@ -1,0 +1,6 @@
+code: N3
+title: Векторизация
+intro: Заменяем циклы операциями над массивами — broadcasting, агрегаты по осям, накопительные суммы и стандартизация.
+minutes: 30
+expected_tasks: 10
+packages: [numpy]

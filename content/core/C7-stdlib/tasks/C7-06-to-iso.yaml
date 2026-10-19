@@ -1,0 +1,37 @@
+id: C7-06-to-iso
+type: function
+function: to_iso
+title: Даты к одному формату
+difficulty: 2
+lesson_section: datetime
+statement: |
+  В выгрузке даты встречаются в трёх форматах: `17.10.2026`, `2026/10/17` и `2026-10-17`. Напиши функцию `to_iso(text)`, которая возвращает дату в формате `2026-10-17`. Пробелы по краям нужно убрать. Если строка не подходит ни под один формат, функция выбрасывает `ValueError`.
+starter: |
+  from datetime import datetime
+
+  def to_iso(text):
+      pass
+reference: |
+  from datetime import datetime
+
+  def to_iso(text):
+      text = text.strip()
+      for fmt in ("%d.%m.%Y", "%Y/%m/%d", "%Y-%m-%d"):
+          try:
+              return datetime.strptime(text, fmt).strftime("%Y-%m-%d")
+          except ValueError:
+              pass
+      raise ValueError(f"неизвестный формат даты: {text}")
+tests:
+  visible: ["to_iso('17.10.2026')", "to_iso('2026/01/05')"]
+  hidden: ["to_iso('2025-12-31')", "to_iso(' 01.02.2026 ')", "raises(lambda: to_iso('31.02.2026'))", "raises(lambda: to_iso('завтра'))", "raises(lambda: to_iso('2026.10.17'))"]
+random: {count: 20, gen: "(lambda y, m, d: repr(random.choice([f'{d:02d}.{m:02d}.{y}', f'{y}/{m:02d}/{d:02d}', f'{y}-{m:02d}-{d:02d}'])))(random.randint(2020, 2030), random.randint(1, 12), random.randint(1, 28)).join(['to_iso(', ')'])"}
+star3: [first_try]
+buggy_variants:
+  - code: "def to_iso(text):\n    if '.' in text:\n        d, m, y = text.strip().split('.')\n        return f'{y}-{m}-{d}'\n    return text.strip().replace('/', '-')"
+hints:
+  - "Нужны strptime и strftime из раздела «datetime» и try / except из раздела «try и except»."
+  - "Перебери три формата по очереди. Для каждого попробуй разобрать строку: получилось — сразу верни дату в нужном формате, не получилось — переходи к следующему. Если не подошёл ни один, выброси ValueError."
+  - "Цикл по кортежу форматов, try: return datetime.strptime(text, fmt).strftime(\"%Y-%m-%d\"), except ValueError: pass, raise после цикла."
+  - "from datetime import datetime\n\ndef to_iso(text):\n    text = text.___()\n    for fmt in (\"%d.%m.%Y\", \"%Y/%m/%d\", \"%Y-%m-%d\"):\n        try:\n            return datetime.strptime(text, fmt).strftime(___)\n        except ___:\n            pass\n    raise ValueError(\"неизвестный формат\")"
+  - "strptime проверяет и формат, и саму дату: 31.02.2026 не существует и вызывает ValueError. Ручная перестановка частей строки пропустила бы такую дату и строки вроде «2026.10.17». В pandas ту же задачу решает pd.to_datetime(..., format='mixed') — это будет в уровне P3."

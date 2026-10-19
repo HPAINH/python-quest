@@ -1,0 +1,25 @@
+id: P2-11-nsmallest
+type: dataframe
+title: Самые доступные товары категории
+difficulty: 2
+lesson_section: sort
+statement: |
+  Для категории с `category_id`, равным `cat`, выбери 5 самых дешёвых товаров: колонки `product_id`, `name`, `price`. Порядок — по возрастанию цены, при равной цене — по возрастанию `product_id`. Если товаров меньше пяти, выведи все. Запиши в `result`.
+setup: |
+  import pandas as pd
+  products = pd.read_csv("products.csv")
+  cat = 3
+reference: |
+  t = products[products["category_id"] == cat]
+  t = t.sort_values(["price", "product_id"]).head(5)
+  result = t[["product_id", "name", "price"]]
+ordered: true
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "t = products.sort_values(['price', 'product_id']).head(5)\nresult = t[['product_id', 'name', 'price']]"
+hints:
+  - "Фильтр, затем сортировка и head — разделы «Фильтры» и «Сортировка»."
+  - "Сначала оставь товары нужной категории, потом отсортируй по цене и номеру, возьми 5 и нужные колонки."
+  - "products[products[\"category_id\"] == cat], sort_values([\"price\", \"product_id\"]), head(5)."
+  - "t = products[products[\"category_id\"] == ___]\nt = t.sort_values([___, \"product_id\"]).head(5)\nresult = t[[\"product_id\", \"name\", \"price\"]]"
+  - "Порядок операций важен: если сначала взять 5 самых дешёвых во всём каталоге, а потом фильтровать, в категории может не остаться ни одного товара. head(5) спокойно вернёт меньше строк, если их меньше пяти."

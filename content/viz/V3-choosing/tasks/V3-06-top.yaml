@@ -1,0 +1,33 @@
+id: V3-06-top
+type: plot
+title: Топ товаров по выручке
+difficulty: 2
+lesson_section: compare
+statement: |
+  Вопрос: «Какие товары приносят больше всего выручки на сайте?» Товаров больше двухсот — покажи 10 лучших по сумме `revenue` покупок в `events.csv` горизонтальными столбцами, лидер — сверху. Подписи столбцов — `product_id`. Нужен заголовок.
+setup: |
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  import seaborn as sns
+  events = pd.read_csv("events.csv")
+plot:
+  labels: true
+  ordered: true
+reference: |
+  rev = events[events["event"] == "purchase"].groupby("product_id")["revenue"].sum()
+  top = rev.nlargest(10).sort_values()
+  fig, ax = plt.subplots()
+  ax.barh(top.index.astype(str), top.values)
+  ax.set_title("Топ-10 товаров по выручке")
+star3: [first_try, "max_lines:5"]
+buggy_variants:
+  - code: "rev = events[events['event'] == 'purchase'].groupby('product_id')['revenue'].sum()\nfig, ax = plt.subplots()\nax.barh(rev.index.astype(str), rev.values)\nax.set_title('Товары')"
+    expect_detector: plot_count
+  - code: "rev = events[events['event'] == 'purchase'].groupby('product_id')['revenue'].sum()\ntop = rev.nlargest(10)\nfig, ax = plt.subplots()\nax.barh(top.index.astype(str), top.values)\nax.set_title('Топ-10')"
+    expect_detector: plot_order
+hints:
+  - "Много категорий — раздел «Сравнение» и «Частые ошибки»."
+  - "Посчитай выручку по товарам, возьми 10 крупнейших и отсортируй по возрастанию, чтобы лидер оказался сверху barh. Номера товаров переведи в строки — это подписи, а не числа."
+  - "groupby(\"product_id\")[\"revenue\"].sum().nlargest(10).sort_values(), ax.barh(top.index.astype(str), top.values)."
+  - "rev = events[events[\"event\"] == \"purchase\"].groupby(\"product_id\")[\"revenue\"].sum()\ntop = rev.___(10).sort_values()\nfig, ax = plt.subplots()\nax.barh(top.index.astype(___), top.values)\nax.set_title(\"...\")"
+  - "Если передать номера товаров числами, barh разместит столбцы по координатам 17, 203, 98… — с огромными промежутками. Строки превращают их в категории, идущие подряд."

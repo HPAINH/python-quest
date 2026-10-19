@@ -1,0 +1,30 @@
+id: D3-05-loss-curve
+type: stat
+title: Кривая потерь
+difficulty: 2
+lesson_section: loop
+data: false
+variants_count: 3
+statement: 'В `setup` есть данные `X`, `y` и класс `MLP` с методами `forward`, `fit`, `predict` (сеть из урока). Обучи `MLP(2, 16, 2, seed=0)` по эпохам вручную: 200 раз вызови `fit(X, y, lr=0.5, epochs=1)` и после каждого вызова записывай среднюю кросс-энтропию на `X`. Запиши `first_loss` и `last_loss` (допуск ±1e-6) и `improved` — `True`, если последняя потеря меньше первой хотя бы вдвое.
+
+  '
+setup: "import numpy as np\n\ndef rnd(*shape, seed=0):\n    return np.random.default_rng(seed).normal(size=shape).round(3)\n\ndef labels(n, k, seed=0):\n    return np.random.default_rng(seed).integers(0, k, n)\n\ndef make_moons(n, noise, seed):\n    rng = np.random.default_rng(seed)\n    m = n // 2\n    t1 = rng.uniform(0, np.pi, m)\n    t2 = rng.uniform(0, np.pi, n - m)\n    X = np.vstack([np.c_[np.cos(t1), np.sin(t1)], np.c_[1 - np.cos(t2), 0.5 - np.sin(t2)]]) + rng.normal(0, noise, (n, 2))\n    y = np.r_[np.zeros(m, int), np.ones(n - m, int)]\n    return X, y\n\nclass MLP:\n    def __init__(self, n_in, n_hidden, n_out, seed=0):\n        rng = np.random.default_rng(seed)\n        self.W1 = rng.normal(0, np.sqrt(2 / n_in), (n_in, n_hidden))\n        self.b1 = np.zeros(n_hidden)\n        self.W2 = rng.normal(0, np.sqrt(2 / n_hidden), (n_hidden, n_out))\n        self.b2 = np.zeros(n_out)\n\n    def forward(self, X):\n        self.Z1 = X @ self.W1 + self.b1\n        self.H = np.maximum(0, self.Z1)\n        Z2 = self.H @ self.W2 + self.b2\n        e = np.exp(Z2 - Z2.max(axis=1, keepdims=True))\n        return e / e.sum(axis=1, keepdims=True)\n\n    def fit(self, X, y, lr=0.5, epochs=1000):\n        n = len(X)\n        Y = np.eye(self.W2.shape[1])[y]\n        for _ in range(epochs):\n            P = self.forward(X)\n            dZ2 = (P - Y) / n\n            dW2 = self.H.T @ dZ2\n            db2 = dZ2.sum(axis=0)\n            dZ1 = (dZ2 @ self.W2.T) * (self.Z1 > 0)\n            dW1 = X.T @ dZ1\n            db1 = dZ1.sum(axis=0)\n            self.W1 -= lr * dW1\n            self.b1 -= lr * db1\n            self.W2 -= lr * dW2\n            self.b2 -= lr * db2\n        return self\n\n    def predict(self, X):\n        return self.forward(X).argmax(axis=1)\n\nX, y = make_moons(300, 0.15, SEED % 1000)\n"
+outputs:
+- var: first_loss
+  tol: 1.0e-06
+- var: last_loss
+  tol: 1.0e-06
+- var: improved
+reference: "m = MLP(2, 16, 2, seed=0)\nlosses = []\nfor _ in range(200):\n    m.fit(X, y, lr=0.5, epochs=1)\n    P = m.forward(X)\n    losses.append(-np.log(P[np.arange(len(y)), y]).mean())\nfirst_loss, last_loss = losses[0], losses[-1]\nimproved = bool(last_loss < first_loss / 2)\n"
+star3:
+- first_try
+- max_lines:8
+buggy_variants:
+- code: "m = MLP(2, 16, 2, seed=0)\nlosses = []\nfor _ in range(200):\n    P = m.forward(X)\n    losses.append(-np.log(P[np.arange(len(y)), y]).mean())\n    m.fit(X, y, lr=0.5, epochs=1)\nfirst_loss, last_loss = losses[0], losses[-1]\nimproved = bool(last_loss < first_loss / 2)"
+  expect_detector: stat_value
+hints:
+- Цикл обучения и потеря — раздел «Цикл обучения».
+- В цикле на 200 шагов сначала сделай одну эпоху обучения, потом посчитай вероятности и кросс-энтропию правильных классов.
+- m.fit(X, y, lr=0.5, epochs=1); P = m.forward(X); -np.log(P[np.arange(len(y)), y]).mean().
+- "m = MLP(2, 16, 2, seed=0)\nlosses = []\nfor _ in range(200):\n    m.fit(X, y, lr=0.5, epochs=___)\n    P = m.forward(X)\n    losses.append(-np.log(P[np.arange(len(y)), ___]).mean())\nfirst_loss, last_loss = losses[0], losses[-1]\nimproved = bool(last_loss < first_loss / 2)"
+- 'Кривая потерь — первое, на что смотрят при обучении: плавное падение — всё хорошо, рост — слишком большой lr, плато сразу — слишком маленький или ошибка в градиентах.'

@@ -1,0 +1,21 @@
+id: C3-02-reverse
+type: stdio
+title: Строка наоборот
+difficulty: 1
+lesson_section: slices
+statement: |
+  Дана строка. Выведи её задом наперёд. Используй срез, без циклов.
+reference: |
+  print(input()[::-1])
+requires: ["uses:slice", "no_for_while"]
+tests:
+  visible: ["Python", "ab c"]
+  hidden: ["a", "казак", "12 34 56"]
+random: {count: 15, gen: "''.join(random.choice('abc xyz123') for _ in range(random.randint(1, 30)))"}
+star3: [first_try, "max_lines:1"]
+hints:
+  - "Срез с отрицательным шагом — раздел «Срезы»."
+  - "Возьми всю строку целиком, но с шагом -1."
+  - "s[::-1]."
+  - "s = input()\nprint(s[___])"
+  - "В срезе [::-1] начало и конец опущены, шаг -1 — строка проходится с конца. Всё решение можно записать в одну строку: print(input()[::-1])."

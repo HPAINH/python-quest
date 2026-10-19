@@ -1,0 +1,28 @@
+id: N1-09-describe
+type: function
+function: describe
+title: Паспорт массива
+difficulty: 1
+lesson_section: dtype
+setup: |
+  import numpy as np
+statement: |
+  Напиши функцию `describe(a)`, которая возвращает словарь с ключами `shape`, `ndim`, `size` и `dtype`. Значение `dtype` — строка, например `"int64"`.
+starter: |
+  def describe(a):
+      pass
+reference: |
+  def describe(a):
+      return {"shape": a.shape, "ndim": a.ndim, "size": a.size, "dtype": str(a.dtype)}
+tests:
+  visible: ["describe(np.array([1, 2, 3]))", "describe(np.zeros((2, 5)))"]
+  hidden: ["describe(np.array([[True, False]]))", "describe(np.arange(24).reshape(2, 3, 4))", "describe(np.array(['a', 'bb']))"]
+star3: [first_try]
+buggy_variants:
+  - code: "def describe(a):\n    return {'shape': a.shape, 'ndim': a.ndim, 'size': a.size, 'dtype': a.dtype}"
+hints:
+  - "Атрибуты массива — раздел «Тип и форма»."
+  - "Собери словарь из четырёх атрибутов массива. dtype переведи в строку."
+  - "a.shape, a.ndim, a.size, str(a.dtype)."
+  - "def describe(a):\n    return {\"shape\": a.___, \"ndim\": a.ndim, \"size\": a.___, \"dtype\": ___(a.dtype)}"
+  - "a.dtype — это объект типа, а не строка, поэтому без str сравнение не пройдёт. Для строкового массива dtype выглядит как <U2: строки до двух символов."

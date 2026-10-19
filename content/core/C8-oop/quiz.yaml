@@ -1,0 +1,138 @@
+quiz:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      class Box:
+          def __init__(self, size):
+              self.size = size
+          def grow(self, k):
+              self.size *= k
+              return self.size
+      b = Box(3)
+      b.grow(2)
+      print(b.grow(2), b.size)
+    answer: "12 12"
+    explain: Каждый вызов grow меняет атрибут объекта. 3 → 6 → 12.
+    section: methods
+  - type: choice
+    q: Зачем первым параметром метода пишут self?
+    options: ["Это необязательное украшение", "Через self метод получает объект, у которого его вызвали, и его атрибуты", "self — это класс, а не объект", "self нужен только в __init__"]
+    answer: 1
+    explain: При вызове obj.method(x) Python передаёт obj в self, а x — во второй параметр.
+    section: methods
+  - type: fill
+    q: Впиши имя метода, чтобы print(p) выводил «Точка(1, 2)».
+    code: |
+      class P:
+          def __init__(self, x, y):
+              self.x, self.y = x, y
+          def ___(self):
+              return f"Точка({self.x}, {self.y})"
+      print(P(1, 2))
+    answer: ["__str__", "__repr__"]
+    expect: "Точка(1, 2)"
+    explain: print вызывает __str__, а если его нет — __repr__.
+    section: dunder
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      from dataclasses import dataclass
+      @dataclass
+      class Item:
+          name: str
+          qty: int = 1
+      print(Item("чай") == Item("чай", 1), Item("чай", 2))
+    answer: "True Item(name='чай', qty=2)"
+    explain: dataclass сам пишет __eq__ и __repr__ по полям.
+    section: dataclass
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      class A:
+          def hello(self):
+              return "A"
+      class B(A):
+          pass
+      class C(A):
+          def hello(self):
+              return "C"
+      print(B().hello(), C().hello())
+    answer: "A C"
+    explain: B наследует метод A, а C переопределяет его.
+    section: inheritance
+
+express:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      class Cart:
+          items = []
+          def add(self, x):
+              self.items.append(x)
+      a, b = Cart(), Cart()
+      a.add(1)
+      b.add(2)
+      print(len(a.items))
+    answer: "2"
+    explain: items объявлен в теле класса — это один список на все объекты. Нужно создавать его в __init__.
+    section: classes
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      class V:
+          def __init__(self, n):
+              self.n = n
+          def __lt__(self, other):
+              return self.n < other.n
+      vs = sorted([V(3), V(1), V(2)])
+      print([v.n for v in vs])
+    answer: "[1, 2, 3]"
+    explain: sorted использует __lt__ для сравнения объектов.
+    section: dunder
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      class P:
+          def __init__(self, x):
+              self.x = x
+      print(P(1) == P(1))
+    answer: "False"
+    explain: Без __eq__ оператор == проверяет, один ли это объект, а здесь два разных.
+    section: dunder
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      class Base:
+          def __init__(self, a):
+              self.a = a
+      class Child(Base):
+          def __init__(self, a, b):
+              super().__init__(a)
+              self.b = b
+      c = Child(1, 2)
+      print(c.a + c.b, isinstance(c, Base))
+    answer: "3 True"
+    explain: super().__init__ заполнил a, дочерний класс добавил b. Объект Child — тоже Base.
+    section: inheritance
+  - type: choice
+    q: Почему в dataclass пишут tags list = field(default_factory=list), а не tags list = []?
+    options: ["Так короче", "Иначе один список стал бы общим для всех объектов — dataclass запрещает это и выдаёт ошибку", "field работает быстрее", "Списки в dataclass запрещены"]
+    answer: 1
+    explain: Это та же проблема изменяемого значения по умолчанию, что и в функциях. default_factory создаёт новый список для каждого объекта.
+    section: dataclass
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      class Counter:
+          def __init__(self):
+              self.n = 0
+          def __len__(self):
+              return self.n
+          def add(self):
+              self.n += 1
+              return self
+      c = Counter().add().add()
+      print(len(c))
+    answer: "2"
+    explain: add возвращает сам объект, поэтому вызовы можно сцепить. len() вызывает __len__.
+    section: dunder

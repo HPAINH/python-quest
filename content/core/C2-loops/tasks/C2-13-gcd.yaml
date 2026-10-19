@@ -1,0 +1,29 @@
+id: C2-13-gcd
+type: stdio
+title: Наибольший общий делитель
+difficulty: 3
+lesson_section: while
+statement: |
+  Даны два натуральных числа (до 10¹⁸). Выведи их наибольший общий делитель.
+
+  Используй алгоритм Евклида: пока второе число не ноль, заменяй пару `(a, b)` на `(b, a % b)`. Модули импортировать нельзя.
+reference: |
+  a, b = map(int, input().split())
+  while b != 0:
+      a, b = b, a % b
+  print(a)
+requires: [no_import, "uses:while"]
+tests:
+  visible: ["12 18", "7 13"]
+  hidden: ["1 1", "100 10", "10 100", "1000000000000000000 999999999999999999", "48 180"]
+random: {count: 30, gen: "f'{random.randint(1, 10**12)} {random.randint(1, 10**12)}'"}
+star3: [first_try, "max_lines:4"]
+buggy_variants:
+  - code: "a, b = map(int, input().split())\nd = min(a, b)\nwhile a % d != 0 or b % d != 0:\n    d -= 1\nprint(d)"
+    expect_detector: infinite_loop
+hints:
+  - "Цикл while с одновременным присваиванием — раздел «Цикл while» и обмен значений из C1."
+  - "Пока b не ноль, новая пара — это старое b и остаток от деления a на b. Когда b станет нулём, ответ лежит в a."
+  - "while b != 0 и a, b = b, a % b."
+  - "a, b = map(int, input().split())\nwhile b != ___:\n    a, b = ___, a % b\nprint(___)"
+  - "12 18 → 18 12 → 12 6 → 6 0, ответ 6. Алгоритм Евклида делает несколько десятков шагов даже для чисел порядка 10¹⁸, а перебор делителей вниз не уложился бы в лимит времени."

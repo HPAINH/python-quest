@@ -1,0 +1,25 @@
+id: P4-02-status-count
+type: dataframe
+title: Заказы по статусам
+difficulty: 1
+lesson_section: groupby
+sql_quest_ref: COUNT(*)
+statement: |
+  Запиши в `result` таблицу с колонками `status` и `n_orders` — число заказов с каждым статусом.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+reference: |
+  result = orders.groupby("status").size().reset_index(name="n_orders")
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = orders.groupby('status').size()"
+    expect_detector: columns_mismatch
+  - code: "result = orders.groupby('status')['promo_code'].count().reset_index(name='n_orders')"
+    expect_detector: column_values
+hints:
+  - "Размер групп — size, имя колонки результата — reset_index(name=...), раздел «groupby»."
+  - "Сгруппируй по статусу, посчитай размер каждой группы и преврати результат в таблицу с нужным именем колонки."
+  - "orders.groupby(\"status\").size().reset_index(name=\"n_orders\")."
+  - "result = orders.groupby(___).size().reset_index(name=___)"
+  - "count по колонке с пропусками (promo_code) не считает строки без промокода. Подойдёт и value_counts, если переименовать колонку count в n_orders."

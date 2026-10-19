@@ -1,0 +1,36 @@
+id: C5-13-two-sum
+type: function
+function: two_sum
+title: Пара с суммой
+difficulty: 3
+lesson_section: dicts
+statement: |
+  Напиши функцию `two_sum(nums, target)`, которая возвращает кортеж индексов `(i, j)`, `i < j`, такой что `nums[i] + nums[j] == target`. Если пар несколько, верни пару с наименьшим `j`, а среди них — с наименьшим `i`. Если пары нет, верни `None`.
+
+  Решение должно работать быстро на списках из 10 000 элементов, поэтому вложенный перебор всех пар не подойдёт — используй словарь «значение → индекс».
+starter: |
+  def two_sum(nums, target):
+      pass
+reference: |
+  def two_sum(nums, target):
+      seen = {}
+      for j, x in enumerate(nums):
+          if target - x in seen:
+              return (seen[target - x], j)
+          if x not in seen:
+              seen[x] = j
+      return None
+tests:
+  visible: ["two_sum([2, 7, 11, 15], 9)", "two_sum([1, 2, 3], 100)"]
+  hidden: ["two_sum([3, 3], 6)", "two_sum([1, 4, 1, 4], 5)", "two_sum([], 0)", "two_sum([5], 10)", "two_sum([0, -1, 1, 0], 0)", "two_sum(list(range(10000)), 19997)", "two_sum([10] * 10000, 30)"]
+random: {count: 30, gen: "f'two_sum({[random.randint(-6, 6) for _ in range(random.randint(0, 10))]}, {random.randint(-8, 8)})'"}
+star3: [first_try]
+buggy_variants:
+  - code: "def two_sum(nums, target):\n    for i in range(len(nums)):\n        for j in range(i + 1, len(nums)):\n            if nums[i] + nums[j] == target:\n                return (i, j)\n    return None"
+  - code: "def two_sum(nums, target):\n    seen = {}\n    for j, x in enumerate(nums):\n        if target - x in seen:\n            return (seen[target - x], j)\n        seen[x] = j\n    return None"
+hints:
+  - "Быстрый поиск по значению — это словарь из раздела «Словари». enumerate(nums) даёт пары «индекс, значение»."
+  - "Иди по списку слева направо. Для текущего x нужное парное значение — target - x. Если оно уже встречалось, пара найдена: это и есть наименьший j. Запоминай для каждого значения его первый индекс — так получится наименьший i."
+  - "seen = {}, for j, x in enumerate(nums), target - x in seen, if x not in seen: seen[x] = j."
+  - "def two_sum(nums, target):\n    seen = {}\n    for j, x in enumerate(nums):\n        if ___ in seen:\n            return (seen[target - x], ___)\n        if x not in seen:\n            seen[x] = ___\n    return None"
+  - "Проверка «есть ли значение в словаре» мгновенная, поэтому весь проход занимает 10 000 шагов, а перебор пар — около 50 миллионов, он не уложится в лимит. Условие if x not in seen хранит самый ранний индекс: для [1, 4, 1, 4] и 5 ответ (0, 1), а при перезаписи для пары с j = 3 получился бы i = 2 вместо 0."

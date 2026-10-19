@@ -1,0 +1,24 @@
+id: N1-06-astype
+type: array
+title: Количества из текста
+difficulty: 1
+lesson_section: dtype
+dtype: strict
+statement: |
+  Из старой системы пришли количества товаров строками — массив `raw`. Переведи его в целые числа и запиши в `result`.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  raw = rng.integers(0, 50, size=int(rng.integers(4, 10))).astype(str)
+reference: |
+  result = raw.astype(int)
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = raw.astype(float)"
+    expect_detector: array_dtype
+hints:
+  - "Тип элементов меняет astype — раздел «Тип и форма»."
+  - "Вызови у массива метод, который переводит элементы в нужный тип, и передай ему int."
+  - "raw.astype(int)."
+  - "result = raw.___(int)"
+  - "astype возвращает новый массив, исходный raw остаётся строковым. float дал бы те же значения, но дробного типа, а нужны целые: количество не бывает дробным."

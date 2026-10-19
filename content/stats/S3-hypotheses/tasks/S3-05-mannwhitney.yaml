@@ -1,0 +1,30 @@
+id: S3-05-mannwhitney
+type: stat
+title: Чеки покупателей
+difficulty: 2
+lesson_section: mannwhitney
+statement: |
+  Среди **купивших** (`converted` = 1) в `exp_checkout` сравни выручку групп B и A тестом Манна-Уитни (двусторонним). Запиши `p_value` (допуск ±0.0001) и `reject` при alpha = 0.05.
+setup: |
+  import pandas as pd
+  from scipy import stats
+  t = pd.read_csv("ab_metrics.csv").merge(pd.read_csv("ab_assignments.csv"), on=["user_id", "experiment"])
+outputs:
+  - var: p_value
+    tol: 0.0001
+  - var: reject
+reference: |
+  c = t[(t["experiment"] == "exp_checkout") & (t["converted"] == 1)]
+  p_value = stats.mannwhitneyu(c.loc[c["group"] == "B", "revenue"], c.loc[c["group"] == "A", "revenue"]).pvalue
+  reject = bool(p_value < 0.05)
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "c = t[t['experiment'] == 'exp_checkout']\np_value = stats.mannwhitneyu(c.loc[c['group'] == 'B', 'revenue'], c.loc[c['group'] == 'A', 'revenue']).pvalue\nreject = bool(p_value < 0.05)"
+  - code: "c = t[(t['experiment'] == 'exp_checkout') & (t['converted'] == 1)]\np_value = stats.ttest_ind(c.loc[c['group'] == 'B', 'revenue'], c.loc[c['group'] == 'A', 'revenue']).pvalue\nreject = bool(p_value < 0.05)"
+    expect_detector: stat_value
+hints:
+  - "Манна-Уитни — раздел «Манна-Уитни»."
+  - "Оставь купивших участников нужного эксперимента и передай выручку групп B и A в mannwhitneyu."
+  - "stats.mannwhitneyu(rb, ra).pvalue."
+  - "c = t[(t[\"experiment\"] == \"exp_checkout\") & (t[\"converted\"] == ___)]\np_value = stats.___(c.loc[c[\"group\"] == \"B\", \"revenue\"], c.loc[c[\"group\"] == \"A\", \"revenue\"]).pvalue\nreject = bool(p_value < 0.05)"
+  - "Новое оформление повышает долю покупателей, но не размер чека — поэтому среди купивших разницы нет. По всем участникам Манна-Уитни уловил бы разницу в долях нулей, то есть в конверсии."

@@ -1,0 +1,35 @@
+id: D2-01-sigmoid-grad
+type: function
+function: sigmoid_grad
+title: Производная сигмоиды
+difficulty: 1
+lesson_section: activation-grads
+tol: 1.0e-09
+statement: 'Напиши функцию `sigmoid_grad(z)` — производную сигмоиды по входу `z` для каждого элемента массива: `σ(z)·(1 − σ(z))`.
+
+  '
+setup: "import numpy as np\n\ndef rnd(*shape, seed=0):\n    return np.random.default_rng(seed).normal(size=shape).round(3)\n\ndef labels(n, k, seed=0):\n    return np.random.default_rng(seed).integers(0, k, n)\n"
+starter: "def sigmoid_grad(z):\n    pass\n"
+reference: "def sigmoid_grad(z):\n    s = 1 / (1 + np.exp(-z))\n    return s * (1 - s)\n"
+tests:
+  visible:
+  - sigmoid_grad(np.array([-2.0, 0.0, 3.0]))
+  hidden:
+  - sigmoid_grad(np.zeros(4))
+  - sigmoid_grad(rnd(3, 2, seed=1))
+  - sigmoid_grad(np.array([-20.0, 20.0]))
+random:
+  count: 15
+  gen: f'sigmoid_grad(rnd({random.randint(1, 4)}, {random.randint(1, 4)}, seed={random.randint(0, 999)}) * 3)'
+star3:
+- first_try
+- max_lines:3
+buggy_variants:
+- code: "def sigmoid_grad(z):\n    return z * (1 - z)"
+- code: "def sigmoid_grad(z):\n    s = 1 / (1 + np.exp(-z))\n    return s * (1 + s)"
+hints:
+- Производные активаций — раздел «Производные активаций».
+- Сначала посчитай сигмоиду, потом умножь её на (1 − она же).
+- s = 1 / (1 + np.exp(-z)); s * (1 - s).
+- "def sigmoid_grad(z):\n    s = 1 / (1 + np.exp(___))\n    return s * (1 - ___)"
+- 'Формула s(1 − s) записана через значение сигмоиды, а не через z. Подставить z вместо s — частая ошибка: z·(1 − z) — совсем другая функция.'

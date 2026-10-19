@@ -1,0 +1,23 @@
+id: N2-09-top3
+type: array
+title: Три лучших магазина
+difficulty: 2
+lesson_section: where
+statement: |
+  В `revenue` — выручка магазинов, индекс — номер магазина. Запиши в `result` номера трёх магазинов с наибольшей выручкой — от самого большого к меньшему.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  revenue = np.round(rng.uniform(1e5, 9e5, size=int(rng.integers(6, 15))), 2)
+reference: |
+  result = np.argsort(-revenue)[:3]
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = np.argsort(revenue)[:3]"
+  - code: "result = np.sort(revenue)[::-1][:3]"
+hints:
+  - "Индексы сортировки даёт np.argsort — раздел «where и поиск»."
+  - "argsort упорядочивает индексы по возрастанию значений. Чтобы получить убывание, отсортируй отрицательные значения, затем возьми первые три."
+  - "np.argsort(-revenue)[:3]."
+  - "result = np.argsort(___revenue)[:___]"
+  - "Нужны номера магазинов, а не суммы, поэтому np.sort не подходит. argsort(-revenue) ставит первым индекс самой большой выручки. Вариант np.argsort(revenue)[::-1][:3] тоже верен."

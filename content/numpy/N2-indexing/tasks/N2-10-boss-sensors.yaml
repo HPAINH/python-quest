@@ -1,0 +1,45 @@
+id: N2-10-boss-sensors
+type: array
+title: "Босс: датчики склада"
+difficulty: 3
+boss: true
+lesson_section: where
+statement: |
+  `temps` — таблица температур в холодильных камерах: строки — камеры, столбцы — замеры за смену. Сбоящий датчик пишет `-999`. Норма для камеры — от 2 до 6 градусов включительно.
+
+  Создай три переменные:
+  1. `fixed` — копия `temps`, где `-999` заменены на `np.nan`;
+  2. `alarm` — номера камер (по возрастанию), где хотя бы один **исправный** замер выходит за норму;
+  3. `last_ok` — массив из последнего столбца `fixed`, где значения вне нормы заменены на `np.nan`.
+
+  Подсказка для `alarm`: `np.any(маска, axis=1)` проверяет, есть ли `True` в каждой строке.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  rows, cols = int(rng.integers(5, 10)), int(rng.integers(6, 12))
+  temps = np.round(rng.normal(4, 1.3, size=(rows, cols)), 1)
+  for _ in range(int(rng.integers(3, 7))):
+      temps[rng.integers(rows), rng.integers(cols)] = -999
+outputs:
+  - var: fixed
+    title: замены -999 на nan
+  - var: alarm
+    title: камеры с выходом за норму
+  - var: last_ok
+    title: последний замер в норме
+reference: |
+  fixed = np.where(temps == -999, np.nan, temps)
+  bad = (fixed < 2) | (fixed > 6)
+  alarm = np.where(np.any(bad, axis=1))[0]
+  last = fixed[:, -1]
+  last_ok = np.where((last >= 2) & (last <= 6), last, np.nan)
+star3: [first_try]
+buggy_variants:
+  - code: "fixed = np.where(temps == -999, np.nan, temps)\nbad = (temps < 2) | (temps > 6)\nalarm = np.where(np.any(bad, axis=1))[0]\nlast = fixed[:, -1]\nlast_ok = np.where((last >= 2) & (last <= 6), last, np.nan)"
+  - code: "fixed = np.where(temps == -999, np.nan, temps)\nbad = (fixed < 2) | (fixed > 6)\nalarm = np.where(np.any(bad, axis=0))[0]\nlast = fixed[-1]\nlast_ok = np.where((last >= 2) & (last <= 6), last, np.nan)"
+hints:
+  - "Всё из уровня: where для замены, маски с & и |, срез столбца m[:, -1] и where с одним аргументом для поиска индексов."
+  - "Сначала замени -999 на nan. Маска «вне нормы» — меньше 2 или больше 6; сравнения с nan всегда дают False, поэтому сбойные замеры в неё не попадут. Для каждой строки проверь, есть ли True, и возьми номера таких строк. Последний столбец — fixed[:, -1], значения вне нормы замени на nan через where."
+  - "np.where(temps == -999, np.nan, temps), (fixed < 2) | (fixed > 6), np.any(bad, axis=1), np.where(...)[0], fixed[:, -1]."
+  - "fixed = np.where(temps == ___, np.nan, temps)\nbad = (fixed < 2) ___ (fixed > 6)\nalarm = np.where(np.any(bad, axis=___))[0]\nlast = fixed[:, ___]\nlast_ok = np.where((last >= 2) & (last <= 6), last, ___)"
+  - "Если строить маску по temps, а не по fixed, значение -999 посчитается «ниже нормы», и камера со сбойным датчиком ложно попадёт в alarm. axis=1 сворачивает строку целиком — ответ по камере, axis=0 дал бы ответ по замерам. fixed[-1] — последняя строка, а нужен последний столбец fixed[:, -1]."

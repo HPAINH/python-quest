@@ -1,0 +1,28 @@
+id: D3-06-moons
+type: model
+title: Две луны
+difficulty: 2
+lesson_section: loop
+data: false
+statement: 'Точки `X`, `y` из `setup` — два полумесяца, которые не разделить прямой: логистическая регрессия даёт около 85% точности. Обучи сеть и запиши в `model` объект с методом `predict(X)`, который возвращает метки 0/1. Порог — accuracy не ниже 0.95 на скрытой выборке других точек той же формы. Класс `MLP` можно написать самому по уроку.
+
+  '
+setup: "import numpy as np\n\ndef rnd(*shape, seed=0):\n    return np.random.default_rng(seed).normal(size=shape).round(3)\n\ndef labels(n, k, seed=0):\n    return np.random.default_rng(seed).integers(0, k, n)\n\ndef make_moons(n, noise, seed):\n    rng = np.random.default_rng(seed)\n    m = n // 2\n    t1 = rng.uniform(0, np.pi, m)\n    t2 = rng.uniform(0, np.pi, n - m)\n    X = np.vstack([np.c_[np.cos(t1), np.sin(t1)], np.c_[1 - np.cos(t2), 0.5 - np.sin(t2)]]) + rng.normal(0, noise, (n, 2))\n    y = np.r_[np.zeros(m, int), np.ones(n - m, int)]\n    return X, y\n\nX, y = make_moons(300, 0.15, 1)\nif SHUFFLE:\n    y = np.random.default_rng(5).permutation(y)\n"
+model:
+  metric: accuracy
+  threshold: 0.95
+  proba: false
+  leak_check: true
+  test_setup: "import numpy as np\n\ndef make_moons(n, noise, seed):\n    rng = np.random.default_rng(seed)\n    m = n // 2\n    t1 = rng.uniform(0, np.pi, m)\n    t2 = rng.uniform(0, np.pi, n - m)\n    X = np.vstack([np.c_[np.cos(t1), np.sin(t1)], np.c_[1 - np.cos(t2), 0.5 - np.sin(t2)]]) + rng.normal(0, noise, (n, 2))\n    y = np.r_[np.zeros(m, int), np.ones(n - m, int)]\n    return X, y\n\nX_test, y_test = make_moons(400, 0.15, 777)\n"
+reference: "class MLP:\n    def __init__(self, n_in, n_hidden, n_out, seed=0):\n        rng = np.random.default_rng(seed)\n        self.W1 = rng.normal(0, np.sqrt(2 / n_in), (n_in, n_hidden))\n        self.b1 = np.zeros(n_hidden)\n        self.W2 = rng.normal(0, np.sqrt(2 / n_hidden), (n_hidden, n_out))\n        self.b2 = np.zeros(n_out)\n\n    def forward(self, X):\n        self.Z1 = X @ self.W1 + self.b1\n        self.H = np.maximum(0, self.Z1)\n        Z2 = self.H @ self.W2 + self.b2\n        e = np.exp(Z2 - Z2.max(axis=1, keepdims=True))\n        return e / e.sum(axis=1, keepdims=True)\n\n    def fit(self, X, y, lr=0.5, epochs=1000):\n        n = len(X)\n        Y = np.eye(self.W2.shape[1])[y]\n        for _ in range(epochs):\n            P = self.forward(X)\n            dZ2 = (P - Y) / n\n            dW2 = self.H.T @ dZ2\n            db2 = dZ2.sum(axis=0)\n            dZ1 = (dZ2 @ self.W2.T) * (self.Z1 > 0)\n            dW1 = X.T @ dZ1\n            db1 = dZ1.sum(axis=0)\n            self.W1 -= lr * dW1\n            self.b1 -= lr * db1\n            self.W2 -= lr * dW2\n            self.b2 -= lr * db2\n        return self\n\n    def predict(self, X):\n        return self.forward(X).argmax(axis=1)\n\nmodel = MLP(2, 16, 2, seed=0).fit(X, y, lr=0.5, epochs=1000)\n"
+star3:
+- first_try
+buggy_variants:
+- code: "class MLP:\n    def __init__(self, n_in, n_hidden, n_out, seed=0):\n        rng = np.random.default_rng(seed)\n        self.W1 = rng.normal(0, np.sqrt(2 / n_in), (n_in, n_hidden))\n        self.b1 = np.zeros(n_hidden)\n        self.W2 = rng.normal(0, np.sqrt(2 / n_hidden), (n_hidden, n_out))\n        self.b2 = np.zeros(n_out)\n\n    def forward(self, X):\n        self.Z1 = X @ self.W1 + self.b1\n        self.H = np.maximum(0, self.Z1)\n        Z2 = self.H @ self.W2 + self.b2\n        e = np.exp(Z2 - Z2.max(axis=1, keepdims=True))\n        return e / e.sum(axis=1, keepdims=True)\n\n    def fit(self, X, y, lr=0.5, epochs=1000):\n        n = len(X)\n        Y = np.eye(self.W2.shape[1])[y]\n        for _ in range(epochs):\n            P = self.forward(X)\n            dZ2 = (P - Y) / n\n            dW2 = self.H.T @ dZ2\n            db2 = dZ2.sum(axis=0)\n            dZ1 = (dZ2 @ self.W2.T) * (self.Z1 > 0)\n            dW1 = X.T @ dZ1\n            db1 = dZ1.sum(axis=0)\n            self.W1 -= lr * dW1\n            self.b1 -= lr * db1\n            self.W2 -= lr * dW2\n            self.b2 -= lr * db2\n        return self\n\n    def predict(self, X):\n        return self.forward(X).argmax(axis=1)\n\nmodel = MLP(2, 16, 2, seed=0).fit(X, y, lr=0.5, epochs=5)"
+  expect_detector: model_metric
+hints:
+- Цикл обучения — раздел «Цикл обучения»; градиенты — уровень D2.
+- 'Класс с весами двух слоёв: forward — ReLU и softmax, fit — цикл полного градиентного спуска, predict — argmax вероятностей. 16 скрытых нейронов, lr = 0.5 и около 1000 эпох хватает.'
+- 'dZ2 = (P - Y) / n; dZ1 = (dZ2 @ W2.T) * (Z1 > 0); W -= lr * dW; predict: forward(X).argmax(axis=1).'
+- "class MLP:\n    def __init__(self, n_in, n_hidden, n_out, seed=0): ...\n    def forward(self, X): ...\n    def fit(self, X, y, lr=0.5, epochs=1000):\n        ...\n        for _ in range(epochs):\n            P = self.forward(X)\n            dZ2 = (P - Y) / n\n            ...\n        return self\n    def predict(self, X):\n        return self.forward(X).___(axis=1)\n\nmodel = MLP(2, 16, 2, seed=0).fit(X, y, lr=0.5, epochs=___)"
+- fit возвращает self, поэтому создание и обучение умещаются в одну строку. Пять эпох — сеть почти не сдвинулась от случайных весов; кривая граница появляется после сотен шагов.

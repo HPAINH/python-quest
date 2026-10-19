@@ -1,0 +1,23 @@
+id: P3-01-no-city
+type: value
+title: Клиенты без города
+difficulty: 1
+lesson_section: missing
+sql_quest_ref: IS NULL
+statement: |
+  Запиши в `result` число клиентов, у которых не указан город (пропуск в колонке `city`).
+setup: |
+  import pandas as pd
+  customers = pd.read_csv("customers.csv")
+reference: |
+  result = int(customers["city"].isna().sum())
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = int(customers['city'].count())"
+  - code: "result = int(customers.isna().sum().sum())"
+hints:
+  - "Поиск пропусков — раздел «Пропуски»."
+  - "isna() даёт маску True/False для каждой строки, а сумма маски — число True."
+  - "customers[\"city\"].isna().sum()."
+  - "result = int(customers[\"city\"].___().sum())"
+  - "count() считает, наоборот, заполненные значения. isna().sum() по всей таблице дал бы пропуски во всех колонках сразу — включая год рождения и промокоды."

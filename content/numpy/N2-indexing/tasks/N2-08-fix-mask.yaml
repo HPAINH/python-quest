@@ -1,0 +1,23 @@
+id: N2-08-fix-mask
+type: fix_bug
+base: value
+title: Исправь фильтр акций
+difficulty: 1
+lesson_section: mistakes
+statement: |
+  Нужно выбрать скидки из `discounts`, которые больше 0 и не больше 30 процентов. Код падает. Исправь его.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  discounts = rng.integers(-10, 60, size=int(rng.integers(10, 30)))
+starter: |
+  result = discounts[discounts > 0 and discounts <= 30]
+reference: |
+  result = discounts[(discounts > 0) & (discounts <= 30)]
+star3: [first_try]
+hints:
+  - "Прочитай ошибку и раздел «Частые ошибки»."
+  - "and не умеет поэлементно объединять маски. Нужен оператор «и» для массивов, а каждое сравнение — в скобках."
+  - "Оператор & и скобки вокруг сравнений."
+  - "result = discounts[(discounts > 0) ___ (discounts <= 30)]"
+  - "and пытается понять, истинен ли массив целиком, и NumPy отвечает ошибкой «truth value of an array is ambiguous». & объединяет маски поэлементно, а скобки нужны, потому что & выполняется раньше сравнения."

@@ -1,0 +1,27 @@
+id: C5-06-anagram
+type: stdio
+title: Анаграммы
+difficulty: 2
+lesson_section: counting
+statement: |
+  Даны две строки, каждая на своей строке. Выведи `YES`, если они анаграммы — состоят из одних и тех же букв в том же количестве без учёта регистра и пробелов, — иначе `NO`.
+reference: |
+  def letters(s):
+      freq = {}
+      for ch in s.lower():
+          if ch != " ":
+              freq[ch] = freq.get(ch, 0) + 1
+      return freq
+  print("YES" if letters(input()) == letters(input()) else "NO")
+tests:
+  visible: ["Листок\nСлиток", "кот\nток к"]
+  hidden: ["a\na", "ab\nabb", "Dormitory\ndirty room", "aab\nabb", "x\n y "]
+star3: [first_try]
+buggy_variants:
+  - code: "a = input().lower().replace(' ', '')\nb = input().lower().replace(' ', '')\nprint('YES' if set(a) == set(b) else 'NO')"
+hints:
+  - "Сравни частоты букв — раздел «Подсчёт частот»."
+  - "Посчитай для каждой строки словарь «буква → сколько раз», пропуская пробелы и приводя к нижнему регистру. Строки — анаграммы, если словари равны."
+  - "Счётчик freq.get(ch, 0) + 1, сравнение словарей через ==. Другой путь — сравнить sorted от очищенных строк."
+  - "def letters(s):\n    freq = {}\n    for ch in s.___():\n        if ch != \" \":\n            freq[ch] = freq.get(ch, 0) + ___\n    return freq\nprint(\"YES\" if letters(input()) ___ letters(input()) else \"NO\")"
+  - "Словари равны, когда совпадают все пары ключ–значение, порядок не важен. Множества здесь не подходят: «aab» и «abb» дают одинаковое множество {a, b}, но разное количество букв."

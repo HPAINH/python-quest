@@ -1,0 +1,106 @@
+quiz:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      for i in range(2, 9, 3):
+          print(i)
+    answer: "2\n5\n8"
+    explain: range(2, 9, 3) — это 2, 5, 8. Правая граница 9 не включается.
+    section: for-range
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      total = 0
+      for i in range(1, 5):
+          total += i
+      print(total)
+    answer: "10"
+    explain: range(1, 5) — это 1, 2, 3, 4. Сумма 10. Пятёрка не входит.
+    section: accumulators
+  - type: choice
+    q: Почему этот цикл никогда не закончится? i = 0; while i < 5 — print(i)
+    options: ["while нельзя использовать с числами", "Внутри цикла i не меняется, условие всегда истинно", "Нужен range", "Условие должно быть i <= 5"]
+    answer: 1
+    explain: Условие while зависит от i, а i не меняется. Нужно добавить i += 1 в тело цикла.
+    section: while
+  - type: fill
+    q: Впиши пропуск, чтобы программа вывела 3 — первое число из range, которое больше 2.
+    code: |
+      for x in range(1, 10):
+          if x > 2:
+              print(x)
+              ___
+    answer: ["break"]
+    expect: "3"
+    explain: break завершает цикл сразу после первого найденного числа.
+    section: break-continue
+  - type: predict
+    q: Сколько раз выполнится print?
+    code: |
+      count = 0
+      for a in range(3):
+          for b in range(4):
+              count += 1
+      print(count)
+    answer: "12"
+    explain: Внутренний цикл проходит 4 шага на каждом из 3 шагов внешнего — всего 12.
+    section: nested-loops
+
+express:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      for i in range(10, 0, -3):
+          print(i, end=" ")
+    answer: "10 7 4 1"
+    explain: Шаг -3 идёт вниз от 10. Ноль — граница, он не включается. Лишний пробел в конце строки при проверке не учитывается.
+    section: for-range
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      n = 1000
+      steps = 0
+      while n > 1:
+          n //= 10
+          steps += 1
+      print(steps)
+    answer: "3"
+    explain: 1000 → 100 → 10 → 1. Три шага, после них условие n > 1 ложно.
+    section: while
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      for i in range(6):
+          if i == 2:
+              continue
+          if i == 4:
+              break
+          print(i)
+    answer: "0\n1\n3"
+    explain: 2 пропускается через continue, на 4 цикл прерывается break.
+    section: break-continue
+  - type: choice
+    q: Почему максимум отрицательных чисел считается неверно, если начать с best = 0?
+    options: ["Ноль больше любого отрицательного числа и так и останется ответом", "Нельзя сравнивать с нулём", "max не работает с отрицательными", "Нужен while"]
+    answer: 0
+    explain: Ни одно отрицательное число не больше 0, поэтому best не изменится. Начинай с первого значения.
+    section: accumulators
+  - type: fill
+    q: Впиши пропуск, чтобы программа вывела произведение чисел от 1 до 5, то есть 120.
+    code: |
+      p = ___
+      for i in range(1, 6):
+          p *= i
+      print(p)
+    answer: ["1"]
+    expect: "120"
+    explain: Начальное значение произведения — 1. С нулём всё произведение будет нулём.
+    section: accumulators
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      for i in range(1, 4):
+          print("#" * i)
+    answer: "#\n##\n###"
+    explain: Строка повторяется умножением на число — получается треугольник.
+    section: nested-loops

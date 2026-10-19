@@ -1,0 +1,21 @@
+id: N3-05-predict-broadcast
+type: predict
+title: Формы при broadcasting
+difficulty: 2
+lesson_section: broadcasting
+statement: |
+  Впиши, что выведет программа.
+code: |
+  import numpy as np
+  m = np.arange(6).reshape(2, 3)
+  row = np.array([1, 0, -1])
+  col = np.array([10, 20])
+  print((m * row).shape, (m + col[:, None]).shape)
+  print((m + col[:, None])[1])
+  print(m.sum(axis=0) - m.sum(axis=1).sum())
+hints:
+  - "Правило совмещения форм — раздел «Broadcasting», суммы по осям — раздел «Оси»."
+  - "m = [[0 1 2], [3 4 5]]. Строка row совмещается со строками m, col[:, None] — столбец (2, 1)."
+  - "Посчитай вторую строку m + col[:, None]: к [3 4 5] прибавляется 20."
+  - "Три строки: две формы, затем строка из трёх чисел, затем массив из трёх чисел."
+  - "Ответ: «(2, 3) (2, 3)», «[23 24 25]», «[-12 -10  -8]». Суммы столбцов [3 5 7], сумма всех элементов 15, разности 3 − 15 = −12 и так далее."

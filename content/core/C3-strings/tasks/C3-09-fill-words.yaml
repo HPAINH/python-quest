@@ -1,0 +1,27 @@
+id: C3-09-fill-words
+type: fill_gaps
+base: stdio
+title: Подсчёт слов
+difficulty: 1
+lesson_section: split-join
+statement: |
+  Дана строка. Выведи количество слов в ней — слова разделены одним или несколькими пробелами.
+
+  Заполни пропуски.
+template: |
+  words = input().___()
+  print(___(words))
+reference: |
+  words = input().split()
+  print(len(words))
+tests:
+  visible: ["мама мыла раму", "   много    пробелов  "]
+  hidden: ["", "одно", "a b c d e f"]
+random: {count: 15, gen: "(' ' * random.randint(0, 3)).join(['', *['w' * random.randint(1, 4) for _ in range(random.randint(0, 8))], ''])"}
+star3: [first_try]
+hints:
+  - "Слова получаются из строки методом split — раздел «split и join»."
+  - "Раздели строку на слова и посчитай, сколько их получилось."
+  - "split() без аргумента и len."
+  - "Первый пропуск — метод, который делит строку по пробелам. Второй — функция длины."
+  - "split() без аргументов режет по любому числу пробелов и не создаёт пустых слов, поэтому лишние пробелы не мешают. len() считает элементы списка. Для пустой строки получится 0."

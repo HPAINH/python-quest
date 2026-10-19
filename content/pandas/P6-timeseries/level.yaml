@@ -1,0 +1,7 @@
+code: P6
+title: Временные ряды
+intro: resample, rolling, shift и оконные функции — выручка по дням, скользящие средние, рост к прошлому периоду, LAG и ROW_NUMBER в pandas.
+minutes: 35
+expected_tasks: 10
+packages: [numpy, pandas]
+data: [core, events]

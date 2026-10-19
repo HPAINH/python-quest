@@ -1,0 +1,51 @@
+id: C5-14-boss-baskets
+type: stdio
+title: "Босс: отчёт по корзинам"
+difficulty: 3
+boss: true
+lesson_section: counting
+statement: |
+  Подготовь сводку по заказам ShopData. В первой строке дано число строк `n`, дальше `n` строк `order_id user_id category amount` через пробел. `amount` — дробное число.
+
+  Выведи:
+  1. для каждой категории строку `категория: выручка` — по убыванию выручки, при равной выручке по алфавиту, выручка с двумя знаками;
+  2. строку `Клиентов: N` — число уникальных клиентов;
+  3. строку `Лучший клиент: ID (сумма)` — клиент с наибольшей суммой покупок, при равенстве — с наименьшим числовым ID, сумма с двумя знаками.
+reference: |
+  by_cat = {}
+  by_user = {}
+  for _ in range(int(input())):
+      order_id, user, cat, amount = input().split()
+      amount = float(amount)
+      user = int(user)
+      by_cat[cat] = by_cat.get(cat, 0) + amount
+      by_user[user] = by_user.get(user, 0) + amount
+  for cat, rev in sorted(by_cat.items(), key=lambda p: (-round(p[1], 2), p[0])):
+      print(f"{cat}: {rev:.2f}")
+  print(f"Клиентов: {len(by_user)}")
+  best = min(by_user, key=lambda u: (-round(by_user[u], 2), u))
+  print(f"Лучший клиент: {best} ({by_user[best]:.2f})")
+tests:
+  visible: ["5\n1 10 кофе 990\n2 11 чай 450.5\n3 10 сыр 1290\n4 12 кофе 300\n5 11 чай 1000", "1\n7 5 мёд 99.99"]
+  hidden: ["3\n1 2 a 100\n2 1 b 100\n3 3 c 50", "4\n1 9 x 10\n2 9 x 10\n3 10 y 20\n4 8 z 5", "2\n1 100 a 0.1\n2 20 a 0.2"]
+random:
+  count: 30
+  helpers: |
+    def gen():
+        k = random.randint(1, 15)
+        rows = []
+        for i in range(k):
+            amt = random.choice([random.randint(1, 20) * 50, random.randint(1, 99999) / 100])
+            rows.append(f"{1000 + i} {random.randint(1, 6)} {random.choice(['кофе', 'чай', 'сыр', 'мёд'])} {amt}")
+        return str(k) + "\n" + "\n".join(rows)
+  gen: "gen()"
+star3: [first_try]
+buggy_variants:
+  - code: "by_cat = {}\nby_user = {}\nfor _ in range(int(input())):\n    order_id, user, cat, amount = input().split()\n    amount = float(amount)\n    by_cat[cat] = by_cat.get(cat, 0) + amount\n    by_user[user] = by_user.get(user, 0) + amount\nfor cat, rev in sorted(by_cat.items(), key=lambda p: (-p[1], p[0])):\n    print(f'{cat}: {rev:.2f}')\nprint(f'Клиентов: {len(by_user)}')\nbest = min(by_user, key=lambda u: (-by_user[u], u))\nprint(f'Лучший клиент: {best} ({by_user[best]:.2f})')"
+  - code: "by_cat = {}\nusers = []\nfor _ in range(int(input())):\n    order_id, user, cat, amount = input().split()\n    by_cat[cat] = by_cat.get(cat, 0) + float(amount)\n    users.append(user)\nfor cat, rev in sorted(by_cat.items(), key=lambda p: (-p[1], p[0])):\n    print(f'{cat}: {rev:.2f}')\nprint(f'Клиентов: {len(users)}')\nprint('Лучший клиент: 0 (0.00)')"
+hints:
+  - "Нужны два счётчика-сумматора из раздела «Подсчёт частот» и сортировка пар из раздела «Методы словарей»."
+  - "Заведи два словаря: выручка по категории и сумма по клиенту. Для каждой строки прибавь сумму в оба. Категории отсортируй по убыванию выручки и алфавиту. Число клиентов — размер второго словаря. Лучший клиент — ключ с наибольшей суммой, при равенстве — с наименьшим ID, поэтому ID переведи в int."
+  - "by_cat.get(cat, 0) + amount, by_user[int(user)], sorted(by_cat.items(), key=lambda p: (-p[1], p[0])), min(by_user, key=lambda u: (-by_user[u], u))."
+  - "by_cat = {}\nby_user = {}\nfor _ in range(int(input())):\n    order_id, user, cat, amount = input().split()\n    amount = ___(amount)\n    user = ___(user)\n    by_cat[cat] = by_cat.get(cat, 0) + amount\n    by_user[user] = by_user.get(user, ___) + amount\nfor cat, rev in sorted(by_cat.items(), key=lambda p: (___, p[0])):\n    print(f\"{cat}: {rev:.2f}\")\nprint(f\"Клиентов: {len(___)}\")\nbest = min(by_user, key=lambda u: (-by_user[u], ___))\nprint(f\"Лучший клиент: {best} ({by_user[best]:.2f})\")"
+  - "Это ручной groupby: в pandas та же сводка — df.groupby('category')['amount'].sum(). ID переводится в int, иначе «10» окажется «меньше» «9» при сравнении строк. Суммы дробных чисел могут отличаться в последних знаках (0.1 + 0.2), поэтому при сравнении сумм эталон округляет их до копеек: round(x, 2)."

@@ -1,0 +1,32 @@
+id: N3-01-bulk
+type: vectorize
+title: Оптовая скидка без цикла
+difficulty: 1
+lesson_section: vectorization
+statement: |
+  Перепиши цикл без циклов. В `price` — цены, в `qty` — количества по 200 000 строкам заказов. Строка получает скидку 10%, если `qty` не меньше 10. Запиши в `result` массив сумм строк (`price × qty` с учётом скидки).
+
+  Исходный цикл для понимания логики:
+
+  ```python
+  result = [p * q * (0.9 if q >= 10 else 1) for p, q in zip(price, qty)]
+  ```
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  n = 200_000
+  price = np.round(rng.uniform(50, 5000, size=n), 2)
+  qty = rng.integers(1, 25, size=n)
+reference: |
+  result = price * qty * np.where(qty >= 10, 0.9, 1.0)
+max_ms: 1500
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = price * qty * np.where(qty > 10, 0.9, 1.0)"
+  - code: "result = np.array([p * q * (0.9 if q >= 10 else 1) for p, q in zip(price, qty)])"
+hints:
+  - "Условие для каждого элемента без цикла — np.where. Раздел «Векторизация вместо цикла»."
+  - "Построй массив множителей: 0.9 там, где qty не меньше 10, и 1.0 в остальных строках. Умножь цену на количество и на этот массив."
+  - "np.where(qty >= 10, 0.9, 1.0)."
+  - "result = price * qty * np.where(qty ___ 10, ___, 1.0)"
+  - "np.where собирает массив множителей за один проход внутри NumPy, а умножение массивов идёт поэлементно. Генератор списка запрещён в этой задаче: на 200 000 строк он в десятки раз медленнее."

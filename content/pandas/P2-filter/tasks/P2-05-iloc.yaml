@@ -1,0 +1,24 @@
+id: P2-05-iloc
+type: dataframe
+title: Хвост таблицы
+difficulty: 1
+lesson_section: loc-iloc
+statement: |
+  Запиши в `result` последние 5 строк таблицы `orders` и первые 3 колонки — по позициям, через `iloc`.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+reference: |
+  result = orders.iloc[-5:, :3]
+requires: ["uses:iloc"]
+ordered: true
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = orders.iloc[-5:, :2]"
+    expect_detector: columns_mismatch
+hints:
+  - "Выбор по позициям — iloc, раздел «loc и iloc»."
+  - "Как в NumPy: первая часть — строки, вторая — колонки. Последние 5 строк — срез с отрицательным началом."
+  - "orders.iloc[-5:, :3]."
+  - "result = orders.iloc[___, ___]"
+  - "iloc работает по номерам позиций, как индексация массива: -5: — пять последних, :3 — колонки с позициями 0, 1, 2. Через loc так не получится: подписи строк — числа от 0, а -5 среди них нет."

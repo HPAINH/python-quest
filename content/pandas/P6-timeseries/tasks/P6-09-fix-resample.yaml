@@ -1,0 +1,23 @@
+id: P6-09-fix-resample
+type: fix_bug
+base: value
+title: Исправь недельный отчёт
+difficulty: 1
+lesson_section: resample
+statement: |
+  Нужна выручка всех заказов по неделям (правило `"W"`), округлённая до 2 знаков: Series с датами в индексе. Код падает — исправь его.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+starter: |
+  result = orders.resample("W")["amount"].sum().round(2)
+reference: |
+  orders["order_date"] = pd.to_datetime(orders["order_date"])
+  result = orders.resample("W", on="order_date")["amount"].sum().round(2)
+star3: [first_try, "max_lines:2"]
+hints:
+  - "Требования resample к датам — раздел «resample» и «Частые ошибки»."
+  - "resample нужно знать, где даты. Здесь даты лежат в колонке-строке: сначала переведи её в datetime, потом укажи её через on= или сделай индексом."
+  - "pd.to_datetime(orders[\"order_date\"]), orders.resample(\"W\", on=\"order_date\")."
+  - "orders[\"order_date\"] = pd.to_datetime(orders[___])\nresult = orders.resample(\"W\", on=___)[\"amount\"].sum().round(2)"
+  - "У таблицы после read_csv индекс — номера строк, а resample работает только с индексом из дат или с колонкой из on=. Колонка должна быть именно datetime, строка не подойдёт."

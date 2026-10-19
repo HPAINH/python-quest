@@ -1,0 +1,33 @@
+id: N4-04-dice
+type: function
+function: dice_counts
+title: Честный ли кубик
+difficulty: 2
+lesson_section: random
+setup: |
+  import numpy as np
+statement: |
+  Напиши функцию `dice_counts(n, seed)`, которая моделирует `n` бросков кубика и возвращает массив из 6 чисел — сколько раз выпала каждая грань от 1 до 6.
+
+  Броски генерируй ровно так: `np.random.default_rng(seed).integers(1, 7, size=n)`.
+starter: |
+  def dice_counts(n, seed):
+      pass
+reference: |
+  def dice_counts(n, seed):
+      rolls = np.random.default_rng(seed).integers(1, 7, size=n)
+      return np.array([(rolls == face).sum() for face in range(1, 7)])
+tests:
+  visible: ["dice_counts(12, 1)", "dice_counts(0, 5)"]
+  hidden: ["dice_counts(1, 0)", "dice_counts(6000, 42)", "dice_counts(7, 7)"]
+random: {count: 10, gen: "f'dice_counts({random.randint(1, 500)}, {random.randint(0, 999)})'"}
+star3: [first_try]
+buggy_variants:
+  - code: "def dice_counts(n, seed):\n    rolls = np.random.default_rng(seed).integers(1, 6, size=n)\n    return np.array([(rolls == f).sum() for f in range(1, 7)])"
+  - code: "def dice_counts(n, seed):\n    rolls = np.random.default_rng().integers(1, 7, size=n)\n    return np.array([(rolls == f).sum() for f in range(1, 7)])"
+hints:
+  - "Генератор с seed и integers — раздел «Случайные числа»."
+  - "Сгенерируй броски точно по условию, затем для каждой грани от 1 до 6 посчитай, сколько раз она выпала, сравнением и суммой маски."
+  - "np.random.default_rng(seed).integers(1, 7, size=n), (rolls == face).sum(). Короче: np.bincount(rolls, minlength=7)[1:]."
+  - "def dice_counts(n, seed):\n    rolls = np.random.default_rng(___).integers(1, ___, size=n)\n    return np.array([(rolls == face).sum() for face in range(1, ___)])"
+  - "Правая граница integers не включается, поэтому для граней 1…6 пишут 7. Без seed результат меняется от запуска к запуску, и проверка не совпадёт. Сумма шести чисел всегда равна n."

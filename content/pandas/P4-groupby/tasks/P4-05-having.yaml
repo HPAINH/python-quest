@@ -1,0 +1,27 @@
+id: P4-05-having
+type: dataframe
+title: Постоянные покупатели
+difficulty: 2
+lesson_section: agg
+sql_quest_ref: HAVING
+statement: |
+  Найди клиентов, у которых не меньше 8 **доставленных** заказов. Запиши в `result` колонки `customer_id` и `n_orders`, по убыванию `n_orders`, при равенстве — по возрастанию `customer_id`.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+reference: |
+  delivered = orders[orders["status"] == "delivered"]
+  t = delivered.groupby("customer_id").size().reset_index(name="n_orders")
+  result = t[t["n_orders"] >= 8].sort_values(["n_orders", "customer_id"], ascending=[False, True])
+ordered: true
+star3: [first_try, "max_lines:3"]
+buggy_variants:
+  - code: "t = orders.groupby('customer_id').size().reset_index(name='n_orders')\nresult = t[t['n_orders'] >= 8].sort_values(['n_orders', 'customer_id'], ascending=[False, True])"
+  - code: "delivered = orders[orders['status'] == 'delivered']\nt = delivered.groupby('customer_id').size().reset_index(name='n_orders')\nresult = t[t['n_orders'] > 8].sort_values(['n_orders', 'customer_id'], ascending=[False, True])"
+    expect_detector: shape_rows
+hints:
+  - "Фильтр по результату группировки — раздел «agg», абзац про HAVING."
+  - "Посчитай доставленные заказы по клиентам, затем отфильтруй получившуюся таблицу и отсортируй по двум колонкам."
+  - "delivered.groupby(\"customer_id\").size().reset_index(name=\"n_orders\"), t[t[\"n_orders\"] >= 8]."
+  - "delivered = orders[orders[\"status\"] == \"delivered\"]\nt = delivered.groupby(\"customer_id\").size().reset_index(name=___)\nresult = t[t[\"n_orders\"] >= ___].sort_values([\"n_orders\", \"customer_id\"], ascending=[___, True])"
+  - "В SQL условие на агрегат пишут в HAVING, в pandas — обычной маской по уже сгруппированной таблице. «Не меньше 8» — это >= 8."

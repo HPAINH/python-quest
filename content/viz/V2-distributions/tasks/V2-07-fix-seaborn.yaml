@@ -1,0 +1,28 @@
+id: V2-07-fix-seaborn
+type: fix_bug
+base: value
+title: Исправь график seaborn
+difficulty: 1
+lesson_section: mistakes
+statement: |
+  Нужны столбцы средней суммы заказа по каналам, построенные `sns.barplot` по заранее посчитанной таблице. Код падает — исправь его.
+setup: |
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  import seaborn as sns
+  orders = pd.read_csv("orders.csv")
+plot:
+  labels: false
+starter: |
+  t = orders.groupby("channel")["amount"].mean()
+  ax = sns.barplot(data=t, x="channel", y="amount")
+reference: |
+  t = orders.groupby("channel", as_index=False)["amount"].mean()
+  ax = sns.barplot(data=t, x="channel", y="amount")
+star3: [first_try]
+hints:
+  - "Типичная ошибка с seaborn — раздел «Частые ошибки»."
+  - "После groupby колонка channel стала индексом, и seaborn не находит её среди колонок. Оставь ключ колонкой."
+  - "orders.groupby(\"channel\", as_index=False)[\"amount\"].mean() или .reset_index()."
+  - "t = orders.groupby(\"channel\", as_index=___)[\"amount\"].mean()\nax = sns.barplot(data=t, x=\"channel\", y=\"amount\")"
+  - "seaborn ищет имена из x= и y= только среди колонок data=, индекс он не видит. sns.barplot(data=orders, x=\"channel\", y=\"amount\", errorbar=None) посчитал бы то же среднее сам, без groupby."

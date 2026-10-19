@@ -1,0 +1,27 @@
+id: C1-02-max-two
+type: stdio
+title: Большее из двух
+difficulty: 1
+lesson_section: if-else
+statement: |
+  В одной строке даны два целых числа. Выведи большее из них. Если числа равны, выведи любое — это одно и то же число.
+
+  Не используй функцию `max`.
+reference: |
+  a, b = map(int, input().split())
+  if a > b:
+      print(a)
+  else:
+      print(b)
+requires: ["no_call:max"]
+tests:
+  visible: ["3 8", "10 -2"]
+  hidden: ["5 5", "-7 -3", "0 0", "100 99"]
+random: {count: 20, gen: "f'{random.randint(-100, 100)} {random.randint(-100, 100)}'"}
+star3: [first_try]
+hints:
+  - "Сравни числа через if — раздел «if и else»."
+  - "Если первое больше второго — выводим первое, иначе второе."
+  - "map(int, input().split()), оператор >, if / else."
+  - "a, b = map(int, input().split())\nif a ___ b:\n    print(___)\nelse:\n    print(___)"
+  - "Если a > b, ответ a. Иначе b больше или равно a, и вывести b тоже правильно: при равенстве числа одинаковые."

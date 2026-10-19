@@ -1,0 +1,101 @@
+quiz:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      A = np.array([[1, 2], [3, 4]])
+      v = np.array([10, 1])
+      print(A @ v, A * v)
+    answer: "[12 34] [[10  2]\n [30  4]]"
+    explain: "@ — матричное умножение: 1·10 + 2·1 = 12. * — поэлементное с broadcasting."
+    section: linalg
+  - type: choice
+    q: Какая форма у результата (4, 3) @ (3, 2)?
+    options: ["(4, 2)", "(3, 3)", "(4, 3)", "Ошибка"]
+    answer: 0
+    explain: Внутренние размеры 3 и 3 совпадают и исчезают, остаются внешние (4, 2).
+    section: linalg
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      a = np.random.default_rng(5).integers(0, 100, size=3)
+      b = np.random.default_rng(5).integers(0, 100, size=3)
+      print((a == b).all())
+    answer: "True"
+    explain: Генераторы с одинаковым seed дают одинаковые числа.
+    section: random
+  - type: fill
+    q: Впиши пропуск, чтобы решить систему 2x = 6, 3y = 12.
+    code: |
+      import numpy as np
+      A = np.array([[2.0, 0.0], [0.0, 3.0]])
+      b = np.array([6.0, 12.0])
+      print(np.linalg.___(A, b))
+    answer: ["solve"]
+    expect: "[3. 4.]"
+    explain: np.linalg.solve находит x из A x = b.
+    section: linalg
+  - type: choice
+    q: Как оценить вероятность события методом Монте-Карло?
+    options: ["Решить уравнение", "Сгенерировать много случайных сценариев и посчитать долю тех, где событие произошло", "Взять среднее всех чисел", "Умножить матрицы"]
+    answer: 1
+    explain: Доля «успешных» сценариев приближает вероятность, и тем точнее, чем сценариев больше.
+    section: simulation
+
+express:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      I = np.eye(2)
+      A = np.array([[5.0, 1.0], [2.0, 3.0]])
+      print(np.allclose(A @ I, A), np.allclose(A @ np.linalg.inv(A), I))
+    answer: "True True"
+    explain: Умножение на единичную матрицу не меняет A, а A на обратную даёт единичную.
+    section: linalg
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      x = np.array([0.0, 1.0, 2.0])
+      y = 2 * x + 1
+      print(np.round(np.polyfit(x, y, 1), 2))
+    answer: "[2. 1.]"
+    explain: Точки лежат на прямой y = 2x + 1, polyfit возвращает [наклон, сдвиг].
+    section: linalg
+  - type: choice
+    q: Почему rng.integers(1, 6) никогда не выдаст 6?
+    options: ["Это ошибка NumPy", "Правая граница integers не включается", "6 выпадает очень редко", "Нужен seed"]
+    answer: 1
+    explain: Для кубика пишут rng.integers(1, 7).
+    section: random
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      rng = np.random.default_rng(0)
+      sims = rng.integers(0, 2, size=(1000, 3))
+      print(sims.shape, sims.sum(axis=1).max() <= 3)
+    answer: "(1000, 3) True"
+    explain: 1000 сценариев по 3 броска монеты; в строке не больше трёх единиц.
+    section: simulation
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      a = np.arange(1, 101)
+      print(np.percentile(a, 50), np.percentile(a, 100))
+    answer: "50.5 100.0"
+    explain: Медиана чисел 1…100 — 50.5, сотый перцентиль — максимум.
+    section: simulation
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      Q = np.array([[1, 2, 0], [0, 1, 1]])
+      p = np.array([100, 10, 1])
+      print(Q @ p, (Q @ p).sum())
+    answer: "[120  11] 131"
+    explain: Каждая строка Q — заказ, Q @ p считает его сумму.
+    section: linalg

@@ -1,0 +1,31 @@
+id: M2-08-predict
+type: predict
+title: Метрики вручную
+difficulty: 2
+lesson_section: clf-metrics
+statement: 'Впиши, что выведет программа.
+
+  '
+code: 'from sklearn import metrics
+
+  y = [0, 0, 1, 1, 1, 0]
+
+  p = [0.2, 0.6, 0.7, 0.4, 0.9, 0.1]
+
+  pred = [int(v >= 0.5) for v in p]
+
+  print(pred)
+
+  print(metrics.confusion_matrix(y, pred).ravel().tolist())
+
+  print(round(metrics.precision_score(y, pred), 3), round(metrics.recall_score(y, pred), 3))
+
+  print(round(metrics.roc_auc_score(y, p), 3), metrics.mean_absolute_error([1, 2], [2, 4]))
+
+  '
+hints:
+- Повтори разделы «Метрики классификации» и «Метрики регрессии».
+- 'Метки: [0, 1, 1, 0, 1, 0]. ravel() разворачивает матрицу в TN, FP, FN, TP.'
+- 'TP = 2, FP = 1, FN = 1. Для AUC: из 9 пар «класс 1 — класс 0» неверно упорядочена только пара 0.4 и 0.6.'
+- 'Четыре строки: список меток, список из четырёх чисел, два числа, два числа.'
+- 'Ответ: «[0, 1, 1, 0, 1, 0]», «[2, 1, 1, 2]», «0.667 0.667», «0.889 1.5».'

@@ -1,0 +1,33 @@
+id: C7-03-top-words
+type: function
+function: top_words
+title: Частые слова в отзывах
+difficulty: 1
+lesson_section: collections
+statement: |
+  Напиши функцию `top_words(text, n=3)`, которая возвращает список из `n` самых частых слов текста в виде пар `(слово, количество)`. Регистр не важен. При равной частоте слова идут по алфавиту.
+starter: |
+  from collections import Counter
+
+  def top_words(text, n=3):
+      pass
+reference: |
+  from collections import Counter
+
+  def top_words(text, n=3):
+      freq = Counter(text.lower().split())
+      return sorted(freq.items(), key=lambda p: (-p[1], p[0]))[:n]
+requires: ["uses:Counter"]
+tests:
+  visible: ["top_words('Кофе вкусный кофе горячий чай кофе чай')", "top_words('b a', 5)"]
+  hidden: ["top_words('')", "top_words('x X x y', 1)", "top_words('d c b a d c b d c d', 2)"]
+random: {count: 15, gen: "f'top_words({\" \".join(random.choice([\"a\", \"b\", \"c\", \"D\", \"d\"]) for _ in range(random.randint(0, 12)))!r}, {random.randint(1, 4)})'"}
+star3: [first_try, "max_lines:5"]
+buggy_variants:
+  - code: "from collections import Counter\n\ndef top_words(text, n=3):\n    return Counter(text.lower().split()).most_common(n)"
+hints:
+  - "Частоты считает Counter — раздел «collections»."
+  - "Приведи текст к нижнему регистру, раздели на слова и посчитай их. Отсортируй пары по убыванию частоты, а при равенстве — по слову, и возьми первые n."
+  - "Counter(text.lower().split()), sorted(freq.items(), key=lambda p: (-p[1], p[0])), срез [:n]."
+  - "from collections import Counter\n\ndef top_words(text, n=3):\n    freq = ___(text.lower().split())\n    return sorted(freq.items(), key=lambda p: (___, p[0]))[:___]"
+  - "most_common(n) при равных частотах оставляет порядок первого появления, а условие требует алфавит. Поэтому сортируем сами по ключу (-количество, слово). Пустой текст даёт пустой список."

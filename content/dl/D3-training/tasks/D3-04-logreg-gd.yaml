@@ -1,0 +1,34 @@
+id: D3-04-logreg-gd
+type: function
+function: train_logreg
+title: Логистическая регрессия спуском
+difficulty: 2
+lesson_section: loop
+tol: 1.0e-09
+statement: 'Напиши функцию `train_logreg(X, y, lr=0.5, epochs=100)`: начни с нулевых весов `w` и `b = 0`, и `epochs` раз сделай шаг полного градиентного спуска для бинарной кросс-энтропии: `p = σ(X·w + b)`, `dw = Xᵀ(p − y) / n`, `db = mean(p − y)`. Верни `np.append(w, b)`.
+
+  '
+setup: "import numpy as np\n\ndef rnd(*shape, seed=0):\n    return np.random.default_rng(seed).normal(size=shape).round(3)\n\ndef labels(n, k, seed=0):\n    return np.random.default_rng(seed).integers(0, k, n)\n"
+starter: "def train_logreg(X, y, lr=0.5, epochs=100):\n    pass\n"
+reference: "def train_logreg(X, y, lr=0.5, epochs=100):\n    n, d = X.shape\n    w = np.zeros(d)\n    b = 0.0\n    for _ in range(epochs):\n        p = 1 / (1 + np.exp(-(X @ w + b)))\n        w = w - lr * X.T @ (p - y) / n\n        b = b - lr * (p - y).mean()\n    return np.append(w, b)\n"
+tests:
+  visible:
+  - train_logreg(np.array([[0.0], [1.0], [2.0], [3.0]]), np.array([0, 0, 1, 1]), epochs=3)
+  hidden:
+  - train_logreg(rnd(30, 2, seed=1), labels(30, 2, seed=2))
+  - train_logreg(rnd(10, 3, seed=3), labels(10, 2, seed=4), lr=0.1, epochs=50)
+  - train_logreg(np.zeros((4, 2)), np.array([1, 1, 0, 1]), epochs=10)
+random:
+  count: 10
+  gen: '(lambda n, d, s: f''train_logreg(rnd({n}, {d}, seed={s}), labels({n}, 2, seed={s + 1}), lr={random.choice([0.1, 0.5, 1.0])}, epochs={random.randint(1, 60)})'')(random.randint(2, 30), random.randint(1, 4), random.randint(0, 999))'
+star3:
+- first_try
+buggy_variants:
+- code: "def train_logreg(X, y, lr=0.5, epochs=100):\n    n, d = X.shape\n    w = np.zeros(d)\n    b = 0.0\n    for _ in range(epochs):\n        p = 1 / (1 + np.exp(-(X @ w + b)))\n        w = w - lr * X.T @ (p - y)\n        b = b - lr * (p - y).sum()\n    return np.append(w, b)"
+- code: "def train_logreg(X, y, lr=0.5, epochs=100):\n    n, d = X.shape\n    w = np.zeros(d)\n    b = 0.0\n    for _ in range(epochs):\n        p = 1 / (1 + np.exp(-(X @ w + b)))\n        w = w - lr * X.T @ (p - y) / n\n    return np.append(w, b)"
+hints:
+- Цикл обучения — раздел «Цикл обучения».
+- 'В каждой эпохе: вероятности через сигмоиду, градиенты по формулам из условия, шаг против градиента. Сдвиг обновляется тоже.'
+- p = 1 / (1 + np.exp(-(X @ w + b))); w = w - lr * X.T @ (p - y) / n; b = b - lr * (p - y).mean().
+- "def train_logreg(X, y, lr=0.5, epochs=100):\n    n, d = X.shape\n    w = np.zeros(d)\n    b = 0.0\n    for _ in range(epochs):\n        p = 1 / (1 + np.exp(-(X @ w + ___)))\n        w = w - lr * X.T @ (p - y) / ___\n        b = b - lr * (p - y).___()\n    return np.append(w, b)"
+- Это та же логистическая регрессия, что в sklearn, только без регуляризации и с простым спуском. Без деления на n шаг растёт вместе с выборкой, и обучение может разойтись.

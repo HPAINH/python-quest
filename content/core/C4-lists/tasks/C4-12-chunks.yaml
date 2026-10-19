@@ -1,0 +1,25 @@
+id: C4-12-chunks
+type: function
+function: chunks
+title: Разбить на пачки
+difficulty: 2
+lesson_section: comprehension
+statement: |
+  Напиши функцию `chunks(items, k)`, которая делит список на пачки по `k` элементов и возвращает список пачек. Последняя пачка может быть короче. `k` — натуральное число.
+starter: |
+  def chunks(items, k):
+      pass
+reference: |
+  def chunks(items, k):
+      return [items[i:i + k] for i in range(0, len(items), k)]
+tests:
+  visible: ["chunks([1, 2, 3, 4, 5], 2)", "chunks(['a', 'b', 'c'], 3)"]
+  hidden: ["chunks([], 4)", "chunks([1], 1)", "chunks([1, 2, 3], 5)", "chunks(list(range(10)), 3)"]
+random: {count: 25, gen: "f'chunks({list(range(random.randint(0, 15)))}, {random.randint(1, 6)})'"}
+star3: [first_try, "max_lines:2"]
+hints:
+  - "Срезы списка и range с шагом — разделы «Списки» и «Генераторы списков»."
+  - "Пачки начинаются с индексов 0, k, 2k и так далее. Каждая пачка — срез от начала пачки длиной k."
+  - "range(0, len(items), k) и срез items[i:i + k]."
+  - "def chunks(items, k):\n    return [items[___:___] for i in range(0, len(items), ___)]"
+  - "range с шагом k даёт начала пачек. Срез не выходит за границы, поэтому последняя пачка просто получается короче. Пустой список даёт пустой список пачек."

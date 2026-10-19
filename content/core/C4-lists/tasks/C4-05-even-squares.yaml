@@ -1,0 +1,26 @@
+id: C4-05-even-squares
+type: function
+function: even_squares
+title: Квадраты чётных
+difficulty: 1
+lesson_section: comprehension
+statement: |
+  Напиши функцию `even_squares(nums)`, которая возвращает список квадратов чётных чисел из `nums` в исходном порядке. Используй генератор списка.
+starter: |
+  def even_squares(nums):
+      pass
+reference: |
+  def even_squares(nums):
+      return [x * x for x in nums if x % 2 == 0]
+requires: ["uses:comprehension"]
+tests:
+  visible: ["even_squares([1, 2, 3, 4])", "even_squares([5, 7])"]
+  hidden: ["even_squares([])", "even_squares([0])", "even_squares([-2, -3, 10])"]
+random: {count: 20, gen: "'even_squares(' + str([random.randint(-30, 30) for _ in range(random.randint(0, 12))]) + ')'"}
+star3: [first_try, "max_lines:2"]
+hints:
+  - "Генератор списка с условием — раздел «Генераторы списков»."
+  - "Возьми каждое x из списка, оставь чётные и положи в результат x в квадрате."
+  - "[x * x for x in nums if x % 2 == 0] и return."
+  - "def even_squares(nums):\n    return [___ for x in nums if ___]"
+  - "Генератор читается слева направо: что положить — x * x, откуда брать — for x in nums, какие оставить — if x % 2 == 0. Пустой список на входе даёт пустой список на выходе."

@@ -1,0 +1,25 @@
+id: N3-02-row-totals
+type: array
+title: Выручка магазинов
+difficulty: 1
+lesson_section: axis
+statement: |
+  `sales` — таблица «магазин × день». Запиши в `result` суммарную выручку каждого магазина за все дни.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  sales = rng.integers(1000, 9000, size=(int(rng.integers(3, 8)), int(rng.integers(5, 15))))
+reference: |
+  result = sales.sum(axis=1)
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = sales.sum(axis=0)"
+    expect_detector: axis_confusion
+  - code: "result = sales.sum()"
+    expect_detector: result_type
+hints:
+  - "Агрегаты по осям — раздел «Оси»."
+  - "Магазины — строки. Нужно свернуть столбцы (дни), чтобы осталась одна сумма на строку."
+  - "sales.sum(axis=1)."
+  - "result = sales.sum(axis=___)"
+  - "axis=1 убирает ось дней, и остаётся по числу на каждый магазин. axis=0 дал бы суммы по дням, а sum() без оси — одно число на всю таблицу."

@@ -1,0 +1,31 @@
+id: V2-04-weekday
+type: plot
+title: Заказы по дням недели
+difficulty: 1
+lesson_section: seaborn
+statement: |
+  Построй столбцы числа всех заказов по дню недели: по X — номер дня от 0 (понедельник) до 6 (воскресенье) по порядку. Используй `sns.countplot` или любой другой способ. Нужен заголовок.
+setup: |
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  import seaborn as sns
+  orders = pd.read_csv("orders.csv", parse_dates=["order_date"])
+plot:
+  labels: true
+  ordered: true
+reference: |
+  orders["weekday"] = orders["order_date"].dt.dayofweek
+  fig, ax = plt.subplots()
+  sns.countplot(data=orders, x="weekday", order=range(7), ax=ax)
+  ax.set_title("Заказы по дням недели")
+star3: [first_try, "max_lines:4"]
+buggy_variants:
+  - code: "orders['weekday'] = orders['order_date'].dt.day_name()\nfig, ax = plt.subplots()\nsns.countplot(data=orders, x='weekday', ax=ax)\nax.set_title('Дни')"
+  - code: "orders['weekday'] = orders['order_date'].dt.dayofweek\ns = orders['weekday'].value_counts()\nfig, ax = plt.subplots()\nax.bar(s.index.astype(str), s.values)\nax.set_title('Дни')"
+    expect_detector: plot_order
+hints:
+  - "countplot — раздел «seaborn», день недели — dt.dayofweek из уровня P3."
+  - "Добавь колонку с номером дня недели и построй countplot по ней с порядком от 0 до 6."
+  - "orders[\"order_date\"].dt.dayofweek, sns.countplot(data=orders, x=\"weekday\", order=range(7), ax=ax)."
+  - "orders[\"weekday\"] = orders[\"order_date\"].dt.___\nfig, ax = plt.subplots()\nsns.countplot(data=orders, x=\"weekday\", order=range(___), ax=ax)\nax.set_title(\"...\")"
+  - "value_counts сортирует по частоте, и дни перемешаются. Названия дней через day_name() встанут в порядке первого появления — тоже не по неделе. Числовой номер с order=range(7) даёт правильный порядок."

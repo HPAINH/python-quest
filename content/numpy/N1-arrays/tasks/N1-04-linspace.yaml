@@ -1,0 +1,24 @@
+id: N1-04-linspace
+type: array
+title: Шкала скидок
+difficulty: 1
+lesson_section: create
+statement: |
+  Нужно `n` уровней скидки, равномерно распределённых от `lo` до `hi` процентов **включительно**. Запиши массив в `result`.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  lo = int(rng.integers(0, 10))
+  hi = int(rng.integers(20, 50))
+  n = int(rng.integers(3, 9))
+reference: |
+  result = np.linspace(lo, hi, n)
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = np.arange(lo, hi, (hi - lo) / n)"
+hints:
+  - "Заданное число точек между границами даёт np.linspace — раздел «Создание массивов»."
+  - "Передай нижнюю границу, верхнюю и количество точек. В отличие от arange, верхняя граница войдёт в массив."
+  - "np.linspace(lo, hi, n)."
+  - "result = np.linspace(___, ___, ___)"
+  - "arange с шагом (hi - lo) / n не включает hi и из-за дробного шага может дать на точку больше или меньше. linspace сам рассчитывает шаг (hi - lo) / (n - 1)."

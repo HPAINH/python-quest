@@ -1,0 +1,31 @@
+id: C5-09-mode
+type: function
+function: mode
+title: Самое частое число
+difficulty: 2
+lesson_section: counting
+statement: |
+  Напиши функцию `mode(nums)`, которая возвращает число, встречающееся в непустом списке чаще всего. Если таких несколько — наименьшее из них.
+starter: |
+  def mode(nums):
+      pass
+reference: |
+  def mode(nums):
+      freq = {}
+      for x in nums:
+          freq[x] = freq.get(x, 0) + 1
+      best = max(freq.values())
+      return min(x for x in freq if freq[x] == best)
+tests:
+  visible: ["mode([3, 1, 3, 2])", "mode([5, 4, 4, 5])"]
+  hidden: ["mode([7])", "mode([-1, -1, 2, 2, 3])", "mode([9, 8, 7])", "mode([0, 0, 0, 1, 1, 1, -5])"]
+random: {count: 30, gen: "'mode(' + str([random.randint(-3, 3) for _ in range(random.randint(1, 12))]) + ')'"}
+star3: [first_try]
+buggy_variants:
+  - code: "def mode(nums):\n    freq = {}\n    for x in nums:\n        freq[x] = freq.get(x, 0) + 1\n    return max(freq, key=freq.get)"
+hints:
+  - "Подсчёт частот — раздел «Подсчёт частот»."
+  - "Посчитай частоты. Найди наибольшую частоту. Среди чисел с такой частотой выбери наименьшее."
+  - "Словарь-счётчик, max(freq.values()), min по генератору с условием."
+  - "def mode(nums):\n    freq = {}\n    for x in nums:\n        freq[x] = freq.get(x, 0) + 1\n    best = max(freq.___())\n    return ___(x for x in freq if freq[x] == ___)"
+  - "max(freq, key=freq.get) вернул бы первое по порядку появления самое частое число, а нужно наименьшее: для [5, 4, 4, 5] это 4, хотя 5 встретилось раньше. Поэтому сначала находим наибольшую частоту, потом минимальное число с ней."

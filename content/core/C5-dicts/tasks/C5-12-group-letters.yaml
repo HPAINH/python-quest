@@ -1,0 +1,30 @@
+id: C5-12-group-letters
+type: function
+function: group_by_letter
+title: Группировка по букве
+difficulty: 2
+lesson_section: nested
+statement: |
+  Напиши функцию `group_by_letter(words)`, которая возвращает словарь «первая буква → список слов на эту букву». Слова в списках — в алфавитном порядке, без повторов. Первая буква берётся в нижнем регистре, сами слова не меняются. Пустых строк во входе нет.
+starter: |
+  def group_by_letter(words):
+      pass
+reference: |
+  def group_by_letter(words):
+      groups = {}
+      for w in set(words):
+          groups.setdefault(w[0].lower(), []).append(w)
+      return {k: sorted(v) for k, v in groups.items()}
+tests:
+  visible: ["group_by_letter(['кофе', 'чай', 'какао', 'кофе'])", "group_by_letter([])"]
+  hidden: ["group_by_letter(['a'])", "group_by_letter(['Apple', 'avocado', 'banana'])", "group_by_letter(['b', 'a', 'b', 'c'])"]
+random: {count: 20, gen: "'group_by_letter(' + str([random.choice(['ab', 'ac', 'ba', 'Bc', 'ca', 'Ab']) for _ in range(random.randint(0, 10))]) + ')'"}
+star3: [first_try]
+buggy_variants:
+  - code: "def group_by_letter(words):\n    groups = {}\n    for w in words:\n        groups.setdefault(w[0].lower(), []).append(w)\n    return {k: sorted(v) for k, v in groups.items()}"
+hints:
+  - "Группировка значений по ключу — раздел «Вложенные структуры»."
+  - "Убери повторы, для каждого слова возьми первую букву в нижнем регистре и добавь слово в список этой буквы. В конце отсортируй списки."
+  - "set(words), w[0].lower(), setdefault(key, []).append(w), sorted."
+  - "def group_by_letter(words):\n    groups = {}\n    for w in ___(words):\n        groups.setdefault(w[0].___(), []).append(w)\n    return {k: ___(v) for k, v in groups.items()}"
+  - "set убирает повторы до группировки. Ключи словаря не обязаны идти по порядку — словари сравниваются без учёта порядка ключей, а вот списки внутри должны быть отсортированы."

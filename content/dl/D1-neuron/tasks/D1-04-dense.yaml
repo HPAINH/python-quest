@@ -1,0 +1,37 @@
+id: D1-04-dense
+type: function
+function: dense
+title: Полносвязный слой
+difficulty: 1
+lesson_section: layer
+tol: 1.0e-09
+statement: 'Напиши функцию `dense(X, W, b)` — выход полносвязного слоя без активации для пакета объектов: `X` формы (n, входы), `W` — (входы, нейроны), `b` — (нейроны,). Результат — массив (n, нейроны).
+
+  '
+setup: "import numpy as np\n\ndef rnd(*shape, seed=0):\n    return np.random.default_rng(seed).normal(size=shape).round(3)\n"
+starter: "def dense(X, W, b):\n    pass\n"
+reference: "def dense(X, W, b):\n    return X @ W + b\n"
+tests:
+  visible:
+  - dense(np.array([[1.0, 2.0]]), np.array([[1.0, 0.0, -1.0], [0.5, 1.0, 2.0]]), np.array([0.0, 1.0, 0.0]))
+  - dense(rnd(3, 2, seed=1), rnd(2, 4, seed=2), rnd(4, seed=3))
+  hidden:
+  - dense(rnd(5, 3, seed=4), rnd(3, 1, seed=5), np.zeros(1))
+  - dense(np.ones((2, 2)), np.eye(2), np.array([1.0, -1.0]))
+  - dense(rnd(1, 6, seed=6), rnd(6, 6, seed=7), rnd(6, seed=8))
+random:
+  count: 15
+  gen: '(lambda n, i, o, s: f''dense(rnd({n}, {i}, seed={s}), rnd({i}, {o}, seed={s + 1}), rnd({o}, seed={s + 2}))'')(random.randint(1, 6), random.randint(1, 5), random.randint(1, 5), random.randint(0, 999))'
+star3:
+- first_try
+- max_lines:2
+buggy_variants:
+- code: "def dense(X, W, b):\n    return W @ X + b"
+  expect_detector: matmul_shape
+- code: "def dense(X, W, b):\n    return X * W + b"
+hints:
+- Слой как матричное умножение — раздел «Слой».
+- Умножь матрицу объектов на матрицу весов и прибавь сдвиг. Сдвиг прибавится к каждой строке сам.
+- X @ W + b.
+- "def dense(X, W, b):\n    return X ___ W + b"
+- '* — поэлементное умножение, а нужно матричное @. W @ X не совпадает по формам: внутренние размерности должны быть равны.'

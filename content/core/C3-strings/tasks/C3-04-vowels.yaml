@@ -1,0 +1,27 @@
+id: C3-04-vowels
+type: stdio
+title: Гласные
+difficulty: 1
+lesson_section: iterate
+statement: |
+  Дана строка. Посчитай в ней гласные буквы — русские (`аеёиоуыэюя`) и английские (`aeiou`) в любом регистре — и выведи их количество.
+reference: |
+  vowels = "аеёиоуыэюяaeiou"
+  count = 0
+  for ch in input().lower():
+      if ch in vowels:
+          count += 1
+  print(count)
+tests:
+  visible: ["Привет, Python!", "ббб"]
+  hidden: ["", "AEIOU", "Ёжик и Ёлка", "xyz"]
+random: {count: 15, gen: "''.join(random.choice('абвгдеёжзиAEbcdOUyz ') for _ in range(random.randint(0, 40)))"}
+star3: [first_try]
+buggy_variants:
+  - code: "vowels = 'аеёиоуыэюяaeiou'\ncount = 0\nfor ch in input():\n    if ch in vowels:\n        count += 1\nprint(count)"
+hints:
+  - "Обход строки и оператор in — раздел «Обход строки»."
+  - "Заведи строку со всеми гласными. Пройди по символам входной строки в нижнем регистре и считай те, что входят в строку гласных."
+  - "vowels = \"аеёиоуыэюяaeiou\", for ch in s.lower(), if ch in vowels, счётчик."
+  - "vowels = \"аеёиоуыэюяaeiou\"\ncount = 0\nfor ch in input().___():\n    if ch ___ vowels:\n        count += 1\nprint(count)"
+  - "ch in vowels проверяет, есть ли символ в строке гласных. lower() нужен, чтобы заглавные И и O тоже посчитались. Пустая строка даёт 0."

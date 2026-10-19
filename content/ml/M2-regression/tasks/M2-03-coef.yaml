@@ -1,0 +1,58 @@
+id: M2-03-coef
+type: stat
+title: Сколько добавляет акция
+difficulty: 2
+lesson_section: linreg
+statement: 'Обучи `LinearRegression` на всех строках по признакам `promo`, `holiday`, `temperature`, `weekday` (без кодирования и масштабирования). Запиши `promo_effect` и `holiday_effect` — веса акции и праздника (допуск ±0.001), и `colder_more` — `True`, если вес температуры отрицательный.
+
+  '
+setup: "import numpy as np\nimport pandas as pd\nfrom sklearn import metrics\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import OneHotEncoder, StandardScaler\nfrom sklearn.impute import SimpleImputer\nfrom sklearn.compose import ColumnTransformer\nfrom sklearn.pipeline import make_pipeline, Pipeline\nfrom sklearn.linear_model import LogisticRegression, LinearRegression\ndd = pd.read_csv(\"demand.csv\", parse_dates=[\"date\"])\ndd[\"month\"] = dd[\"date\"].dt.month\nXd = dd.drop(columns=[\"date\", \"product_id\", \"units\"])\nyd = dd[\"units\"]\nif SHUFFLE:\n    yd = yd.sample(frac=1, random_state=1).reset_index(drop=True)\n"
+outputs:
+- var: promo_effect
+  tol: 0.001
+- var: holiday_effect
+  tol: 0.001
+- var: colder_more
+reference: 'cols = ["promo", "holiday", "temperature", "weekday"]
+
+  lr = LinearRegression().fit(Xd[cols], yd)
+
+  w = dict(zip(cols, lr.coef_))
+
+  promo_effect = w["promo"]
+
+  holiday_effect = w["holiday"]
+
+  colder_more = bool(w["temperature"] < 0)
+
+  '
+star3:
+- first_try
+- max_lines:6
+buggy_variants:
+- code: 'cols = [''promo'', ''holiday'', ''temperature'', ''weekday'']
+
+    lr = LinearRegression().fit(Xd[cols], yd)
+
+    promo_effect = lr.coef_[1]
+
+    holiday_effect = lr.coef_[0]
+
+    colder_more = bool(lr.coef_[2] < 0)'
+  expect_detector: stat_value
+hints:
+- Веса модели — раздел «Линейная регрессия».
+- Обучи модель на четырёх колонках; веса лежат в coef_ в том же порядке, что колонки. Удобно сопоставить их через dict(zip(cols, coef_)).
+- LinearRegression().fit(Xd[cols], yd).coef_, dict(zip(cols, lr.coef_)).
+- 'cols = ["promo", "holiday", "temperature", "weekday"]
+
+  lr = LinearRegression().fit(Xd[cols], yd)
+
+  w = dict(zip(cols, lr.___))
+
+  promo_effect = w[___]
+
+  holiday_effect = w["holiday"]
+
+  colder_more = bool(w["temperature"] < 0)'
+- Вес promo — на сколько штук в среднем растут продажи в день акции при прочих равных. Индексы весов легко перепутать, словарь по именам надёжнее.

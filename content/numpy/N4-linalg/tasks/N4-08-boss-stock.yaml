@@ -1,0 +1,44 @@
+id: N4-08-boss-stock
+type: array
+title: "Босс: запас на складе"
+difficulty: 3
+boss: true
+lesson_section: simulation
+statement: |
+  Склад ShopData пополняется раз в `days` дней. Спрос на товар — в среднем `lam` штук в день, распределение Пуассона. Нужно понять, сколько товара держать.
+
+  Используй генератор `rng` из подготовки ровно одним вызовом: `rng.poisson(lam, size=(10_000, days))` — 10 000 сценариев одного периода.
+
+  Создай три переменные:
+  1. `totals` — спрос за весь период в каждом сценарии, массив из 10 000 чисел;
+  2. `p_short` — доля сценариев, где спрос за период больше текущего запаса `stock`, округлённая до 3 знаков через `round`;
+  3. `safety` — запас, которого хватит в 95% сценариев: 95-й перцентиль `totals`, округлённый вверх до целого через `np.ceil` и переведённый в `int`.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  lam = int(rng.integers(10, 60))
+  days = int(rng.integers(5, 15))
+  stock = int(lam * days * rng.uniform(0.95, 1.1))
+outputs:
+  - var: totals
+    title: спрос за период по сценариям
+  - var: p_short
+    title: вероятность нехватки
+  - var: safety
+    title: запас на 95% сценариев
+reference: |
+  sims = rng.poisson(lam, size=(10_000, days))
+  totals = sims.sum(axis=1)
+  p_short = round(float((totals > stock).mean()), 3)
+  safety = int(np.ceil(np.percentile(totals, 95)))
+requires: ["no_loops"]
+star3: [first_try, "max_lines:4"]
+buggy_variants:
+  - code: "sims = rng.poisson(lam, size=(10_000, days))\ntotals = sims.sum(axis=0)\np_short = round(float((totals > stock).mean()), 3)\nsafety = int(np.ceil(np.percentile(totals, 95)))"
+  - code: "sims = rng.poisson(lam, size=(10_000, days))\ntotals = sims.sum(axis=1)\np_short = round(float((sims > stock).mean()), 3)\nsafety = int(np.percentile(totals, 95))"
+hints:
+  - "Это задача на симуляции, агрегаты по оси и перцентиль — разделы «Случайные числа» и «Симуляции», плюс «Оси» из N3."
+  - "Сгенерируй матрицу сценарий × день одним вызовом. Спрос за период — сумма по строке. Доля нехватки — среднее маски totals > stock. Запас — 95-й перцентиль, округлённый вверх."
+  - "sims.sum(axis=1), (totals > stock).mean(), np.percentile(totals, 95), np.ceil, int."
+  - "sims = rng.poisson(lam, size=(10_000, days))\ntotals = sims.sum(axis=___)\np_short = round(float((totals ___ stock).mean()), 3)\nsafety = int(np.___(np.percentile(totals, 95)))"
+  - "Сумма по axis=0 дала бы спрос по дням во всех сценариях сразу — ответ на другой вопрос. Сравнивать с запасом нужно спрос за весь период, а не каждого дня. Запас округляется вверх: при 312.4 нужно 313 штук, а не 312. Так считают страховой запас в логистике."

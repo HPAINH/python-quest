@@ -1,0 +1,64 @@
+id: M5-02-scale
+type: value
+title: Кластеры с масштабом и без
+difficulty: 2
+lesson_section: scaling
+statement: 'Возьми из `df` колонки `orders_90d`, `avg_check`, `days_since_last`, заполни пропуски медианами. Раздели клиентов на 3 кластера `KMeans(3, n_init=10, random_state=0)` дважды — по сырым значениям и после `StandardScaler`. Запиши `raw_sizes` и `scaled_sizes` — размеры кластеров по убыванию.
+
+  '
+setup: 'import numpy as np
+
+  import pandas as pd
+
+  from sklearn.cluster import KMeans
+
+  from sklearn.decomposition import PCA
+
+  from sklearn.preprocessing import StandardScaler
+
+  from sklearn.metrics import silhouette_score
+
+  from sklearn.datasets import make_blobs
+
+  df = pd.read_csv("churn.csv")
+
+  '
+outputs:
+- var: raw_sizes
+- var: scaled_sizes
+reference: 'c = ["orders_90d", "avg_check", "days_since_last"]
+
+  X = df[c].fillna(df[c].median())
+
+  raw_sizes = sorted(np.bincount(KMeans(3, n_init=10, random_state=0).fit_predict(X)).tolist(), reverse=True)
+
+  Z = StandardScaler().fit_transform(X)
+
+  scaled_sizes = sorted(np.bincount(KMeans(3, n_init=10, random_state=0).fit_predict(Z)).tolist(), reverse=True)
+
+  '
+star3:
+- first_try
+- max_lines:5
+buggy_variants:
+- code: 'c = [''orders_90d'', ''avg_check'', ''days_since_last'']
+
+    X = df[c].fillna(df[c].median())
+
+    raw_sizes = sorted(np.bincount(KMeans(3, n_init=10, random_state=0).fit_predict(X)).tolist(), reverse=True)
+
+    scaled_sizes = raw_sizes'
+hints:
+- Масштаб и расстояния — раздел «Масштаб».
+- Заполни пропуски медианами, кластеризуй сырые значения, затем стандартизируй и кластеризуй снова. fit_predict сразу возвращает метки.
+- df[c].fillna(df[c].median()), KMeans(3, n_init=10, random_state=0).fit_predict(X), StandardScaler().fit_transform(X).
+- 'c = ["orders_90d", "avg_check", "days_since_last"]
+
+  X = df[c].fillna(df[c].___())
+
+  raw_sizes = sorted(np.bincount(KMeans(3, n_init=10, random_state=0).fit_predict(X)).tolist(), reverse=True)
+
+  Z = StandardScaler().___(X)
+
+  scaled_sizes = sorted(np.bincount(KMeans(3, n_init=10, random_state=0).fit_predict(Z)).tolist(), reverse=True)'
+- Размеры разные, потому что без масштаба расстояния почти целиком определяет чек — в рублях он на порядки больше остальных признаков.

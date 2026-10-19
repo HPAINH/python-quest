@@ -1,0 +1,72 @@
+id: C3-14-boss-log
+type: stdio
+title: "Босс: лог покупок"
+difficulty: 3
+boss: true
+lesson_section: split-join
+statement: |
+  Аналитик ShopData разбирает лог событий сайта. В первой строке дано число строк `n`, дальше `n` строк вида:
+
+  ```
+  2026-10-17 14:05:33 | user=482 | event=purchase | amount=1290.50
+  ```
+
+  Поле `event` бывает `view`, `cart` или `purchase`. Поле `amount` есть только у покупок. Строки упорядочены по времени.
+
+  Выведи три строки:
+  1. `Покупок: N` — число событий `purchase`;
+  2. `Выручка: S` — сумма `amount` по покупкам с двумя знаками после запятой;
+  3. `Первая и последняя: ЧЧ:ММ-ЧЧ:ММ` — время первой и последней покупки без секунд. Если покупок нет, выведи `Первая и последняя: нет`.
+reference: |
+  n = int(input())
+  count = 0
+  total = 0.0
+  first = last = ""
+  for _ in range(n):
+      parts = input().split(" | ")
+      event = parts[2].split("=")[1]
+      if event == "purchase":
+          count += 1
+          total += float(parts[3].split("=")[1])
+          hhmm = parts[0].split()[1][:5]
+          if first == "":
+              first = hhmm
+          last = hhmm
+  print(f"Покупок: {count}")
+  print(f"Выручка: {total:.2f}")
+  if count:
+      print(f"Первая и последняя: {first}-{last}")
+  else:
+      print("Первая и последняя: нет")
+tests:
+  visible:
+    - "4\n2026-10-17 09:12:01 | user=1 | event=view\n2026-10-17 09:15:44 | user=1 | event=purchase | amount=990.00\n2026-10-17 11:02:10 | user=7 | event=cart\n2026-10-17 18:40:59 | user=7 | event=purchase | amount=1290.50"
+    - "2\n2026-10-17 10:00:00 | user=3 | event=view\n2026-10-17 10:01:00 | user=3 | event=cart"
+  hidden:
+    - "1\n2026-01-01 00:00:00 | user=9 | event=purchase | amount=0.01"
+    - "3\n2026-02-02 23:59:59 | user=1 | event=purchase | amount=100\n2026-02-02 23:59:59 | user=2 | event=purchase | amount=200.5\n2026-02-03 00:00:01 | user=3 | event=purchase | amount=0.5"
+    - "2\n2026-10-17 12:00:00 | user=12 | event=view\n2026-10-17 12:30:00 | user=12 | event=purchase | amount=59999.99"
+random:
+  count: 30
+  helpers: |
+    def line(t):
+        h, m, s = t // 3600, t % 3600 // 60, t % 60
+        ev = random.choice(["view", "view", "cart", "purchase"])
+        base = f"2026-10-17 {h:02d}:{m:02d}:{s:02d} | user={random.randint(1, 999)} | event={ev}"
+        if ev == "purchase":
+            base += f" | amount={random.randint(1, 500000) / 100:.2f}"
+        return base
+    def gen():
+        k = random.randint(1, 15)
+        times = sorted(random.randint(0, 86399) for _ in range(k))
+        return str(k) + "\n" + "\n".join(line(t) for t in times)
+  gen: "gen()"
+star3: [first_try]
+buggy_variants:
+  - code: "n = int(input())\ncount = 0\ntotal = 0\nfirst = last = ''\nfor _ in range(n):\n    parts = input().split(' | ')\n    if 'purchase' in parts[2]:\n        count += 1\n        total += float(parts[3].split('=')[1])\n        t = parts[0].split()[1]\n        if first == '':\n            first = t\n        last = t\nprint(f'Покупок: {count}')\nprint(f'Выручка: {total:.2f}')\nif count:\n    print(f'Первая и последняя: {first}-{last}')\nelse:\n    print('Первая и последняя: нет')"
+hints:
+  - "Главный инструмент — split из раздела «split и join» и срезы из раздела «Срезы»."
+  - "Каждую строку раздели по « | » на поля. Из поля события возьми значение после «=». Для покупки прибавь сумму, переведённую в float, и время из первого поля без секунд — первые 5 символов времени. Первое время запомни один раз, последнее перезаписывай каждый раз."
+  - "line.split(\" | \"), parts[2].split(\"=\")[1], float(...), parts[0].split()[1][:5], f\"{total:.2f}\"."
+  - "n = int(input())\ncount = 0\ntotal = 0.0\nfirst = last = \"\"\nfor _ in range(n):\n    parts = input().split(___)\n    event = parts[2].split(\"=\")[___]\n    if event == \"purchase\":\n        count += 1\n        total += float(parts[3].split(\"=\")[1])\n        hhmm = parts[0].split()[1][:___]\n        if first == \"\":\n            first = hhmm\n        last = ___\nprint(f\"Покупок: {count}\")\nprint(f\"Выручка: {total:___}\")\nif count:\n    print(f\"Первая и последняя: {first}-{last}\")\nelse:\n    print(\"Первая и последняя: нет\")"
+  - "Разделитель « | » с пробелами сразу даёт чистые поля. «2026-10-17 18:40:59».split()[1] — это «18:40:59», а срез [:5] — «18:40». Строки идут по времени, поэтому первая найденная покупка — самая ранняя, а последняя перезаписанная — самая поздняя. Важно: без среза в ответ попали бы секунды."

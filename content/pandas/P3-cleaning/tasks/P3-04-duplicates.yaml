@@ -1,0 +1,33 @@
+id: P3-04-duplicates
+type: dataframe
+title: Повторы в выгрузке
+difficulty: 1
+lesson_section: duplicates
+sql_quest_ref: DISTINCT
+statement: |
+  Старая CRM иногда выгружала клиента дважды. Создай две переменные:
+  1. `n_dup` — число строк `customers_raw`, полностью повторяющих одну из предыдущих;
+  2. `result` — таблица без таких повторов, исходный порядок.
+setup: |
+  import pandas as pd
+  raw = pd.read_csv("customers_raw.csv")
+outputs:
+  - var: n_dup
+    title: число повторов
+  - var: result
+    title: таблица без повторов
+    ordered: true
+reference: |
+  n_dup = int(raw.duplicated().sum())
+  result = raw.drop_duplicates()
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "n_dup = int(raw.duplicated(keep=False).sum())\nresult = raw.drop_duplicates()"
+  - code: "n_dup = int(raw.duplicated().sum())\nresult = raw.drop_duplicates(keep=False)"
+    expect_detector: shape_rows
+hints:
+  - "Поиск и удаление повторов — раздел «Дубликаты»."
+  - "duplicated() отмечает True каждую строку, которая уже встречалась выше. drop_duplicates() удаляет такие строки."
+  - "raw.duplicated().sum(), raw.drop_duplicates()."
+  - "n_dup = int(raw.___().sum())\nresult = raw.___()"
+  - "keep=False отмечает все экземпляры повтора, включая первый, поэтому повторов получается вдвое больше, а drop_duplicates(keep=False) удалил бы и оригиналы — клиенты пропали бы совсем."

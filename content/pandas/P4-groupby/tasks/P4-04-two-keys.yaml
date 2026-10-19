@@ -1,0 +1,22 @@
+id: P4-04-two-keys
+type: dataframe
+title: Канал и статус
+difficulty: 1
+lesson_section: groupby
+statement: |
+  Запиши в `result` число заказов для каждого сочетания канала и статуса: колонки `channel`, `status`, `n`.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+reference: |
+  result = orders.groupby(["channel", "status"]).size().reset_index(name="n")
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = orders.groupby('channel').size().reset_index(name='n')"
+    expect_detector: columns_mismatch
+hints:
+  - "Группировка по нескольким колонкам — раздел «groupby»."
+  - "Передай в groupby список из двух колонок и посчитай размер групп."
+  - "orders.groupby([\"channel\", \"status\"]).size()."
+  - "result = orders.groupby([___, ___]).size().reset_index(name=\"n\")"
+  - "Со списком ключей группой становится каждое встретившееся сочетание. После reset_index обе части ключа становятся колонками."

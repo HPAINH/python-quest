@@ -1,0 +1,46 @@
+id: P4-12-boss-products
+type: dataframe
+title: "Босс: хиты продаж"
+difficulty: 3
+boss: true
+lesson_section: agg
+statement: |
+  Категорийный менеджер просит отчёт по позициям заказов `order_items`. Выручка позиции — `quantity * unit_price * (1 - discount)`.
+
+  Создай две переменные:
+  1. `top` — 10 товаров с наибольшей выручкой: колонки `product_id`, `units` (сумма `quantity`), `revenue` (выручка, округлённая до 2 знаков), `orders` (число разных заказов). По убыванию `revenue`, при равенстве — по возрастанию `product_id`.
+  2. `cat_share` — доля каждой категории в общей выручке: колонки `category_id` и `share` (округление до 4 знаков), по убыванию `share`. Категорию товара возьми из `products` через `map` — без merge.
+setup: |
+  import pandas as pd
+  items = pd.read_csv("order_items.csv")
+  products = pd.read_csv("products.csv")
+outputs:
+  - var: top
+    title: топ-10 товаров
+    ordered: true
+  - var: cat_share
+    title: доли категорий
+    ordered: true
+reference: |
+  items["revenue"] = items["quantity"] * items["unit_price"] * (1 - items["discount"])
+  t = items.groupby("product_id").agg(
+      units=("quantity", "sum"),
+      revenue=("revenue", "sum"),
+      orders=("order_id", "nunique"),
+  ).reset_index()
+  t["revenue"] = t["revenue"].round(2)
+  top = t.sort_values(["revenue", "product_id"], ascending=[False, True]).head(10)
+  cat_of = products.set_index("product_id")["category_id"]
+  items["category_id"] = items["product_id"].map(cat_of)
+  by_cat = items.groupby("category_id")["revenue"].sum()
+  cat_share = (by_cat / by_cat.sum()).round(4).reset_index(name="share").sort_values(["share", "category_id"], ascending=[False, True])
+star3: [first_try]
+buggy_variants:
+  - code: "items['revenue'] = items['quantity'] * items['unit_price']\nt = items.groupby('product_id').agg(units=('quantity', 'sum'), revenue=('revenue', 'sum'), orders=('order_id', 'nunique')).reset_index()\nt['revenue'] = t['revenue'].round(2)\ntop = t.sort_values(['revenue', 'product_id'], ascending=[False, True]).head(10)\ncat_of = products.set_index('product_id')['category_id']\nitems['category_id'] = items['product_id'].map(cat_of)\nby_cat = items.groupby('category_id')['revenue'].sum()\ncat_share = (by_cat / by_cat.sum()).round(4).reset_index(name='share').sort_values(['share', 'category_id'], ascending=[False, True])"
+  - code: "items['revenue'] = items['quantity'] * items['unit_price'] * (1 - items['discount'])\nt = items.groupby('product_id').agg(units=('quantity', 'sum'), revenue=('revenue', 'sum'), orders=('order_id', 'nunique')).reset_index()\nt['revenue'] = t['revenue'].round(2)\ntop = t.sort_values(['units', 'product_id'], ascending=[False, True]).head(10)\ncat_of = products.set_index('product_id')['category_id']\nitems['category_id'] = items['product_id'].map(cat_of)\nby_cat = items.groupby('category_id')['revenue'].sum()\ncat_share = (by_cat / by_cat.sum()).round(4).reset_index(name='share').sort_values(['share', 'category_id'], ascending=[False, True])"
+hints:
+  - "Всё из уровня: вычисляемая колонка, agg с именованными функциями, сортировка с head, доля через деление на общую сумму. Для категории — map по Series «product_id → category_id»."
+  - "Сначала добавь колонку revenue в items. Потом agg по product_id: sum для quantity и revenue, nunique для order_id. Для долей: Series products.set_index(\"product_id\")[\"category_id\"], map по product_id, groupby по категории, деление на итог."
+  - "items[\"quantity\"] * items[\"unit_price\"] * (1 - items[\"discount\"]), agg(units=..., revenue=..., orders=(\"order_id\", \"nunique\")), items[\"product_id\"].map(cat_of), by_cat / by_cat.sum()."
+  - "items[\"revenue\"] = items[\"quantity\"] * items[\"unit_price\"] * (1 - ___)\nt = items.groupby(\"product_id\").agg(units=(\"quantity\", \"sum\"), revenue=(\"revenue\", \"sum\"), orders=(\"order_id\", ___)).reset_index()\nt[\"revenue\"] = t[\"revenue\"].round(2)\ntop = t.sort_values([\"revenue\", \"product_id\"], ascending=[False, True]).head(___)\ncat_of = products.set_index(\"product_id\")[___]\nitems[\"category_id\"] = items[\"product_id\"].map(cat_of)\nby_cat = items.groupby(\"category_id\")[\"revenue\"].sum()\ncat_share = (by_cat / by_cat.sum()).round(4).reset_index(name=\"share\").sort_values([\"share\", \"category_id\"], ascending=[False, True])"
+  - "map с Series работает как словарь: для каждого product_id находит category_id по подписи — это «бедный JOIN», в уровне P5 то же сделает merge. Без скидки выручка завышена. Топ по штукам (units) и топ по выручке — разные списки: дешёвые товары продаются чаще."

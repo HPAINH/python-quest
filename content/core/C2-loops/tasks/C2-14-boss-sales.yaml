@@ -1,0 +1,54 @@
+id: C2-14-boss-sales
+type: stdio
+title: "Босс: дни продаж"
+difficulty: 3
+boss: true
+lesson_section: accumulators
+statement: |
+  Аналитик ShopData разбирает выручку магазина по дням.
+
+  В первой строке дано число дней `n` (от 1 до 1000). В следующих `n` строках — выручка за каждый день, целые неотрицательные числа.
+
+  Выведи три строки:
+  1. `Максимум: X в день D` — наибольшая выручка и номер дня, считая с 1. Если максимумов несколько — самый ранний день.
+  2. `Минимум: Y в день E` — то же для наименьшей выручки.
+  3. `Самый длинный рост: L дн.` — длина самой длинной серии дней подряд, где выручка каждого следующего дня строго больше предыдущего. Один день — это серия длины 1.
+
+  Списки не нужны: всё считается за один проход.
+reference: |
+  n = int(input())
+  first = int(input())
+  mx, mx_day = first, 1
+  mn, mn_day = first, 1
+  run, best_run = 1, 1
+  prev = first
+  for day in range(2, n + 1):
+      x = int(input())
+      if x > mx:
+          mx, mx_day = x, day
+      if x < mn:
+          mn, mn_day = x, day
+      if x > prev:
+          run += 1
+      else:
+          run = 1
+      if run > best_run:
+          best_run = run
+      prev = x
+  print(f"Максимум: {mx} в день {mx_day}")
+  print(f"Минимум: {mn} в день {mn_day}")
+  print(f"Самый длинный рост: {best_run} дн.")
+tests:
+  visible: ["6\n120\n150\n90\n100\n130\n160", "1\n500"]
+  hidden: ["3\n5\n5\n5", "4\n4\n3\n2\n1", "5\n1\n2\n3\n4\n5", "7\n10\n0\n10\n20\n0\n30\n31", "2\n0\n0"]
+random: {count: 40, gen: "(lambda k: str(k) + '\\n' + '\\n'.join(str(random.randint(0, 30)) for _ in range(k)))(random.randint(1, 40))"}
+star3: [first_try]
+buggy_variants:
+  - code: "n = int(input())\nmx, mx_day, mn, mn_day = 0, 1, 0, 1\nrun = best_run = 1\nprev = None\nfor day in range(1, n + 1):\n    x = int(input())\n    if x > mx:\n        mx, mx_day = x, day\n    if x < mn:\n        mn, mn_day = x, day\n    if prev is not None and x > prev:\n        run += 1\n    else:\n        run = 1\n    best_run = max(best_run, run)\n    prev = x\nprint(f'Максимум: {mx} в день {mx_day}')\nprint(f'Минимум: {mn} в день {mn_day}')\nprint(f'Самый длинный рост: {best_run} дн.')"
+  - code: "n = int(input())\nfirst = int(input())\nmx, mx_day = first, 1\nmn, mn_day = first, 1\nrun, best_run = 1, 1\nprev = first\nfor day in range(2, n + 1):\n    x = int(input())\n    if x >= mx:\n        mx, mx_day = x, day\n    if x < mn:\n        mn, mn_day = x, day\n    if x > prev:\n        run += 1\n    else:\n        run = 1\n    if run > best_run:\n        best_run = run\n    prev = x\nprint(f'Максимум: {mx} в день {mx_day}')\nprint(f'Минимум: {mn} в день {mn_day}')\nprint(f'Самый длинный рост: {best_run} дн.')"
+hints:
+  - "Нужны накопители из раздела «Накопители и счётчики»: максимум с номером дня, минимум с номером дня и текущая серия."
+  - "Прочитай первый день отдельно и сделай его стартовым значением для максимума, минимума и серии. Дальше для каждого дня: обнови максимум и минимум только при строгом улучшении (так сохранится самый ранний день), продли серию, если выручка выросла, иначе начни серию заново с 1, и запомни лучшую серию."
+  - "Переменные mx, mx_day, mn, mn_day, run, best_run, prev; цикл for day in range(2, n + 1); строгие сравнения > и <."
+  - "n = int(input())\nfirst = int(input())\nmx, mx_day = first, 1\nmn, mn_day = first, 1\nrun, best_run = 1, 1\nprev = first\nfor day in range(2, n + 1):\n    x = int(input())\n    if x ___ mx:\n        mx, mx_day = x, day\n    if x ___ mn:\n        mn, mn_day = x, day\n    if x > prev:\n        run ___\n    else:\n        run = ___\n    if run > best_run:\n        best_run = run\n    prev = ___\nprint(f\"Максимум: {mx} в день {mx_day}\")\nprint(f\"Минимум: {mn} в день {mn_day}\")\nprint(f\"Самый длинный рост: {best_run} дн.\")"
+  - "Для 120 150 90 100 130 160: максимум 160 в день 6, минимум 90 в день 3. Серии роста: 120→150 (2), потом 90→100→130→160 (4). Строгое > при поиске максимума оставляет самый ранний день; с >= для «5 5 5» получился бы день 3. Начинать с нуля нельзя: при нулевой выручке минимум «нашёлся» бы в несуществующем дне."

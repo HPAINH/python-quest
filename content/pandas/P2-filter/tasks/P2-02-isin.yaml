@@ -1,0 +1,23 @@
+id: P2-02-isin
+type: dataframe
+title: Промокоды онлайн-каналов
+difficulty: 1
+lesson_section: filter
+statement: |
+  Запиши в `result` заказы из каналов `app` и `web`, оформленные с промокодом `SALE10` или `AUTUMN26`. Нужны колонки `order_id`, `channel`, `promo_code` и `amount`.
+setup: |
+  import pandas as pd
+  orders = pd.read_csv("orders.csv")
+reference: |
+  mask = orders["channel"].isin(["app", "web"]) & orders["promo_code"].isin(["SALE10", "AUTUMN26"])
+  result = orders.loc[mask, ["order_id", "channel", "promo_code", "amount"]]
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "result = orders.loc[orders['promo_code'].isin(['SALE10', 'AUTUMN26']), ['order_id', 'channel', 'promo_code', 'amount']]"
+    expect_detector: shape_rows
+hints:
+  - "Проверка «входит в список» — isin, раздел «Фильтры»; строки и колонки сразу — loc, раздел «loc и iloc»."
+  - "Построй две маски через isin и объедини их через &. Затем выбери строки по маске и нужные колонки через loc."
+  - "orders[\"channel\"].isin([...]) & orders[\"promo_code\"].isin([...]), orders.loc[mask, [...]]."
+  - "mask = orders[\"channel\"].___([\"app\", \"web\"]) & orders[\"promo_code\"].isin([\"SALE10\", \"AUTUMN26\"])\nresult = orders.loc[___, [\"order_id\", \"channel\", \"promo_code\", \"amount\"]]"
+  - "isin заменяет цепочку сравнений через |. Пустой промокод (NaN) не входит ни в какой список, поэтому заказы без промокода отсеются сами. loc[маска, колонки] делает фильтр и выбор колонок за один шаг."

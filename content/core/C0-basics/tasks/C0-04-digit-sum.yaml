@@ -1,0 +1,26 @@
+id: C0-04-digit-sum
+type: stdio
+title: Сумма цифр
+difficulty: 2
+lesson_section: arithmetic
+statement: |
+  Дано трёхзначное натуральное число. Выведи сумму его цифр.
+
+  Реши арифметикой: через `//` и `%`, без обращения к символам строки.
+reference: |
+  n = int(input())
+  print(n // 100 + n // 10 % 10 + n % 10)
+requires: [no_subscript]
+tests:
+  visible: ["123", "905"]
+  hidden: ["100", "999", "510"]
+random: {count: 25, gen: "str(random.randint(100, 999))"}
+star3: [first_try, "max_lines:2"]
+buggy_variants:
+  - code: "n = int(input())\nprint(n // 100 + n // 10 + n % 10)"
+hints:
+  - "Цифры числа достают через // и % — раздел «Арифметика»."
+  - "Последняя цифра — остаток от деления на 10. Средняя — остаток от деления на 10 после отбрасывания последней цифры. Первая — целая часть от деления на 100."
+  - "Тебе понадобятся n % 10, n // 10 % 10 и n // 100."
+  - "n = int(input())\nfirst = n // ___\nsecond = n // 10 % ___\nthird = n % ___\nprint(first + second + third)"
+  - "Для 905: 905 // 100 = 9, 905 // 10 = 90 и 90 % 10 = 0, 905 % 10 = 5. Сумма 14. Всё записано в одну строку print."

@@ -1,0 +1,33 @@
+id: N3-09-zscore
+type: function
+function: zscore
+title: Стандартизация признака
+difficulty: 2
+lesson_section: aggregates
+setup: |
+  import numpy as np
+statement: |
+  Напиши функцию `zscore(a)`, которая возвращает z-оценки массива: `(a - среднее) / стандартное отклонение`, округлённые до 3 знаков через `np.round`. Если отклонение равно 0 (все значения одинаковые), функция возвращает массив нулей той же длины.
+starter: |
+  def zscore(a):
+      pass
+reference: |
+  def zscore(a):
+      a = np.asarray(a, dtype=float)
+      sd = a.std()
+      if sd == 0:
+          return np.zeros(len(a))
+      return np.round((a - a.mean()) / sd, 3)
+tests:
+  visible: ["zscore(np.array([2, 4, 6]))", "zscore(np.array([5, 5, 5]))"]
+  hidden: ["zscore(np.array([1.0, 2.0]))", "zscore(np.array([10, 0, 0, 0]))", "zscore(np.arange(10))"]
+random: {count: 15, gen: "f'zscore(np.array({[random.randint(-50, 50) for _ in range(random.randint(2, 12))]}))'"}
+star3: [first_try]
+buggy_variants:
+  - code: "def zscore(a):\n    return np.round((a - a.mean()) / a.std(), 3)"
+hints:
+  - "Формула z-оценки — раздел «Накопление и статистика»."
+  - "Посчитай среднее и стандартное отклонение. Если отклонение равно нулю, верни нули, иначе — округлённую формулу."
+  - "a.mean(), a.std(), np.zeros(len(a)), np.round(..., 3)."
+  - "def zscore(a):\n    a = np.asarray(a, dtype=float)\n    sd = a.___()\n    if sd == 0:\n        return np.___(len(a))\n    return np.round((a - a.mean()) / sd, ___)"
+  - "Если все значения одинаковые, отклонение 0, и деление даёт nan с предупреждением. Такие признаки встречаются в реальных данных, и модель сломается, если не обработать случай заранее. Стандартизация — первый шаг перед многими моделями ML."

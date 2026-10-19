@@ -1,0 +1,7 @@
+code: S1
+title: Описательная статистика
+intro: Центр, разброс и форма распределения, биномиальное, Пуассона и нормальное в scipy.stats, z-оценки и выбросы.
+minutes: 30
+expected_tasks: 10
+packages: [numpy, pandas, scipy]
+data: [core]

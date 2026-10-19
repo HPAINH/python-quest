@@ -1,0 +1,23 @@
+id: N2-02-block
+type: array
+title: Блок таблицы
+difficulty: 1
+lesson_section: slicing2d
+statement: |
+  `sales` — таблица продаж: строки — магазины, столбцы — месяцы. Запиши в `result` продажи магазинов со второго по четвёртый включительно за последние 3 месяца.
+setup: |
+  import numpy as np
+  rng = np.random.default_rng(SEED)
+  sales = rng.integers(100, 999, size=(int(rng.integers(5, 9)), int(rng.integers(6, 13))))
+reference: |
+  result = sales[1:4, -3:]
+star3: [first_try, "max_lines:1"]
+buggy_variants:
+  - code: "result = sales[2:5, -3:]"
+  - code: "result = sales[-3:, 1:4]"
+hints:
+  - "Двумерные срезы пишутся через запятую — раздел «Двумерные массивы»."
+  - "По строкам нужны индексы 1, 2, 3 (второй–четвёртый магазин), по столбцам — три последних."
+  - "sales[1:4, -3:]."
+  - "result = sales[___, ___]"
+  - "Нумерация с нуля: второй магазин — индекс 1, четвёртый — 3, а срез 1:4 не включает 4. Первая позиция в скобках — строки, вторая — столбцы. Если их перепутать, форма результата получится другой."

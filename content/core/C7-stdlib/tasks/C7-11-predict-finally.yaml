@@ -1,0 +1,28 @@
+id: C7-11-predict-finally
+type: predict
+title: Порядок try / except / else / finally
+difficulty: 2
+lesson_section: exceptions
+statement: |
+  Впиши, что выведет программа.
+code: |
+  def check(x):
+      try:
+          r = 10 // x
+      except ZeroDivisionError:
+          print("ноль")
+          return -1
+      else:
+          print("ок")
+          return r
+      finally:
+          print("конец", x)
+
+  print(check(2))
+  print(check(0))
+hints:
+  - "Перечитай про else и finally в разделе «try и except»."
+  - "else выполняется, если ошибки не было. finally выполняется всегда — даже если в try, except или else стоит return, и до того, как значение вернётся."
+  - "Распиши два вызова по шагам: какие print сработают и в каком порядке, и только потом печатается результат check."
+  - "Первый вызов печатает две строки, потом его результат. Второй — тоже две строки и результат."
+  - "Ответ: «ок», «конец 2», «5», «ноль», «конец 0», «-1». finally срабатывает перед тем, как return отдаст значение, поэтому «конец» печатается раньше результата."

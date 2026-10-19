@@ -1,0 +1,52 @@
+id: P7-10-boss-report
+type: dataframe
+title: "Босс: продуктовый отчёт"
+difficulty: 3
+boss: true
+lesson_section: why
+statement: |
+  Подготовь три таблицы для продуктового отчёта.
+
+  1. `funnel` — воронка по платформам: строки — `platform` (`app`, `web`), колонки — шаги `view`, `add_to_cart`, `checkout`, `purchase` в этом порядке, в ячейках — число уникальных пользователей. Платформа берётся из сессии события.
+  2. `m1` — retention первого месяца по когортам: колонки `cohort` (строка вида `2026-03`) и `m1` — доля пользователей когорты, у которых была сессия в следующем за регистрацией месяце, 3 знака. Только когорты с марта по август 2026.
+  3. `arpu` — ARPU по источнику привлечения: колонки `source` и `arpu` (2 знака), по убыванию `arpu`.
+setup: |
+  import pandas as pd
+  users = pd.read_csv("users.csv", parse_dates=["signup_date"])
+  sessions = pd.read_csv("sessions.csv", parse_dates=["start_time"])
+  events = pd.read_csv("events.csv")
+  steps = ["view", "add_to_cart", "checkout", "purchase"]
+outputs:
+  - var: funnel
+    title: воронка по платформам
+  - var: m1
+    title: retention первого месяца
+    ordered: true
+  - var: arpu
+    title: ARPU по источникам
+    ordered: true
+reference: |
+  e = events.merge(sessions[["session_id", "platform"]], on="session_id")
+  funnel = e.pivot_table(index="platform", columns="event", values="user_id", aggfunc="nunique")[steps]
+  users["cohort"] = users["signup_date"].dt.to_period("M")
+  s = sessions.merge(users[["user_id", "cohort"]], on="user_id")
+  s["offset"] = (s["start_time"].dt.to_period("M") - s["cohort"]).apply(lambda d: d.n)
+  back = s.loc[s["offset"] == 1].groupby("cohort")["user_id"].nunique()
+  size = users.groupby("cohort")["user_id"].nunique()
+  m1 = (back / size).fillna(0).round(3).loc["2026-03":"2026-08"]
+  m1 = m1.rename_axis("cohort").reset_index(name="m1")
+  m1["cohort"] = m1["cohort"].astype(str)
+  rev = events[events["event"] == "purchase"].merge(users, on="user_id").groupby("source")["revenue"].sum()
+  arpu = (rev / users.groupby("source").size()).fillna(0).round(2).rename_axis("source").reset_index(name="arpu").sort_values("arpu", ascending=False)
+star3: [first_try]
+buggy_variants:
+  - code: "e = events.merge(sessions[['session_id', 'platform']], on='session_id')\nfunnel = e.pivot_table(index='platform', columns='event', values='user_id', aggfunc='count')[steps]\nusers['cohort'] = users['signup_date'].dt.to_period('M')\ns = sessions.merge(users[['user_id', 'cohort']], on='user_id')\ns['offset'] = (s['start_time'].dt.to_period('M') - s['cohort']).apply(lambda d: d.n)\nback = s.loc[s['offset'] == 1].groupby('cohort')['user_id'].nunique()\nsize = users.groupby('cohort')['user_id'].nunique()\nm1 = (back / size).fillna(0).round(3).loc['2026-03':'2026-08']\nm1 = m1.rename_axis('cohort').reset_index(name='m1')\nm1['cohort'] = m1['cohort'].astype(str)\nrev = events[events['event'] == 'purchase'].merge(users, on='user_id').groupby('source')['revenue'].sum()\narpu = (rev / users.groupby('source').size()).fillna(0).round(2).rename_axis('source').reset_index(name='arpu').sort_values('arpu', ascending=False)"
+    expect_detector: column_values
+  - code: "e = events.merge(sessions[['session_id', 'platform']], on='session_id')\nfunnel = e.pivot_table(index='platform', columns='event', values='user_id', aggfunc='nunique')[steps]\nusers['cohort'] = users['signup_date'].dt.to_period('M')\ns = sessions.merge(users[['user_id', 'cohort']], on='user_id')\ns['offset'] = (s['start_time'].dt.to_period('M') - s['cohort']).apply(lambda d: d.n)\nback = s.loc[s['offset'] == 1].groupby('cohort')['user_id'].nunique()\nsize = users.groupby('cohort')['user_id'].nunique()\nm1 = (back / size).fillna(0).round(3).loc['2026-03':'2026-08']\nm1 = m1.rename_axis('cohort').reset_index(name='m1')\nm1['cohort'] = m1['cohort'].astype(str)\nb = events[events['event'] == 'purchase'].merge(users, on='user_id')\narpu = (b.groupby('source')['revenue'].sum() / b.groupby('source')['user_id'].nunique()).round(2).rename_axis('source').reset_index(name='arpu').sort_values('arpu', ascending=False)"
+    expect_detector: column_values
+hints:
+  - "Всё из уровня: воронка через pivot_table с nunique, когорты со смещением и ARPU по сегментам."
+  - "Для воронки добавь к событиям платформу из сессий и сделай pivot_table по платформе и событию с aggfunc=\"nunique\". Для m1 оставь сессии со смещением 1 и раздели число уникальных пользователей на размер когорты. Для ARPU дели выручку источника на всех его пользователей."
+  - "pivot_table(index=\"platform\", columns=\"event\", values=\"user_id\", aggfunc=\"nunique\")[steps], s.loc[s[\"offset\"] == 1], rev / users.groupby(\"source\").size()."
+  - "e = events.merge(sessions[[\"session_id\", \"platform\"]], on=\"session_id\")\nfunnel = e.pivot_table(index=\"platform\", columns=\"event\", values=\"user_id\", aggfunc=___)[steps]\nusers[\"cohort\"] = users[\"signup_date\"].dt.to_period(\"M\")\ns = sessions.merge(users[[\"user_id\", \"cohort\"]], on=\"user_id\")\ns[\"offset\"] = (s[\"start_time\"].dt.to_period(\"M\") - s[\"cohort\"]).apply(lambda d: d.n)\nback = s.loc[s[\"offset\"] == ___].groupby(\"cohort\")[\"user_id\"].nunique()\nsize = users.groupby(\"cohort\")[\"user_id\"].nunique()\nm1 = (back / size).fillna(0).round(3).loc[\"2026-03\":\"2026-08\"]\nm1 = m1.rename_axis(\"cohort\").reset_index(name=\"m1\")\nm1[\"cohort\"] = m1[\"cohort\"].astype(str)\nrev = events[events[\"event\"] == \"purchase\"].merge(users, on=\"user_id\").groupby(\"source\")[\"revenue\"].sum()\narpu = (rev / users.groupby(___).size()).fillna(0).round(2).rename_axis(\"source\").reset_index(name=\"arpu\").sort_values(\"arpu\", ascending=False)"
+  - "Сентябрьскую когорту исключаем: её следующий месяц ещё не наступил, и m1 = 0 был бы ложным. Делить выручку источника на его покупателей — это ARPPU, а не ARPU. Один пользователь может пользоваться обеими платформами, поэтому сумма строк воронки больше общего числа пользователей."

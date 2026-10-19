@@ -1,0 +1,44 @@
+id: C8-03-money
+type: function
+function: Money
+title: Деньги с форматом
+difficulty: 2
+lesson_section: dunder
+statement: |
+  Напиши класс `Money(amount, currency="₽")`:
+  - `str(m)` возвращает сумму с двумя знаками и пробелами между разрядами: `"1 290.50 ₽"`;
+  - `m1 + m2` возвращает новый объект `Money` с суммой. Если валюты разные, выбрасывается `ValueError`;
+  - `m1 == m2` истинно, если совпадают сумма (с точностью до копейки) и валюта.
+starter: |
+  class Money:
+      def __init__(self, amount, currency="₽"):
+          self.amount = amount
+          self.currency = currency
+reference: |
+  class Money:
+      def __init__(self, amount, currency="₽"):
+          self.amount = amount
+          self.currency = currency
+
+      def __str__(self):
+          return f"{self.amount:,.2f}".replace(",", " ") + " " + self.currency
+
+      def __add__(self, other):
+          if self.currency != other.currency:
+              raise ValueError("разные валюты")
+          return Money(self.amount + other.amount, self.currency)
+
+      def __eq__(self, other):
+          return self.currency == other.currency and round(self.amount, 2) == round(other.amount, 2)
+tests:
+  visible: ["str(Money(1290.5))", "str(Money(1000, '$') + Money(0.99, '$'))"]
+  hidden: ["Money(0.1) + Money(0.2) == Money(0.3)", "Money(5) == Money(5, '$')", "raises(lambda: Money(1) + Money(1, '$'))", "str(Money(1234567.891, '€'))", "type(Money(1) + Money(2)).__name__"]
+star3: [first_try]
+buggy_variants:
+  - code: "class Money:\n    def __init__(self, amount, currency='₽'):\n        self.amount = amount\n        self.currency = currency\n    def __str__(self):\n        return f'{self.amount:.2f} {self.currency}'\n    def __add__(self, other):\n        return Money(self.amount + other.amount, self.currency)\n    def __eq__(self, other):\n        return self.amount == other.amount"
+hints:
+  - "Специальные методы __str__, __add__ и __eq__ — раздел «Специальные методы»."
+  - "__str__ форматирует сумму с разделителем тысяч и двумя знаками. __add__ проверяет валюты и создаёт новый Money с суммой. __eq__ сравнивает валюты и округлённые суммы."
+  - "f\"{self.amount:,.2f}\".replace(\",\", \" \"), def __add__(self, other), return Money(...), round(x, 2)."
+  - "    def __str__(self):\n        return f\"{self.amount:,.2f}\".replace(___, \" \") + \" \" + self.currency\n\n    def __add__(self, other):\n        if self.currency != other.currency:\n            raise ___(\"разные валюты\")\n        return ___(self.amount + other.amount, self.currency)\n\n    def __eq__(self, other):\n        return self.currency == other.currency and round(self.amount, ___) == round(other.amount, 2)"
+  - "Оператор + вызывает __add__, == вызывает __eq__. Без округления 0.1 + 0.2 не равно 0.3. Складывать рубли с долларами нельзя — ошибка лучше неверной суммы. __add__ возвращает новый объект, а не меняет старые."

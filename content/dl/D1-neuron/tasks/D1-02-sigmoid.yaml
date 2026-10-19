@@ -1,0 +1,36 @@
+id: D1-02-sigmoid
+type: function
+function: sigmoid
+title: Сигмоида
+difficulty: 1
+lesson_section: activations
+tol: 1.0e-09
+statement: 'Напиши функцию `sigmoid(z)`, которая применяет сигмоиду `1 / (1 + e^(−z))` к каждому элементу массива `z` и возвращает массив той же формы.
+
+  '
+setup: "import numpy as np\n\ndef rnd(*shape, seed=0):\n    return np.random.default_rng(seed).normal(size=shape).round(3)\n"
+starter: "def sigmoid(z):\n    pass\n"
+reference: "def sigmoid(z):\n    return 1 / (1 + np.exp(-z))\n"
+tests:
+  visible:
+  - sigmoid(np.array([-2.0, 0.0, 3.0]))
+  - sigmoid(np.array([[0.0, 1.0], [-1.0, 0.5]]))
+  hidden:
+  - sigmoid(np.zeros(3))
+  - sigmoid(rnd(2, 3, seed=5))
+  - sigmoid(np.array([-30.0, 30.0]))
+random:
+  count: 20
+  gen: f'sigmoid(rnd({random.randint(1, 4)}, {random.randint(1, 4)}, seed={random.randint(0, 999)}))'
+star3:
+- first_try
+- max_lines:2
+buggy_variants:
+- code: "def sigmoid(z):\n    return 1 / (1 + np.exp(z))"
+- code: "def sigmoid(z):\n    import math\n    return 1 / (1 + math.exp(-z))"
+hints:
+- Сигмоида — раздел «Активации».
+- NumPy применяет np.exp к каждому элементу массива сам — цикл не нужен.
+- 1 / (1 + np.exp(-z)).
+- "def sigmoid(z):\n    return 1 / (1 + np.exp(___))"
+- 'math.exp работает только с одним числом и падает на массиве. Без минуса получится сигмоида от −z — она зеркальная: 1 − sigmoid(z).'

@@ -1,0 +1,44 @@
+id: C4-14-boss-top
+type: stdio
+title: "Босс: топ товаров"
+difficulty: 3
+boss: true
+lesson_section: sorting
+statement: |
+  Менеджер ShopData просит топ-3 товаров по выручке.
+
+  В первой строке дано число товаров `n` (от 1 до 100). В следующих `n` строках — название товара (одно слово), цена и количество проданных штук через пробел. Цена — дробное число, количество — целое.
+
+  Выведи до трёх строк вида `название: выручка` для товаров с наибольшей выручкой (цена × количество) — по убыванию выручки, а при равной выручке — по алфавиту названий. Выручку выводи с двумя знаками после запятой. Последней строкой выведи `Итого: S` — общую выручку всех товаров с двумя знаками.
+reference: |
+  n = int(input())
+  items = []
+  for _ in range(n):
+      name, price, qty = input().split()
+      items.append((name, float(price) * int(qty)))
+  items.sort(key=lambda t: (-t[1], t[0]))
+  for name, rev in items[:3]:
+      print(f"{name}: {rev:.2f}")
+  print(f"Итого: {sum(r for _, r in items):.2f}")
+tests:
+  visible: ["4\nкофе 990 12\nчай 450 30\nсыр 1290.5 4\nмолоко 89.9 100", "1\nхлеб 55 3"]
+  hidden: ["3\nb 10 1\na 10 1\nc 5 2", "5\nx 1 1\ny 2 1\nz 3 1\nw 4 1\nv 5 1", "2\nноль 100 0\nодин 0.01 1", "4\nd 2.5 4\nc 10 1\nb 5 2\na 1 10"]
+random:
+  count: 30
+  helpers: |
+    def gen():
+        k = random.randint(1, 8)
+        names = random.sample(["кофе", "чай", "сыр", "хлеб", "молоко", "сок", "мёд", "рис", "соль", "масло"], k)
+        rows = [f"{nm} {random.choice([random.randint(1, 50) * 10, random.randint(100, 9999) / 100])} {random.randint(0, 20)}" for nm in names]
+        return str(k) + "\n" + "\n".join(rows)
+  gen: "gen()"
+star3: [first_try]
+buggy_variants:
+  - code: "n = int(input())\nitems = []\nfor _ in range(n):\n    name, price, qty = input().split()\n    items.append((name, float(price) * int(qty)))\nitems.sort(key=lambda t: t[1], reverse=True)\nfor name, rev in items[:3]:\n    print(f'{name}: {rev:.2f}')\nprint(f'Итого: {sum(r for _, r in items):.2f}')"
+  - code: "n = int(input())\nitems = []\nfor _ in range(n):\n    name, price, qty = input().split()\n    items.append((name, float(price) * int(qty)))\nitems.sort(key=lambda t: (-t[1], t[0]))\nfor name, rev in items[:3]:\n    print(f'{name}: {rev:.2f}')\nprint(f'Итого: {sum(r for _, r in items[:3]):.2f}')"
+hints:
+  - "Список кортежей и сортировка с составным ключом — разделы «Кортежи» и «Сортировка»."
+  - "Для каждого товара сохрани кортеж из названия и выручки. Отсортируй по убыванию выручки, при равенстве — по названию. Выведи первые три, а итог считай по всем товарам."
+  - "name, price, qty = input().split(), float(price) * int(qty), items.sort(key=lambda t: (-t[1], t[0])), срез [:3], f\"{x:.2f}\"."
+  - "n = int(input())\nitems = []\nfor _ in range(n):\n    name, price, qty = input().split()\n    items.append((name, ___(price) * int(qty)))\nitems.sort(key=lambda t: (___, t[0]))\nfor name, rev in items[:___]:\n    print(f\"{name}: {rev:.2f}\")\nprint(f\"Итого: {sum(r for _, r in items):___}\")"
+  - "Ключ (-выручка, название) даёт убывание по выручке и алфавит при равенстве — reverse=True перевернул бы и алфавит. Срез [:3] безопасен, даже если товаров меньше трёх. Итого считается по всем товарам, а не по топу."

@@ -1,0 +1,52 @@
+id: C1-12-boss-delivery
+type: stdio
+title: "Босс: тариф доставки ShopData"
+difficulty: 3
+boss: true
+lesson_section: nested
+statement: |
+  Посчитай стоимость доставки заказа ShopData.
+
+  Ввод — три строки:
+  1. вес посылки в килограммах и расстояние в километрах — два целых числа через пробел;
+  2. сумма заказа в рублях — целое число;
+  3. есть ли у клиента подписка: `да` или `нет`.
+
+  Правила:
+  - базовая цена: до 1 кг включительно — 199 ₽, до 5 кг включительно — 299 ₽, тяжелее — 299 ₽ плюс 40 ₽ за каждый килограмм сверх пяти;
+  - если расстояние больше 30 км, к цене добавляется 100 ₽;
+  - если сумма заказа от 5000 ₽, доставка бесплатная;
+  - иначе подписчики платят половину, округлённую вниз до рубля.
+
+  Выведи стоимость доставки — одно целое число.
+reference: |
+  w, dist = map(int, input().split())
+  total = int(input())
+  sub = input()
+  if w <= 1:
+      cost = 199
+  elif w <= 5:
+      cost = 299
+  else:
+      cost = 299 + 40 * (w - 5)
+  if dist > 30:
+      cost += 100
+  if total >= 5000:
+      cost = 0
+  elif sub == "да":
+      cost = cost // 2
+  print(cost)
+tests:
+  visible: ["3 12\n2500\nнет", "8 45\n1200\nда"]
+  hidden: ["1 30\n4999\nнет", "1 31\n100\nда", "5 0\n5000\nда", "6 1\n0\nнет", "0 100\n10\nнет", "20 31\n4999\nда"]
+random: {count: 40, gen: "f'{random.randint(0, 25)} {random.randint(0, 60)}\\n{random.randint(0, 8000)}\\n{random.choice([\"да\", \"нет\"])}'"}
+star3: [first_try]
+buggy_variants:
+  - code: "w, dist = map(int, input().split())\ntotal = int(input())\nsub = input()\nif w <= 1:\n    cost = 199\nelif w <= 5:\n    cost = 299\nelse:\n    cost = 299 + 40 * (w - 5)\nif dist >= 30:\n    cost += 100\nif total >= 5000:\n    cost = 0\nelif sub == 'да':\n    cost = cost // 2\nprint(cost)"
+  - code: "w, dist = map(int, input().split())\ntotal = int(input())\nsub = input()\ncost = 199\nif w <= 5:\n    cost = 299\nelse:\n    cost = 299 + 40 * (w - 5)\nif dist > 30:\n    cost += 100\nif total >= 5000:\n    cost = 0\nelif sub == 'да':\n    cost = cost // 2\nprint(cost)"
+hints:
+  - "Здесь всё из уровня: цепочка elif, условия с границами и порядок проверок. Перечитай «Цепочка elif» и «Вложенные условия»."
+  - "Считай по шагам, как в правилах: базовая цена по весу, потом надбавка за расстояние, потом бесплатная доставка или скидка подписчику. Храни текущую цену в одной переменной и меняй её."
+  - "Цепочка if / elif / else по весу, отдельный if для расстояния, if / elif для суммы и подписки, деление // 2."
+  - "w, dist = map(int, input().split())\ntotal = int(input())\nsub = input()\nif w <= 1:\n    cost = ___\nelif w <= 5:\n    cost = ___\nelse:\n    cost = 299 + 40 * (___)\nif dist ___ 30:\n    cost += 100\nif total >= 5000:\n    cost = ___\nelif sub == ___:\n    cost = cost // 2\nprint(cost)"
+  - "Для «8 45, 1200, да»: вес 8 > 5, база 299 + 40 * 3 = 419. Расстояние 45 > 30, получаем 519. Сумма меньше 5000, клиент подписчик — 519 // 2 = 259. Важны границы: ровно 1 кг — 199, ровно 30 км — без надбавки, ровно 5000 — бесплатно."

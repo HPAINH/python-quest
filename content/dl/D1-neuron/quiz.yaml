@@ -1,0 +1,97 @@
+quiz:
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      x = np.array([1.0, 2.0])
+      w = np.array([0.5, -1.0])
+      print(x @ w + 3)
+    answer: "1.5"
+    explain: 0.5 − 2 + 3.
+    section: neuron
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      z = np.array([-1.0, 0.0, 2.0])
+      print(np.maximum(0, z).tolist(), float(1 / (1 + np.exp(-0.0))))
+    answer: "[0.0, 0.0, 2.0] 0.5"
+    explain: ReLU обнуляет отрицательные значения, сигмоида нуля — 0.5.
+    section: activations
+  - type: choice
+    q: Зачем в нейросети нелинейные активации?
+    options: ["Для скорости", "Без них несколько слоёв сводятся к одному линейному преобразованию", "Чтобы веса были положительными", "Для нормировки"]
+    answer: 1
+    explain: Композиция линейных функций — линейная функция.
+    section: activations
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      X = np.zeros((5, 3))
+      W = np.zeros((3, 4))
+      b = np.zeros(4)
+      print((X @ W + b).shape)
+    answer: "(5, 4)"
+    explain: (n, входы) @ (входы, нейроны) → (n, нейроны).
+    section: layer
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      z = np.array([[1.0, 1.0], [0.0, 1000.0]])
+      e = np.exp(z - z.max(axis=1, keepdims=True))
+      print((e / e.sum(axis=1, keepdims=True)).round(2).tolist())
+    answer: "[[0.5, 0.5], [0.0, 1.0]]"
+    explain: Вычитание максимума спасает от переполнения exp(1000).
+    section: forward
+
+express:
+  - type: choice
+    q: Почему из входа softmax вычитают максимум?
+    options: ["Чтобы результат сложился в 1", "Чтобы exp не переполнялся; результат не меняется", "Чтобы получить отрицательные вероятности", "Так быстрее"]
+    answer: 1
+    explain: Сдвиг всех значений на константу не меняет softmax.
+    section: activations
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      w, b = np.zeros(2), 0.0
+      x, y = np.array([1.0, -2.0]), 0
+      pred = int(x @ w + b >= 0)
+      w += (y - pred) * x
+      b += (y - pred)
+      print(pred, w.tolist(), b)
+    answer: "1 [-1.0, 2.0] -1.0"
+    explain: При ошибке веса сдвигаются против x.
+    section: perceptron
+  - type: choice
+    q: Какая форма у W для слоя из 16 нейронов на входе с 10 признаками?
+    options: ["(16, 10)", "(10, 16)", "(10,)", "(16,)"]
+    answer: 1
+    explain: Строки W — входы, колонки — нейроны.
+    section: layer
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      P = np.array([[0.1, 0.7, 0.2], [0.5, 0.3, 0.2]])
+      print(P.argmax(axis=1).tolist(), P.sum(axis=1).tolist())
+    answer: "[1, 0] [1.0, 1.0]"
+    explain: Класс — индекс наибольшей вероятности в строке.
+    section: forward
+  - type: choice
+    q: Когда перцептрон гарантированно перестаёт ошибаться на обучающих данных?
+    options: ["Всегда", "Если классы можно разделить прямой (гиперплоскостью)", "Если данных больше 1000", "Никогда"]
+    answer: 1
+    explain: Иначе он будет менять веса бесконечно.
+    section: perceptron
+  - type: predict
+    q: Что выведет программа?
+    code: |
+      import numpy as np
+      print(np.tanh(0.0), round(float(np.tanh(100.0)), 3))
+    answer: "0.0 1.0"
+    explain: tanh сжимает в (−1, 1).
+    section: activations
